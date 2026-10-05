@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Tomography (Package)": {
+      "commandName": "MsixPackage"
+    }
+  }
+}

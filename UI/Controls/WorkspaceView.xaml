@@ -1,0 +1,83 @@
+<UserControl x:Class="Tomography.UI.Controls.WorkspaceView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Tomography.UI.Controls" FontSize="12" FontFamily="Microsoft YaHei UI" RequestedTheme="Dark">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Background" Value="{ThemeResource ParameterBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource WorkspaceStrokeBrush}" />
+        </Style>
+        <Style TargetType="ToggleButton">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="Padding" Value="8,3" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+    </UserControl.Resources>
+    <Grid x:Name="ModuleGrid">
+        <Grid.ColumnDefinitions><ColumnDefinition x:Name="LeftModules" Width="67*" /><ColumnDefinition Width="2" /><ColumnDefinition x:Name="RightModules" Width="33*" /></Grid.ColumnDefinitions>
+        <Grid.RowDefinitions><RowDefinition x:Name="TopModules" Height="68*" /><RowDefinition Height="2" /><RowDefinition x:Name="BottomModules" Height="32*" /></Grid.RowDefinitions>
+        <Border x:Name="WaveformModule" Style="{StaticResource WorkspaceCardStyle}" CornerRadius="12">
+            <Grid RowSpacing="8">
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                <Grid>
+                    <TextBlock Style="{StaticResource WorkspaceHeadingStyle}" VerticalAlignment="Center" ><Run Text="∿" FontSize="18" /><Run Text="  测量波形" /></TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
+                        <Button Content="▷" IsEnabled="False" AutomationProperties.Name="开始显示" />
+                        <Button Content="暂停显示" IsEnabled="False" />
+                        <Button Content="复位" IsEnabled="False" />
+                    </StackPanel>
+                </Grid>
+                <StackPanel x:Name="WaveformModes" Grid.Row="1" Orientation="Horizontal" Spacing="2">
+                    <ToggleButton Content="全场波形图" Click="WaveformModeClicked" />
+                    <ToggleButton Content="物场波形图" IsChecked="True" Click="WaveformModeClicked" />
+                    <ToggleButton Content="叠加波形图" Click="WaveformModeClicked" />
+                </StackPanel>
+                <local:WaveformPreview x:Name="ChannelWaveform" Grid.Row="2" />
+            </Grid>
+        </Border>
+        <Border x:Name="DataModule" Grid.Row="2" Style="{StaticResource WorkspaceCardStyle}" CornerRadius="12">
+            <Grid RowSpacing="8">
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                <TextBlock Style="{StaticResource WorkspaceHeadingStyle}" ><Run Text="∿" FontSize="18" /><Run Text="  通道幅值" /></TextBlock>
+                <Border Grid.Row="1" BorderBrush="{ThemeResource WorkspaceStrokeBrush}" BorderThickness="1" CornerRadius="3">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="28" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                        <Grid ColumnSpacing="4" Background="{ThemeResource ParameterBackgroundBrush}">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="1" HorizontalAlignment="Center" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="2" HorizontalAlignment="Center" VerticalAlignment="Center" /><TextBlock Grid.Column="2" Text="3" HorizontalAlignment="Center" VerticalAlignment="Center" /><TextBlock Grid.Column="3" Text="4" HorizontalAlignment="Center" VerticalAlignment="Center" /><TextBlock Grid.Column="4" Text="5" HorizontalAlignment="Center" VerticalAlignment="Center" /><TextBlock Grid.Column="5" Text="6" HorizontalAlignment="Center" VerticalAlignment="Center" /><TextBlock Grid.Column="6" Text="7" HorizontalAlignment="Center" VerticalAlignment="Center" /><TextBlock Grid.Column="7" Text="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Grid>
+                        <ListView Grid.Row="1" AutomationProperties.AutomationId="ChannelAmplitudes" AutomationProperties.Name="通道幅值" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+        <Border x:Name="ReconstructionModule" Grid.Column="2" Style="{StaticResource WorkspaceCardStyle}" CornerRadius="12">
+            <Grid RowSpacing="8">
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                <Grid ColumnSpacing="6">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource WorkspaceHeadingStyle}" VerticalAlignment="Center" ><Run Text="▱" FontSize="18" /><Run Text="  二维重建图像" /></TextBlock>
+                    <ComboBox Grid.Column="1" SelectedIndex="0" MinWidth="72" MinHeight="28" FontSize="12" Padding="8,3" HorizontalAlignment="Left" AutomationProperties.Name="重建帧率">
+                        <x:String>5 FPS</x:String><x:String>10 FPS</x:String><x:String>20 FPS</x:String>
+                    </ComboBox>
+                    <Button Grid.Column="2" Content="重建" Click="ReconstructionClicked" AutomationProperties.AutomationId="ReconstructImage" />
+                </Grid>
+                <local:ReconstructionView x:Name="ReconstructionImage" Grid.Row="1" />
+            </Grid>
+        </Border>
+        <Border x:Name="CameraModule" Grid.Row="2" Grid.Column="2" Style="{StaticResource WorkspaceCardStyle}" CornerRadius="12">
+            <Grid>
+                <TextBlock Style="{StaticResource WorkspaceHeadingStyle}" ><Run Text="▣" FontSize="18" /><Run Text="  相机预览" /></TextBlock>
+                <TextBlock Text="未连接相机" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </Grid>
+        </Border>
+        <Thumb x:Name="ColumnDivider" Grid.Column="1" Grid.RowSpan="3" Background="Transparent" DragDelta="ColumnDragDelta" AutomationProperties.Name="调整工作台列宽" />
+        <Thumb x:Name="RowDivider" Grid.Row="1" Grid.ColumnSpan="3" Background="Transparent" DragDelta="RowDragDelta" AutomationProperties.Name="调整工作台行高" />
+    </Grid>
+</UserControl>

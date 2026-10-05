@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Tomography.Business</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="pythonnet" Version="3.2.0" />
+    <ProjectReference Include="..\Data\Data.csproj" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Python\**\*.py" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
