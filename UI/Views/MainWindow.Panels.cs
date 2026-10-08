@@ -13,8 +13,7 @@ public sealed partial class MainWindow
         {
             case TitleBarAction.ToggleTools: Toggle(ToolsPanel); break;
             case TitleBarAction.ToggleBottom:
-                Toggle(CommandPanel);
-                CommandRow.Height = new GridLength(CommandPanel.Visibility == Visibility.Visible ? 220 : 0);
+                ToggleBottomPanel(this, new RoutedEventArgs());
                 break;
             case TitleBarAction.ToggleProject:
                 Toggle(ProjectPanel);
@@ -34,6 +33,30 @@ public sealed partial class MainWindow
             case TitleBarAction.ZoomIn: SetZoom(_zoom + 0.1); break;
             case TitleBarAction.ZoomOut: SetZoom(_zoom - 0.1); break;
             case TitleBarAction.ZoomReset: SetZoom(1); break;
+        }
+    }
+
+    private void BottomTabChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
+    {
+        if (BottomPanel is not null) ShowBottomPanel(sender.SelectedItem == AITab);
+    }
+
+    private void ShowBottomPanel(bool ai)
+    {
+        BottomTabs.SelectedItem = ai ? AITab : CommandTab;
+        CommandPanel.Visibility = ai ? Visibility.Collapsed : Visibility.Visible;
+        ChatPanel.Visibility = ai ? Visibility.Visible : Visibility.Collapsed;
+        BottomPanel.Visibility = Visibility.Visible;
+        CommandRow.Height = new GridLength(220);
+    }
+
+    private void ToggleBottomPanel(object sender, RoutedEventArgs e)
+    {
+        if (BottomPanel.Visibility == Visibility.Collapsed) ShowBottomPanel(BottomTabs.SelectedItem == AITab);
+        else
+        {
+            BottomPanel.Visibility = Visibility.Collapsed;
+            CommandRow.Height = new GridLength(0);
         }
     }
 

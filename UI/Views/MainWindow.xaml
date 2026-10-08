@@ -37,8 +37,6 @@
                     AutomationProperties.AutomationId="NavAlgorithm"><ToolTipService.ToolTip><ToolTip Content="算法" Placement="Right" CornerRadius="16" Padding="12,7" /></ToolTipService.ToolTip></NavigationViewItem>
                 <NavigationViewItem Content="插件" Tag="插件" Icon="Library" CornerRadius="12" Margin="0,0,0,4"
                     AutomationProperties.AutomationId="NavPlugins"><ToolTipService.ToolTip><ToolTip Content="插件" Placement="Right" CornerRadius="16" Padding="12,7" /></ToolTipService.ToolTip></NavigationViewItem>
-                <NavigationViewItem Content="AI" Tag="AI" Icon="Highlight" CornerRadius="12"
-                    AutomationProperties.AutomationId="NavAI"><ToolTipService.ToolTip><ToolTip Content="AI" Placement="Right" CornerRadius="16" Padding="12,7" /></ToolTipService.ToolTip></NavigationViewItem>
             </NavigationView.MenuItems>
             <Grid x:Name="ContentGrid" Margin="6,2,0,0">
                 <Grid.ColumnDefinitions>
@@ -71,7 +69,10 @@
                     <ScrollViewer x:Name="WorkspaceScroll" ZoomMode="Enabled" MinZoomFactor="0.5" MaxZoomFactor="2" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
                         <Grid><controls:WorkspaceView x:Name="Workspace" /></Grid>
                     </ScrollViewer>
-                    <controls:CommandPanelView x:Name="CommandPanel" Grid.Row="2" Visibility="Collapsed" />
+                    <Grid x:Name="BottomPanel" Grid.Row="2" Visibility="Collapsed">
+                        <controls:CommandPanelView x:Name="CommandPanel" />
+                        <controls:ChatPanelView x:Name="ChatPanel" Visibility="Collapsed" />
+                    </Grid>
                 </Grid>
                 <controls:ProjectNavigationView x:Name="ProjectPanel" Grid.Column="3" Visibility="Collapsed" Margin="4,0,0,0" />
             </Grid>
@@ -82,11 +83,16 @@
             <PersonPicture Width="36" Height="36" DisplayName="{x:Bind ViewModel.AccountName, Mode=OneWay}"
                 ProfilePicture="{x:Bind local:MainWindow.AvatarSource(ViewModel.AvatarUri), Mode=OneWay}" />
         </Button>
-        <controls:ChatPanelView x:Name="ChatPanel" Grid.Row="1" Width="320" Height="340" Margin="0,0,12,12"
-            HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="Collapsed" />
         <Grid Grid.Row="2" Margin="48,0,16,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
             <TextBlock x:Name="ConnectionStatus" Text="●  设备未连接" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <TextBlock Text="就绪" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <SelectorBar x:Name="BottomTabs" Grid.Column="1" VerticalAlignment="Center" SelectionChanged="BottomTabChanged" AutomationProperties.Name="底部面板切换">
+                <SelectorBarItem x:Name="CommandTab" Text="命令" AutomationProperties.AutomationId="BottomCommandTab" />
+                <SelectorBarItem x:Name="AITab" Text="AI" AutomationProperties.AutomationId="BottomAITab" />
+            </SelectorBar>
+            <Button Grid.Column="2" Content="&#xE70D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0"
+                VerticalAlignment="Center" Click="ToggleBottomPanel" AutomationProperties.Name="展开或收起底部面板" AutomationProperties.AutomationId="ToggleBottomPanel" ToolTipService.ToolTip="展开 / 收起底部面板" />
+            <TextBlock Grid.Column="3" Text="就绪" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
         </Grid>
     </Grid>
 </Window>

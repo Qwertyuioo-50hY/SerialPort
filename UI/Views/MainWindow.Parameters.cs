@@ -26,15 +26,12 @@ public sealed partial class MainWindow
             AutomationProperties.SetAutomationId(button, id);
             ParameterBody.Children.Add(button);
         }
-        TextBox TextField(string label, string id, bool multiline = false)
+        TextBox TextField(string label, string id)
         {
             var field = new TextBox
             {
                 Header = label,
-                PlaceholderText = multiline ? "输入问题…" : label,
-                AcceptsReturn = multiline,
-                TextWrapping = multiline ? TextWrapping.Wrap : TextWrapping.NoWrap,
-                MinHeight = multiline ? 130 : 32
+                PlaceholderText = label
             };
             AutomationProperties.SetAutomationId(field, id);
             ParameterBody.Children.Add(field);
@@ -55,12 +52,6 @@ public sealed partial class MainWindow
                 break;
             case "算法":
                 AddReconstructionSettings(ParameterBody);
-                break;
-            case "AI":
-                Caption("AI 辅助分析");
-                ParameterBody.Children.Add(new TextBlock { Text = "分析采集数据与重建图像", TextWrapping = TextWrapping.Wrap });
-                TextField("问题", "AIQuestion", true);
-                DisabledButton("发送", "SendAIQuestion");
                 break;
             case "登录":
                 Caption("账户登录");
