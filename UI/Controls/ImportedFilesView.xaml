@@ -1,0 +1,11 @@
+<UserControl x:Class="Tomography.UI.Controls.ImportedFilesView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border Style="{StaticResource WorkspaceCardStyle}">
+        <Grid RowSpacing="8">
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+            <TextBlock Text="项目文件（选择后可导出）" FontSize="14" FontWeight="SemiBold" />
+            <ListView x:Name="Files" Grid.Row="1" AutomationProperties.Name="已导入文件" AutomationProperties.AutomationId="ImportedFiles" />
+            <TextBlock x:Name="EmptyMessage" Grid.Row="1" Text="尚未导入文件" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,98 @@
+<Window x:Class="Tomography.UI.Views.AppWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Tomography.UI.Views"
+    xmlns:title="using:Tomography.TitleBar"
+    xmlns:controls="using:Tomography.UI.Controls" Title="Tomography">
+    <Grid x:Name="Root" Background="Transparent" RequestedTheme="Dark" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="42" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="42" />
+        </Grid.RowDefinitions>
+        <title:WindowTitleBarView x:Name="AppTitleBar" />
+        <Image Width="24" Height="24" Margin="9,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+            Source="ms-appx:///Assets/BrandLogo.png" IsHitTestVisible="False" AutomationProperties.Name="Tomography LOGO" />
+        <NavigationView x:Name="Navigation" Grid.Row="1" PaneDisplayMode="LeftCompact"
+            IsPaneOpen="False" IsPaneToggleButtonVisible="False" IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False" CompactPaneLength="42" IsTitleBarAutoPaddingEnabled="False" Background="Transparent"
+            ItemInvoked="NavigationItemInvoked"
+            AutomationProperties.AutomationId="Navigation">
+            <NavigationView.Resources>
+                <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
+                <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="Transparent" />
+                <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="Transparent" />
+                <Thickness x:Key="NavigationViewContentGridBorderThickness">0</Thickness>
+                <Thickness x:Key="NavigationViewItemButtonMargin">4,4</Thickness>
+                <x:Double x:Key="NavigationViewSelectionIndicatorWidth">0</x:Double>
+                <Thickness x:Key="NavigationViewItemOnLeftIconBoxMargin">4,0,0,0</Thickness>
+            </NavigationView.Resources>
+            <NavigationView.MenuItems>
+                <NavigationViewItem Tag="Connect" Content="连接设备" SelectsOnInvoked="False" Margin="0,0,0,4" CornerRadius="12" ToolTipService.ToolTip="连接 / 断开设备" AutomationProperties.AutomationId="ConnectDevice">
+                    <NavigationViewItem.Icon><IconSourceElement><IconSourceElement.IconSource><FontIconSource x:Name="ConnectionIcon" Glyph="&#xECCA;" FontSize="20" /></IconSourceElement.IconSource></IconSourceElement></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="DeviceNavigation" Content="接口/协议" Tag="接口/协议" Icon="Link" CornerRadius="12" Margin="0,0,0,4"
+                    AutomationProperties.AutomationId="NavDevice"><ToolTipService.ToolTip><ToolTip Content="接口/协议" Placement="Right" CornerRadius="16" Padding="12,7" /></ToolTipService.ToolTip></NavigationViewItem>
+                <NavigationViewItem Content="算法" Tag="算法" Icon="Repair" CornerRadius="12" Margin="0,0,0,4"
+                    AutomationProperties.AutomationId="NavAlgorithm"><ToolTipService.ToolTip><ToolTip Content="算法" Placement="Right" CornerRadius="16" Padding="12,7" /></ToolTipService.ToolTip></NavigationViewItem>
+                <NavigationViewItem Content="插件" Tag="插件" Icon="Library" CornerRadius="12" Margin="0,0,0,4"
+                    AutomationProperties.AutomationId="NavPlugins"><ToolTipService.ToolTip><ToolTip Content="插件" Placement="Right" CornerRadius="16" Padding="12,7" /></ToolTipService.ToolTip></NavigationViewItem>
+            </NavigationView.MenuItems>
+            <Grid x:Name="ContentGrid" Margin="6,2,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="ParameterColumn" Width="286" />
+                    <ColumnDefinition x:Name="DividerColumn" Width="2" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition x:Name="ProjectColumn" Width="0" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="ParameterPanel" Style="{StaticResource WorkspaceCardStyle}" Background="{ThemeResource ParameterBackgroundBrush}"
+                    Visibility="{x:Bind local:AppWindow.BoolToVisibility(ViewModel.ParametersVisible), Mode=OneWay}">
+                    <Grid RowSpacing="8">
+                        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                        <TextBlock Text="{x:Bind ViewModel.Section, Mode=OneWay}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="ParameterBody" Spacing="8" />
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+                <Thumb x:Name="ParameterDivider" Grid.Column="1"
+                    Width="2" HorizontalAlignment="Stretch" IsTabStop="True" Background="Transparent"
+                    Visibility="{x:Bind local:AppWindow.BoolToVisibility(ViewModel.ParametersVisible), Mode=OneWay}"
+                    DragDelta="ParameterDragDelta" KeyDown="ParameterDividerKeyDown"
+                    AutomationProperties.AutomationId="ParameterDivider"
+                    AutomationProperties.Name="调整参数面板宽度" ToolTipService.ToolTip="拖动或按左右方向键调整宽度" />
+                <Grid Grid.Column="2" RowSpacing="4">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition x:Name="CommandRow" Height="0" /></Grid.RowDefinitions>
+                    <StackPanel x:Name="ToolsPanel" Visibility="Collapsed" Orientation="Horizontal" Spacing="6">
+                        <Button Content="连接" IsEnabled="False" /><Button Content="开始采集" IsEnabled="False" /><Button Content="停止采集" IsEnabled="False" />
+                    </StackPanel>
+                    <ScrollViewer x:Name="WorkspaceScroll" ZoomMode="Enabled" MinZoomFactor="0.5" MaxZoomFactor="2" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
+                        <Grid><controls:ImagingWorkspaceView x:Name="Workspace" /></Grid>
+                    </ScrollViewer>
+                    <Grid x:Name="BottomPanel" Grid.Row="2" Visibility="Collapsed">
+                        <controls:SerialConsoleView x:Name="CommandPanel" />
+                        <controls:AiChatPanelView x:Name="ChatPanel" Visibility="Collapsed" />
+                    </Grid>
+                </Grid>
+                <controls:ImportedFilesView x:Name="ProjectPanel" Grid.Column="3" Visibility="Collapsed" Margin="4,0,0,0" />
+            </Grid>
+        </NavigationView>
+        <Button x:Name="AccountButton" Grid.Row="1" Width="36" Height="36" Margin="3,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+            Padding="0" CornerRadius="18" Background="Transparent" BorderThickness="0" Click="AccountClicked"
+            AutomationProperties.AutomationId="NavLogin" AutomationProperties.Name="账户登录" ToolTipService.ToolTip="账户登录">
+            <PersonPicture Width="36" Height="36" DisplayName="{x:Bind ViewModel.AccountName, Mode=OneWay}"
+                ProfilePicture="{x:Bind local:AppWindow.AvatarSource(ViewModel.AvatarUri), Mode=OneWay}" />
+        </Button>
+        <Grid Grid.Row="2" Margin="48,0,16,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+            <TextBlock x:Name="ConnectionStatus" Text="●  设备未连接" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <SelectorBar x:Name="BottomTabs" Grid.Column="1" VerticalAlignment="Center" SelectionChanged="BottomTabChanged" AutomationProperties.Name="底部面板切换">
+                <SelectorBarItem x:Name="CommandTab" Text="命令" AutomationProperties.AutomationId="BottomCommandTab" />
+                <SelectorBarItem x:Name="AITab" Text="AI" AutomationProperties.AutomationId="BottomAITab" />
+            </SelectorBar>
+            <Button Grid.Column="2" Content="&#xE70D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0"
+                VerticalAlignment="Center" Click="ToggleBottomPanel" AutomationProperties.Name="展开或收起底部面板" AutomationProperties.AutomationId="ToggleBottomPanel" ToolTipService.ToolTip="展开 / 收起底部面板" />
+            <TextBlock Grid.Column="3" Text="就绪" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Grid>
+    </Grid>
+</Window>
