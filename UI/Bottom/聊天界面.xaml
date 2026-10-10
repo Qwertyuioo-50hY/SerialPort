@@ -1,4 +1,4 @@
-<UserControl x:Class="Tomography.UI.Controls.AiChatPanelView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<UserControl x:Class="Tomography.UI.Bottom.AiChatPanelView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Border Style="{StaticResource WorkspaceCardStyle}" CornerRadius="12">
         <Grid RowSpacing="8">
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>

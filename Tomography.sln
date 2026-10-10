@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business", "Business\Busine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{62D2342D-06BB-44DB-B130-3117B4382444}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TitleBar", "TitleBar\TitleBar.csproj", "{2A38D7A5-69B9-4B61-A70B-970AF2801CD4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -43,14 +41,6 @@ Global
 		{62D2342D-06BB-44DB-B130-3117B4382444}.Release|x64.Build.0 = Release|x64
 		{62D2342D-06BB-44DB-B130-3117B4382444}.Release|ARM64.ActiveCfg = Release|ARM64
 		{62D2342D-06BB-44DB-B130-3117B4382444}.Release|ARM64.Build.0 = Release|ARM64
-		{2A38D7A5-69B9-4B61-A70B-970AF2801CD4}.Debug|x64.ActiveCfg = Debug|x64
-		{2A38D7A5-69B9-4B61-A70B-970AF2801CD4}.Debug|x64.Build.0 = Debug|x64
-		{2A38D7A5-69B9-4B61-A70B-970AF2801CD4}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{2A38D7A5-69B9-4B61-A70B-970AF2801CD4}.Debug|ARM64.Build.0 = Debug|ARM64
-		{2A38D7A5-69B9-4B61-A70B-970AF2801CD4}.Release|x64.ActiveCfg = Release|x64
-		{2A38D7A5-69B9-4B61-A70B-970AF2801CD4}.Release|x64.Build.0 = Release|x64
-		{2A38D7A5-69B9-4B61-A70B-970AF2801CD4}.Release|ARM64.ActiveCfg = Release|ARM64
-		{2A38D7A5-69B9-4B61-A70B-970AF2801CD4}.Release|ARM64.Build.0 = Release|ARM64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

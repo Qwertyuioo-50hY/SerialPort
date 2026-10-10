@@ -1,6 +1,6 @@
 using Microsoft.Windows.Storage.Pickers;
 
-namespace Tomography.UI.Views;
+namespace Tomography.UI.windows;
 
 public sealed partial class AppWindow
 {

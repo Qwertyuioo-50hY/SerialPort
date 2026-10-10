@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 
-namespace Tomography.UI.Controls;
+namespace Tomography.UI.workspace;
 
 public sealed partial class ImagingWorkspaceView : UserControl
 {

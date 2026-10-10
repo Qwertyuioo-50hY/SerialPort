@@ -1,4 +1,4 @@
-namespace Tomography.UI.Views;
+namespace Tomography.UI.windows;
 
 public sealed partial class AppWindow
 {

@@ -8,12 +8,12 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Tomography.TitleBar;
-using Tomography.UI.ViewModels;
+using Tomography.UI.TittleBar;
+using Tomography.UI.windows;
 using Windows.Graphics;
 using Windows.System;
 
-namespace Tomography.UI.Views;
+namespace Tomography.UI.windows;
 
 public sealed partial class AppWindow : Window
 {
@@ -82,20 +82,6 @@ public sealed partial class AppWindow : Window
         UpdatePresentation();
     }
 
-    private void NavigationSelectionUpdated(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
-    {
-        if (!ViewModel.ParametersVisible && sender.SelectedItem != null) sender.SelectedItem = null;
-    }
-
-    private void NavigationItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
-    {
-        if (args.InvokedItemContainer is NavigationViewItem item && item.Tag is string section)
-        {
-            if (section == "Connect") ToggleDeviceConnection();
-            else ViewModel.SelectSection(section);
-        }
-    }
-
     private void UpdatePresentation()
     {
         AppTitleBar.ParametersVisible = ViewModel.ParametersVisible;
@@ -106,61 +92,6 @@ public sealed partial class AppWindow : Window
         ParameterColumn.Width = new GridLength(ViewModel.ParametersVisible ? _parameterWidth : 0);
         DividerColumn.Width = new GridLength(ViewModel.ParametersVisible ? 2 : 0);
         AppTitleBar.SetModeRightEdge((Navigation.PaneDisplayMode == NavigationViewPaneDisplayMode.LeftMinimal ? 0 : 42) + 6 + _parameterWidth);
-    }
-
-    private void ParameterDragDelta(object sender, DragDeltaEventArgs e)
-    {
-        _parameterWidth += e.HorizontalChange;
-        UpdatePresentation();
-    }
-
-    private void ParameterDividerKeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (e.Key != VirtualKey.Left && e.Key != VirtualKey.Right) return;
-        _parameterWidth += e.Key == VirtualKey.Right ? 16 : -16;
-        UpdatePresentation();
-        e.Handled = true;
-    }
-
-    private async void TitleBarActionRequested(object? sender, TitleBarAction action)
-    {
-        switch (action)
-        {
-            case TitleBarAction.ToggleParameters: ViewModel.ParametersVisible = !ViewModel.ParametersVisible; break;
-            case TitleBarAction.ConnectDevice: ToggleDeviceConnection(); break;
-            case TitleBarAction.ImportAlgorithm: await ImportFileAsync("自定义算法"); break;
-            case TitleBarAction.ImportData: await ImportFileAsync("数据"); break;
-            case TitleBarAction.ImportSensitivity: await ImportFileAsync("灵敏度矩阵"); break;
-            case TitleBarAction.ToggleRealtimeReconstruction: SetRealtimeReconstruction(!_realtimeEnabled); break;
-            case TitleBarAction.CheckPythonSyntax: CheckPythonSyntaxAsync(); break;
-            case TitleBarAction.RunReconstruction: ReconstructAsync(); break;
-            case TitleBarAction.ExportFile: await ExportFileAsync(); break;
-            case TitleBarAction.ExportAcquisitionCsv: await ExportAcquisitionAsync(false); break;
-            case TitleBarAction.ExportAcquisitionMat: await ExportAcquisitionAsync(true); break;
-            case TitleBarAction.ExportMatrix: await ExportReconstructionAsync(false); break;
-            case TitleBarAction.ExportImage: await ExportReconstructionAsync(true); break;
-            case TitleBarAction.OpenChat: ShowBottomPanel(true); break;
-            case TitleBarAction.OpenConsole: ShowBottomPanel(false); break;
-            case TitleBarAction.AddCommand: await AddCustomCommandAsync(); break;
-            case TitleBarAction.ConfigureApi: await ConfigureAsync("自定义API"); break;
-            case TitleBarAction.ConfigureAlgorithm:
-                ViewModel.Section = "算法";
-                ViewModel.ParametersVisible = true;
-                break;
-            case TitleBarAction.ConfigureWaveform: await ConfigureAsync("波形图像"); break;
-            default: HandleViewAction(action); break;
-            case TitleBarAction.Help:
-                var dialog = new ContentDialog
-                {
-                    XamlRoot = Root.XamlRoot,
-                    RequestedTheme = Root.ActualTheme,
-                    Title = "快捷键",
-                    Content = "Ctrl+M：显示 / 隐藏顶部菜单\nAlt+F / V / I / C / H：文件 / 视图 / 指令 / 自定义 / 帮助\nCtrl+B：显示 / 隐藏参数面板\n拖动面板右侧边缘或按左右方向键：调整宽度\nAlt：显示顶部菜单访问键",
-                    CloseButtonText = "关闭"
-                };
-                await dialog.ShowAsync();
-                break;
-        }
     }
 
     private void TitleBarBoundsChanged(object? sender, EventArgs e) => UpdateTitleBar();

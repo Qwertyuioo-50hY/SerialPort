@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Tomography.Business.Models;
 
-namespace Tomography.UI.Controls;
+namespace Tomography.UI.Navigation;
 
 public sealed partial class ImportedFilesView : UserControl
 {

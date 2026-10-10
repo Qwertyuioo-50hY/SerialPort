@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Tomography.UI.ViewModels
+namespace Tomography.UI.windows
 {
     /// <summary>界面设计阶段只保存展示状态，不调用设备、文件或算法服务。</summary>
     public sealed class WindowStateViewModel : INotifyPropertyChanged

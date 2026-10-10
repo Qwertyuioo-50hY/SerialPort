@@ -1,7 +1,6 @@
 using Microsoft.UI.Xaml;
-using Tomography.UI.Views;
 
-namespace Tomography.UI;
+namespace Tomography.UI.windows;
 
 public partial class App : Application
 {

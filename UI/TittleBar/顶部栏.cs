@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Windows.Graphics;
 
-namespace Tomography.TitleBar;
+namespace Tomography.UI.TittleBar;
 
 
 public sealed partial class WindowTitleBarView : UserControl

@@ -1,8 +1,11 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
+using Windows.System;
 
-namespace Tomography.UI.Views;
+namespace Tomography.UI.windows;
 
 public sealed partial class AppWindow
 {
@@ -41,7 +44,7 @@ public sealed partial class AppWindow
         switch (ViewModel.Section)
         {
             case "接口/协议":
-                _protocolSettings ??= new Tomography.UI.Controls.ConnectionProtocolView();
+                _protocolSettings ??= new Tomography.UI.SideView.ConnectionProtocolView();
                 _protocolSettings.SetPorts(_serialConnection.GetPortNames());
                 ParameterBody.Children.Add(_protocolSettings);
                 break;
@@ -62,4 +65,32 @@ public sealed partial class AppWindow
                 break;
         }
     }
+    private void NavigationSelectionUpdated(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        if (!ViewModel.ParametersVisible && sender.SelectedItem != null) sender.SelectedItem = null;
+    }
+
+    private void NavigationItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    {
+        if (args.InvokedItemContainer is NavigationViewItem item && item.Tag is string section)
+        {
+            if (section == "Connect") ToggleDeviceConnection();
+            else ViewModel.SelectSection(section);
+        }
+    }
+
+    private void ParameterDragDelta(object sender, DragDeltaEventArgs e)
+    {
+        _parameterWidth += e.HorizontalChange;
+        UpdatePresentation();
+    }
+
+    private void ParameterDividerKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Left && e.Key != VirtualKey.Right) return;
+        _parameterWidth += e.Key == VirtualKey.Right ? 16 : -16;
+        UpdatePresentation();
+        e.Handled = true;
+    }
+
 }

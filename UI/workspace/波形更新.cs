@@ -1,4 +1,4 @@
-namespace Tomography.UI.Controls;
+namespace Tomography.UI.workspace;
 
 public sealed partial class ImagingWorkspaceView
 {

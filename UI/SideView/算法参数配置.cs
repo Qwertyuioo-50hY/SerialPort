@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Tomography.Business.Services;
 
-namespace Tomography.UI.Controls;
+namespace Tomography.UI.SideView;
 
 /// <summary>算法参数和用户操作，计算由 Business 完成。</summary>
 public sealed class AlgorithmParametersView : UserControl

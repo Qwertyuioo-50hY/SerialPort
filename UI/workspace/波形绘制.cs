@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Windows.Foundation;
 
-namespace Tomography.UI.Controls;
+namespace Tomography.UI.workspace;
 
 /// <summary>显示最新一帧 64 通道值，按数据范围绘制折线。</summary>
 public sealed partial class ChannelWaveformView : UserControl

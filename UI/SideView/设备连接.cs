@@ -1,7 +1,7 @@
 using Tomography.Business.Services;
-using Tomography.UI.Controls;
+using Tomography.UI.SideView;
 
-namespace Tomography.UI.Views;
+namespace Tomography.UI.windows;
 
 public sealed partial class AppWindow
 {

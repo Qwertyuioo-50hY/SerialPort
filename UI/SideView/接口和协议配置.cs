@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Tomography.UI.Controls;
+namespace Tomography.UI.SideView;
 
 public sealed partial class ConnectionProtocolView : UserControl
 {

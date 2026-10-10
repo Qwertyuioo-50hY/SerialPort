@@ -1,4 +1,4 @@
-namespace Tomography.UI.Views;
+namespace Tomography.UI.windows;
 
 public sealed partial class AppWindow
 {
@@ -6,7 +6,7 @@ public sealed partial class AppWindow
     {
         if (_reconstructing) return;
         if (_reconstruction.CustomAlgorithmPath is null) { ConnectionStatus.Text = "请先导入自定义 Python 算法"; return; }
-        _reconstructionSettings ??= new Tomography.UI.Controls.AlgorithmParametersView();
+        _reconstructionSettings ??= new Tomography.UI.SideView.AlgorithmParametersView();
         _reconstructing = true;
         _reconstructionSettings.SetBusy(true);
         try

@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="Tomography.TitleBar.WindowTitleBarView"
+    x:Class="Tomography.UI.TittleBar.WindowTitleBarView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Height="42" FontSize="12">

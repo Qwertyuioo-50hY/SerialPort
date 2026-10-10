@@ -6,7 +6,7 @@ using Tomography.Business.Interfaces;
 using Tomography.Business.Models;
 using Tomography.Business.Services;
 
-namespace Tomography.UI.Controls;
+namespace Tomography.UI.workspace;
 
 public sealed partial class ReconstructionImageView : UserControl, IReconstructionImageSink
 {
