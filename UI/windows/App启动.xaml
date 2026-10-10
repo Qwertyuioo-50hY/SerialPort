@@ -8,16 +8,31 @@
             </ResourceDictionary.MergedDictionaries>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#181818" />
-                    <SolidColorBrush x:Key="ParameterBackgroundBrush" Color="#161616" />
-                    <SolidColorBrush x:Key="WorkspaceStrokeBrush" Color="#333333" />
+                    <SolidColorBrush x:Key="ShellBackgroundBrush" Color="#101010" />
+                    <SolidColorBrush x:Key="RailForegroundBrush" Color="#858585" />
+                    <SolidColorBrush x:Key="RailSelectedBackgroundBrush" Color="#252525" />
+                    <SolidColorBrush x:Key="RailAccentBrush" Color="#18B568" />
+                    <SolidColorBrush x:Key="LogoPlateBrush" Color="#F1F0ED" />
+                    <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#1D1D1D" />
+                    <SolidColorBrush x:Key="ParameterBackgroundBrush" Color="#1D1D1D" />
+                    <SolidColorBrush x:Key="WorkspaceStrokeBrush" Color="#2B2B2B" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#181818" />
-                    <SolidColorBrush x:Key="ParameterBackgroundBrush" Color="#161616" />
-                    <SolidColorBrush x:Key="WorkspaceStrokeBrush" Color="#333333" />
+                    <SolidColorBrush x:Key="ShellBackgroundBrush" Color="#101010" />
+                    <SolidColorBrush x:Key="RailForegroundBrush" Color="#858585" />
+                    <SolidColorBrush x:Key="RailSelectedBackgroundBrush" Color="#252525" />
+                    <SolidColorBrush x:Key="RailAccentBrush" Color="#18B568" />
+                    <SolidColorBrush x:Key="LogoPlateBrush" Color="#F1F0ED" />
+                    <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#1D1D1D" />
+                    <SolidColorBrush x:Key="ParameterBackgroundBrush" Color="#1D1D1D" />
+                    <SolidColorBrush x:Key="WorkspaceStrokeBrush" Color="#2B2B2B" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush x:Key="ShellBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+                    <SolidColorBrush x:Key="RailForegroundBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+                    <SolidColorBrush x:Key="RailSelectedBackgroundBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+                    <SolidColorBrush x:Key="RailAccentBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+                    <SolidColorBrush x:Key="LogoPlateBrush" Color="{ThemeResource SystemColorWindowColor}" />
                     <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
                     <SolidColorBrush x:Key="ParameterBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
                     <SolidColorBrush x:Key="WorkspaceStrokeBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
@@ -36,9 +51,9 @@
             <Style x:Key="WorkspaceCardStyle" TargetType="Border">
                 <Setter Property="Background" Value="{ThemeResource WorkspaceBackgroundBrush}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource WorkspaceStrokeBrush}" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="CornerRadius" Value="4" />
-                <Setter Property="Padding" Value="8" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="CornerRadius" Value="24" />
+                <Setter Property="Padding" Value="20" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

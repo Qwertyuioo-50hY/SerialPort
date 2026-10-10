@@ -34,7 +34,7 @@ public sealed partial class ImagingWorkspaceView : UserControl
 
     private void ColumnDragDelta(object sender, DragDeltaEventArgs e)
     {
-        var width = ModuleGrid.ActualWidth - 2;
+        var width = ModuleGrid.ActualWidth - 8;
         if (width < 400) return;
         var left = Math.Clamp(LeftModules.ActualWidth + e.HorizontalChange, 200, width - 200);
         LeftModules.Width = new GridLength(left, GridUnitType.Star);
@@ -43,7 +43,7 @@ public sealed partial class ImagingWorkspaceView : UserControl
 
     private void RowDragDelta(object sender, DragDeltaEventArgs e)
     {
-        var height = ModuleGrid.ActualHeight - 2;
+        var height = ModuleGrid.ActualHeight - 8;
         if (height < 240) return;
         var top = Math.Clamp(TopModules.ActualHeight + e.VerticalChange, 120, height - 120);
         TopModules.Height = new GridLength(top, GridUnitType.Star);

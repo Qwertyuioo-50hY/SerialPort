@@ -12,18 +12,12 @@ public sealed partial class AppWindow
         switch (action)
         {
             case TitleBarAction.ToggleTools: Toggle(ToolsPanel); break;
-            case TitleBarAction.ToggleBottom:
-                ToggleBottomPanel(this, new RoutedEventArgs());
-                break;
             case TitleBarAction.ToggleProject:
                 Toggle(ProjectPanel);
                 ProjectColumn.Width = new GridLength(ProjectPanel.Visibility == Visibility.Visible ? 240 : 0);
                 break;
             case TitleBarAction.ToggleSidebar:
-                Navigation.PaneDisplayMode = Navigation.PaneDisplayMode == NavigationViewPaneDisplayMode.LeftCompact
-                    ? NavigationViewPaneDisplayMode.LeftMinimal : NavigationViewPaneDisplayMode.LeftCompact;
-                Navigation.IsPaneOpen = false;
-                Toggle(AccountButton);
+                Toggle(SideRail);
                 UpdatePresentation();
                 break;
             case TitleBarAction.ToggleWaveform: Workspace.ToggleModule("Waveform"); break;

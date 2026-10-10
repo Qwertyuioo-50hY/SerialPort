@@ -22,8 +22,6 @@ public sealed partial class AppWindow
             case TitleBarAction.ExportAcquisitionMat: await ExportAcquisitionAsync(true); break;
             case TitleBarAction.ExportMatrix: await ExportReconstructionAsync(false); break;
             case TitleBarAction.ExportImage: await ExportReconstructionAsync(true); break;
-            case TitleBarAction.OpenChat: ShowBottomPanel(true); break;
-            case TitleBarAction.OpenConsole: ShowBottomPanel(false); break;
             case TitleBarAction.AddCommand: await AddCustomCommandAsync(); break;
             case TitleBarAction.ConfigureApi: await ConfigureAsync("自定义API"); break;
             case TitleBarAction.ConfigureAlgorithm:

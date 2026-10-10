@@ -7,6 +7,9 @@ namespace Tomography.UI.Navigation;
 public sealed partial class ImportedFilesView : UserControl
 {
     public ImportedFilesView() => InitializeComponent();
+    public event EventHandler<string>? WindowCommandRequested;
+    private void WindowCommandClicked(object sender, RoutedEventArgs e) =>
+        WindowCommandRequested?.Invoke(this, (string)((Button)sender).Tag);
     public ImportedAsset? SelectedAsset => Files.SelectedItem is ListViewItem item ? item.Tag as ImportedAsset : null;
     public void AddAsset(ImportedAsset asset)
     {

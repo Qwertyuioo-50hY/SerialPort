@@ -5,13 +5,9 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Tomography.UI.TittleBar;
-using Tomography.UI.windows;
 using Windows.Graphics;
-using Windows.System;
 
 namespace Tomography.UI.windows;
 
@@ -19,13 +15,16 @@ public sealed partial class AppWindow : Window
 {
     public WindowStateViewModel ViewModel { get; } = new();
     private InputNonClientPointerSource? _titleBarInput;
-    private double _parameterWidth = 286;
+    private double _parameterWidth = 294;
+    private readonly WindowTitleBarView AppTitleBar = new();
+    private readonly FontIconSource ConnectionIcon = new();
+    private readonly TextBlock ConnectionStatus = new();
     private bool _loaded;
 
     public AppWindow()
     {
         InitializeComponent();
-        SystemBackdrop = new MicaBackdrop();
+        SystemBackdrop = null;
         var hwnd = Win32Interop.GetWindowFromWindowId(AppWindow.Id);
         var scale = GetDpiForWindow(hwnd) / 96.0;
         var display = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Nearest);
@@ -35,32 +34,20 @@ public sealed partial class AppWindow : Window
         AppWindow.MoveAndResize(new RectInt32(work.X + (work.Width - width) / 2,
             work.Y + (work.Height - height) / 2, width, height), display);
         AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
-        if (AppWindowTitleBar.IsCustomizationSupported())
-        {
-            ExtendsContentIntoTitleBar = true;
-            AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Standard;
-            AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
-            SetTitleBar(AppTitleBar);
-            _titleBarInput = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
-        }
-        AppTitleBar.ActionRequested += TitleBarActionRequested;
-        AppTitleBar.CommandRequested += CustomCommandRequested;
-        Navigation.SelectionChanged += NavigationSelectionUpdated;
-        AppTitleBar.InteractiveBoundsChanged += TitleBarBoundsChanged;
+        if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
+        ExtendsContentIntoTitleBar = true;
+        _titleBarInput = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
         Root.ActualThemeChanged += RootThemeChanged;
         AppWindow.Changed += AppWindowChanged;
         ViewModel.PropertyChanged += ViewModelPropertyChanged;
-        Activated += WindowActivated;
         Closed += WindowClosed;
-        Navigation.SelectedItem = DeviceNavigation;
         Workspace.ReconstructionRequested += WorkspaceReconstructionRequested;
+        ProjectPanel.WindowCommandRequested += WindowCommandRequested;
         BuildParameterContents();
     }
 
     public static ImageSource? AvatarSource(string? uri) => string.IsNullOrWhiteSpace(uri)
         ? null : new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(uri));
-
-    private void AccountClicked(object sender, RoutedEventArgs e) => ViewModel.SelectSection("登录");
 
     public static Visibility BoolToVisibility(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
 
@@ -73,7 +60,7 @@ public sealed partial class AppWindow : Window
 
     private void RootSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (_loaded) UpdatePresentation();
+        if (_loaded) { UpdatePresentation(); UpdateTitleBar(); }
     }
 
     private void ViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -84,48 +71,45 @@ public sealed partial class AppWindow : Window
 
     private void UpdatePresentation()
     {
-        AppTitleBar.ParametersVisible = ViewModel.ParametersVisible;
-        Navigation.SelectedItem = ViewModel.ParametersVisible && Navigation.PaneDisplayMode != NavigationViewPaneDisplayMode.LeftMinimal
-            ? Navigation.MenuItems.OfType<NavigationViewItem>().FirstOrDefault(item => item.Tag as string == ViewModel.Section) : null;
         if (ContentGrid.ActualWidth > 0)
-            _parameterWidth = Math.Clamp(_parameterWidth, 240, Math.Max(240, Math.Min(430, ContentGrid.ActualWidth - 500)));
+            _parameterWidth = Math.Clamp(_parameterWidth, 240, Math.Max(240, Math.Min(430, ContentGrid.ActualWidth - 760)));
         ParameterColumn.Width = new GridLength(ViewModel.ParametersVisible ? _parameterWidth : 0);
-        DividerColumn.Width = new GridLength(ViewModel.ParametersVisible ? 2 : 0);
-        AppTitleBar.SetModeRightEdge((Navigation.PaneDisplayMode == NavigationViewPaneDisplayMode.LeftMinimal ? 0 : 42) + 6 + _parameterWidth);
+        DividerColumn.Width = new GridLength(ViewModel.ParametersVisible ? 8 : 0);
     }
 
-    private void TitleBarBoundsChanged(object? sender, EventArgs e) => UpdateTitleBar();
     private void RootThemeChanged(FrameworkElement sender, object args) => UpdateTitleBar();
     private void AppWindowChanged(Microsoft.UI.Windowing.AppWindow sender, AppWindowChangedEventArgs args) => UpdateTitleBar();
 
     private void UpdateTitleBar()
     {
-        if (_titleBarInput == null || AppTitleBar.XamlRoot == null) return;
-        var scale = AppTitleBar.XamlRoot.RasterizationScale;
-        AppTitleBar.SetInsets(AppWindow.TitleBar.LeftInset / scale, AppWindow.TitleBar.RightInset / scale);
-        _titleBarInput.SetRegionRects(NonClientRegionKind.Passthrough, AppTitleBar.GetInteractiveBounds());
-        AppWindow.TitleBar.ButtonBackgroundColor = AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-        AppWindow.TitleBar.ButtonForegroundColor = Root.ActualTheme == ElementTheme.Dark ? Colors.White : Colors.Black;
+        if (_titleBarInput is null || Root.XamlRoot is null) return;
+        var scale = Root.XamlRoot.RasterizationScale;
+        _titleBarInput.SetRegionRects(NonClientRegionKind.Caption, new[]
+        {
+            new RectInt32((int)(88 * scale), 0, (int)(Math.Max(0, Root.ActualWidth - 100) * scale), (int)(12 * scale))
+        });
     }
-
-    private void WindowActivated(object sender, WindowActivatedEventArgs args) =>
-        AppTitleBar.SetActive(args.WindowActivationState != WindowActivationState.Deactivated);
 
     private void WindowClosed(object sender, WindowEventArgs args)
     {
         _acquisitionStop?.Cancel();
         Workspace.ReconstructionRequested -= WorkspaceReconstructionRequested;
+        ProjectPanel.WindowCommandRequested -= WindowCommandRequested;
         _connectionLifetime.Cancel();
         _serialConnection.Dispose();
         ViewModel.PropertyChanged -= ViewModelPropertyChanged;
-        AppTitleBar.ActionRequested -= TitleBarActionRequested;
-        AppTitleBar.CommandRequested -= CustomCommandRequested;
-        Navigation.SelectionChanged -= NavigationSelectionUpdated;
-        AppTitleBar.InteractiveBoundsChanged -= TitleBarBoundsChanged;
         Root.ActualThemeChanged -= RootThemeChanged;
         AppWindow.Changed -= AppWindowChanged;
-        Activated -= WindowActivated;
         Closed -= WindowClosed;
+    }
+
+    private void WindowCommandRequested(object? sender, string command)
+    {
+        if (command == "Close") { Close(); return; }
+        if (AppWindow.Presenter is not OverlappedPresenter presenter) return;
+        if (command == "Minimize") presenter.Minimize();
+        else if (presenter.State == OverlappedPresenterState.Maximized) presenter.Restore();
+        else presenter.Maximize();
     }
 
     [DllImport("user32.dll")]

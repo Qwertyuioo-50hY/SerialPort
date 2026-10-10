@@ -65,20 +65,6 @@ public sealed partial class AppWindow
                 break;
         }
     }
-    private void NavigationSelectionUpdated(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
-    {
-        if (!ViewModel.ParametersVisible && sender.SelectedItem != null) sender.SelectedItem = null;
-    }
-
-    private void NavigationItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
-    {
-        if (args.InvokedItemContainer is NavigationViewItem item && item.Tag is string section)
-        {
-            if (section == "Connect") ToggleDeviceConnection();
-            else ViewModel.SelectSection(section);
-        }
-    }
-
     private void ParameterDragDelta(object sender, DragDeltaEventArgs e)
     {
         _parameterWidth += e.HorizontalChange;
