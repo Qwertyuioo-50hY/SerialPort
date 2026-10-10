@@ -36,6 +36,8 @@ public sealed partial class AppWindow : Window
         AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
         if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
         ExtendsContentIntoTitleBar = true;
+        var borderColor = 0xFFFFFFFEu;
+        DwmSetWindowAttribute(hwnd, 34, ref borderColor, sizeof(uint));
         _titleBarInput = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
         Root.ActualThemeChanged += RootThemeChanged;
         AppWindow.Changed += AppWindowChanged;
@@ -114,4 +116,6 @@ public sealed partial class AppWindow : Window
 
     [DllImport("user32.dll")]
     private static extern uint GetDpiForWindow(nint hwnd);
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(nint hwnd, int attribute, ref uint value, int size);
 }

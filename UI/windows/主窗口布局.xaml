@@ -6,6 +6,27 @@
     xmlns:navigation="using:Tomography.UI.Navigation"
     xmlns:workspace="using:Tomography.UI.workspace" Title="Tomography">
     <Grid x:Name="Root" Background="{ThemeResource ShellBackgroundBrush}" RequestedTheme="Dark" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
+        <Grid.Resources>
+            <Style x:Key="DividerStyle" TargetType="Thumb">
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Thumb">
+                            <Grid Background="Transparent">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="PointerOver"><VisualState.Setters><Setter Target="Highlight.Opacity" Value="0.4" /></VisualState.Setters></VisualState>
+                                        <VisualState x:Name="Pressed"><VisualState.Setters><Setter Target="Highlight.Opacity" Value="0.6" /></VisualState.Setters></VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border x:Name="Highlight" Width="2" Opacity="0" Background="{ThemeResource TextFillColorPrimaryBrush}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
         <Border Margin="4" BorderBrush="#080808" BorderThickness="8" CornerRadius="32" Background="{ThemeResource ShellBackgroundBrush}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="72" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
@@ -29,9 +50,10 @@
                             <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="ParameterBody" Spacing="12" /></ScrollViewer>
                         </Grid>
                     </Border>
-                    <Thumb x:Name="ParameterDivider" Grid.Column="1" Width="8" HorizontalAlignment="Stretch" Background="Transparent"
-                        Visibility="{x:Bind local:AppWindow.BoolToVisibility(ViewModel.ParametersVisible), Mode=OneWay}"
-                        DragDelta="ParameterDragDelta" KeyDown="ParameterDividerKeyDown" AutomationProperties.Name="调整侧边栏宽度" />
+                    <local:ResizeDivider Grid.Column="1" Width="8" Visibility="{x:Bind local:AppWindow.BoolToVisibility(ViewModel.ParametersVisible), Mode=OneWay}">
+                        <Thumb x:Name="ParameterDivider" Style="{StaticResource DividerStyle}" DragDelta="ParameterDragDelta"
+                            KeyDown="ParameterDividerKeyDown" AutomationProperties.Name="调整侧边栏宽度" />
+                    </local:ResizeDivider>
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
                         <StackPanel x:Name="ToolsPanel" Visibility="Collapsed" Orientation="Horizontal" Spacing="6"><Button Content="连接" IsEnabled="False" /></StackPanel>
@@ -39,6 +61,9 @@
                             <workspace:ImagingWorkspaceView x:Name="Workspace" />
                         </ScrollViewer>
                     </Grid>
+                    <local:ResizeDivider Grid.Column="3" Width="8">
+                        <Thumb Style="{StaticResource DividerStyle}" DragDelta="ProjectDragDelta" AutomationProperties.Name="调整项目导航宽度" />
+                    </local:ResizeDivider>
                     <navigation:ImportedFilesView x:Name="ProjectPanel" Grid.Column="4" />
                 </Grid>
             </Grid>
