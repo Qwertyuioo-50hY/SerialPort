@@ -27,7 +27,7 @@
                 </Setter>
             </Style>
         </Grid.Resources>
-        <Border Margin="4" BorderBrush="#080808" BorderThickness="8" CornerRadius="32" Background="{ThemeResource ShellBackgroundBrush}">
+        <Border Margin="4" BorderBrush="#080808" BorderThickness="8" CornerRadius="24" Background="{ThemeResource ShellBackgroundBrush}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="72" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                 <side:IconRailView x:Name="SideRail" />

@@ -34,8 +34,8 @@ public sealed partial class AppWindow : Window
         AppWindow.MoveAndResize(new RectInt32(work.X + (work.Width - width) / 2,
             work.Y + (work.Height - height) / 2, width, height), display);
         AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
+        ExtendsContentIntoTitleBar = false;
         if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
-        ExtendsContentIntoTitleBar = true;
         var borderColor = 0xFFFFFFFEu;
         DwmSetWindowAttribute(hwnd, 34, ref borderColor, sizeof(uint));
         _titleBarInput = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
