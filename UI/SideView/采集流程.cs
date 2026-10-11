@@ -24,7 +24,9 @@ public sealed partial class AppWindow
         var count = 0;
         try
         {
-            var result = await _acquisition.RunAsync(_serialConnection, 100, 8,
+            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 99))
+                throw new ArgumentException("激励频率必须为 1–999 kHz 的整数，线圈数必须为 1–99 的整数。");
+            var result = await _acquisition.RunAsync(_serialConnection, (int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount,
                 mode, 10, frame =>
                 {
                     if (_connectionLifetime.IsCancellationRequested) return;

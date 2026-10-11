@@ -16,7 +16,7 @@
             <Border Width="38" Height="38" CornerRadius="11" Background="{ThemeResource LogoPlateBrush}" Padding="5" HorizontalAlignment="Center">
                 <Image Source="ms-appx:///Assets/BrandLogo.png" AutomationProperties.Name="软件 Logo" />
             </Border>
-            <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="折叠侧栏" ToolTipService.ToolTip="折叠侧栏"><Path Width="24" Height="20" Stroke="{ThemeResource RailForegroundBrush}" StrokeThickness="2" Data="M 0,3 L 13,3 M 0,10 L 13,10 M 0,17 L 13,17 M 16,3 L 23,10 L 16,17" /></Button>
+            <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="折叠侧栏" ToolTipService.ToolTip="折叠侧栏"><Path Width="18" Height="15" Stretch="Uniform" Stroke="{ThemeResource RailForegroundBrush}" StrokeThickness="2" Data="M 0,3 L 13,3 M 0,10 L 13,10 M 0,17 L 13,17 M 16,3 L 23,10 L 16,17" /></Button>
             <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />
             <Grid Height="64">
                 <Border Width="40" Height="40" CornerRadius="12" Background="{ThemeResource RailSelectedBackgroundBrush}" HorizontalAlignment="Center" VerticalAlignment="Center">

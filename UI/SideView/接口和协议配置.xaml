@@ -2,28 +2,47 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <StackPanel Spacing="10">
-        <TextBlock Text="协议与连接" FontSize="14" FontWeight="SemiBold" />
-        <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />
-        <Grid ColumnSpacing="8">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="150" /></Grid.ColumnDefinitions>
-            <TextBlock Text="数据源" VerticalAlignment="Center" />
-            <ComboBox x:Name="DataSource" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0" AutomationProperties.AutomationId="DataSource" AutomationProperties.Name="数据源" SelectionChanged="ConfigurationChanged">
-<x:String>实际设备</x:String><x:String>Demo</x:String><x:String>文件回放</x:String><x:String>模拟数据</x:String></ComboBox>
-        </Grid>
-        <Grid ColumnSpacing="8">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="150" /></Grid.ColumnDefinitions>
-            <TextBlock Text="数据接口" VerticalAlignment="Center" />
-            <ComboBox x:Name="ConnectionType" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0" AutomationProperties.AutomationId="ConnectionType" AutomationProperties.Name="数据接口" SelectionChanged="ConfigurationChanged">
-<x:String>串口 UART/USB-TTL</x:String><x:String>TCP</x:String><x:String>UDP</x:String></ComboBox>
-        </Grid>
-        <Grid ColumnSpacing="8">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="150" /></Grid.ColumnDefinitions>
-            <TextBlock Text="数据协议" VerticalAlignment="Center" />
-            <ComboBox x:Name="DataProtocol" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0" AutomationProperties.AutomationId="DataProtocol" AutomationProperties.Name="数据协议" SelectionChanged="ConfigurationChanged">
-<x:String>FireWater/CSV</x:String><x:String>JSON</x:String><x:String>Modbus RTU</x:String></ComboBox>
-        </Grid>
-        <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />
-        <TextBlock x:Name="ParametersHeading" Text="串口参数配置" FontSize="14" FontWeight="SemiBold" />
+        <StackPanel.Resources>
+            <Style TargetType="Expander">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            </Style>
+            <Style x:Key="ChoiceItemStyle" TargetType="ListBoxItem">
+                <Setter Property="Padding" Value="8,4" />
+                <Setter Property="Template">
+                    <Setter.Value><ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="Transparent">
+                            <CheckBox Content="{TemplateBinding Content}" IsChecked="{TemplateBinding IsSelected}" IsHitTestVisible="False" IsTabStop="False" Margin="8,4" />
+                        </Border>
+                    </ControlTemplate></Setter.Value>
+                </Setter>
+            </Style>
+        </StackPanel.Resources>
+        <Expander Header="数据源">
+            <ListBox x:Name="DataSource" SelectedIndex="0" SelectionMode="Single" ItemContainerStyle="{StaticResource ChoiceItemStyle}" Background="Transparent" BorderThickness="0" AutomationProperties.AutomationId="DataSource" AutomationProperties.Name="数据源" SelectionChanged="ConfigurationChanged">
+                <x:String>实际设备</x:String>
+                <x:String>Demo</x:String>
+                <x:String>文件回放</x:String>
+                <x:String>模拟数据</x:String>
+            </ListBox>
+        </Expander>
+        <Expander Header="数据接口">
+            <ListBox x:Name="ConnectionType" SelectedIndex="0" SelectionMode="Single" ItemContainerStyle="{StaticResource ChoiceItemStyle}" Background="Transparent" BorderThickness="0" AutomationProperties.AutomationId="ConnectionType" AutomationProperties.Name="数据接口" SelectionChanged="ConfigurationChanged">
+                <x:String>串口 UART/USB-TTL</x:String>
+                <x:String>TCP</x:String>
+                <x:String>UDP</x:String>
+            </ListBox>
+        </Expander>
+        <Expander Header="数据协议">
+            <ListBox x:Name="DataProtocol" SelectedIndex="0" SelectionMode="Single" ItemContainerStyle="{StaticResource ChoiceItemStyle}" Background="Transparent" BorderThickness="0" AutomationProperties.AutomationId="DataProtocol" AutomationProperties.Name="数据协议" SelectionChanged="ConfigurationChanged">
+                <x:String>FireWater/CSV</x:String>
+                <x:String>JSON</x:String>
+                <x:String>Modbus RTU</x:String>
+            </ListBox>
+        </Expander>
+        <Expander>
+            <Expander.Header><TextBlock x:Name="ParametersHeading" Text="串口参数配置" /></Expander.Header>
+            <StackPanel Spacing="10">
         <StackPanel x:Name="SerialParameters" Spacing="10">
         <Grid ColumnSpacing="8">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="130" /></Grid.ColumnDefinitions>
@@ -169,6 +188,7 @@
             <TextBox Grid.Column="1" Text="5" AutomationProperties.AutomationId="SimulationFrequency" AutomationProperties.Name="采样频率 / Hz" />
         </Grid>
         </StackPanel>
-        <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />
+            </StackPanel>
+        </Expander>
     </StackPanel>
 </UserControl>
