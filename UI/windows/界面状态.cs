@@ -5,7 +5,7 @@ namespace Tomography.UI.windows
     /// <summary>界面设计阶段只保存展示状态，不调用设备、文件或算法服务。</summary>
     public sealed class WindowStateViewModel : INotifyPropertyChanged
     {
-        private string _section = "接口/协议";
+        private string _section = "设备";
         private bool _parametersVisible = true;
         private string _accountName = "";
         private string? _avatarUri;

@@ -14,7 +14,8 @@ public sealed partial class AppWindow
         var extensions = role switch
         {
             "自定义算法" => new[] { ".py" },
-            "灵敏度矩阵" => new[] { ".mat", ".csv", ".txt" },
+            "灵敏度矩阵" => new[] { ".mat", ".csv" },
+            "节点坐标" or "物场/Demo数据" or "空场参考" => new[] { ".csv", ".txt" },
             _ => new[] { ".csv", ".txt", ".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff" }
         };
         foreach (var extension in extensions) picker.FileTypeFilter.Add(extension);

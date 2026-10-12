@@ -18,7 +18,7 @@ public sealed partial class AppWindow : Window
     private double _parameterWidth = 294;
     private readonly WindowTitleBarView AppTitleBar = new();
     private readonly FontIconSource ConnectionIcon = new();
-    private readonly TextBlock ConnectionStatus = new();
+    private TextBlock ConnectionStatus = new();
     private bool _loaded;
 
     public AppWindow()
@@ -45,6 +45,7 @@ public sealed partial class AppWindow : Window
         Closed += WindowClosed;
         Workspace.ReconstructionRequested += WorkspaceReconstructionRequested;
         ProjectPanel.WindowCommandRequested += WindowCommandRequested;
+        InitializeDevicePage();
         BuildParameterContents();
     }
 
@@ -73,6 +74,11 @@ public sealed partial class AppWindow : Window
 
     private void UpdatePresentation()
     {
+        var device = ViewModel.Section is "设备" or "接口/协议";
+        DeviceShell.Visibility = device ? Visibility.Visible : Visibility.Collapsed;
+        ContentGrid.Visibility = device ? Visibility.Collapsed : Visibility.Visible;
+        ShellFrame.BorderThickness = new Thickness(device ? 0 : 8);
+        ShellFrame.CornerRadius = new CornerRadius(device ? 14 : 24);
         if (ContentGrid.ActualWidth > 0)
             _parameterWidth = Math.Clamp(_parameterWidth, 240, Math.Max(240, Math.Min(430, ContentGrid.ActualWidth - 760)));
         ParameterColumn.Width = new GridLength(ViewModel.ParametersVisible ? _parameterWidth : 0);
@@ -88,7 +94,7 @@ public sealed partial class AppWindow : Window
         var scale = Root.XamlRoot.RasterizationScale;
         _titleBarInput.SetRegionRects(NonClientRegionKind.Caption, new[]
         {
-            new RectInt32((int)(88 * scale), 0, (int)(Math.Max(0, Root.ActualWidth - 100) * scale), (int)(12 * scale))
+            new RectInt32((int)(64 * scale), 0, (int)(Math.Max(0, Root.ActualWidth - 220) * scale), (int)(12 * scale))
         });
     }
 
@@ -98,7 +104,9 @@ public sealed partial class AppWindow : Window
         Workspace.ReconstructionRequested -= WorkspaceReconstructionRequested;
         ProjectPanel.WindowCommandRequested -= WindowCommandRequested;
         _connectionLifetime.Cancel();
+        CloseDevice();
         _serialConnection.Dispose();
+        _tcpConnection.Dispose();
         ViewModel.PropertyChanged -= ViewModelPropertyChanged;
         Root.ActualThemeChanged -= RootThemeChanged;
         AppWindow.Changed -= AppWindowChanged;

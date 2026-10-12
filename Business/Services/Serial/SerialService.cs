@@ -9,7 +9,7 @@ using Tomography.Data.Models;
 namespace Tomography.Business.Services
 {
     /// <summary>串口连接管理、事件及资源生命周期。</summary>
-    public partial class SerialService : ISerialService
+    public partial class SerialService : ISerialService, IDeviceChannel
     {
         private readonly IChecksumService _checksumService;
         private readonly ISerialTransport _transport;

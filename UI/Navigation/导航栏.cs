@@ -13,6 +13,7 @@ public sealed partial class ImportedFilesView : UserControl
     public ImportedAsset? SelectedAsset => Files.SelectedItem is ListViewItem item ? item.Tag as ImportedAsset : null;
     public void AddAsset(ImportedAsset asset)
     {
+        if (Files.Items.OfType<ListViewItem>().Any(item => item.Tag is ImportedAsset existing && existing.Path == asset.Path)) return;
         var item = new ListViewItem { Content = asset.Name, Tag = asset };
         Files.Items.Add(item);
         Files.SelectedItem = item;

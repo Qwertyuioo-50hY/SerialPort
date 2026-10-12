@@ -7,6 +7,9 @@ namespace Tomography.Business.Models
     /// </summary>
     public sealed class AppSettings
     {
+        public CustomFrameDefinition? CustomFrame { get; set; }
+        public DeviceConfiguration Device { get; set; } = new();
+        public Dictionary<string, string> ExperimentInputs { get; set; } = new();
         /// <summary>
         /// 默认串口配置。
         /// </summary>

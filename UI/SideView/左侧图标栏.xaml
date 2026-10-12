@@ -16,7 +16,7 @@
             <Border Width="38" Height="38" CornerRadius="11" Background="{ThemeResource LogoPlateBrush}" Padding="5" HorizontalAlignment="Center">
                 <Image Source="ms-appx:///Assets/BrandLogo.png" AutomationProperties.Name="软件 Logo" />
             </Border>
-            <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="折叠侧栏" ToolTipService.ToolTip="折叠侧栏"><Path Width="18" Height="15" Stretch="Uniform" Stroke="{ThemeResource RailForegroundBrush}" StrokeThickness="2" Data="M 0,3 L 13,3 M 0,10 L 13,10 M 0,17 L 13,17 M 16,3 L 23,10 L 16,17" /></Button>
+            <Button Style="{StaticResource RailButtonStyle}" Click="CollapseDirectory" AutomationProperties.AutomationId="CollapseDirectory" AutomationProperties.Name="折叠资源栏" ToolTipService.ToolTip="折叠资源栏"><Path Width="18" Height="15" Stretch="Uniform" Stroke="{ThemeResource RailForegroundBrush}" StrokeThickness="2" Data="M 0,3 L 13,3 M 0,10 L 13,10 M 0,17 L 13,17 M 16,3 L 23,10 L 16,17" /></Button>
             <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />
             <Grid Height="64">
                 <Border Width="40" Height="40" CornerRadius="12" Background="{ThemeResource RailSelectedBackgroundBrush}" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -30,11 +30,11 @@
         </StackPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
             <StackPanel x:Name="RailItems" Spacing="4" Margin="0,14,0,0" HorizontalAlignment="Center">
-                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="概览" ToolTipService.ToolTip="概览"><FontIcon Glyph="&#xE80A;" FontSize="19" /></Button>
-                <Button x:Name="SelectedRailItem" Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Background="{ThemeResource RailSelectedBackgroundBrush}" Foreground="{ThemeResource RailAccentBrush}" AutomationProperties.Name="工作台" ToolTipService.ToolTip="工作台"><FontIcon Foreground="{ThemeResource RailAccentBrush}" Glyph="&#xE8A5;" FontSize="19" /></Button>
+                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Tag="采集" AutomationProperties.AutomationId="AcquisitionNavigation" AutomationProperties.Name="采集" ToolTipService.ToolTip="概览"><FontIcon Glyph="&#xE80A;" FontSize="19" /></Button>
+                <Button x:Name="SelectedRailItem" Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Background="{ThemeResource RailSelectedBackgroundBrush}" Foreground="{ThemeResource RailAccentBrush}" Tag="设备" AutomationProperties.AutomationId="DeviceNavigation" AutomationProperties.Name="设备" ToolTipService.ToolTip="设备"><FontIcon Foreground="{ThemeResource RailAccentBrush}" Glyph="&#xE8A5;" FontSize="19" /></Button>
                 <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="成员" ToolTipService.ToolTip="成员"><FontIcon Glyph="&#xE716;" FontSize="19" /></Button>
                 <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="连接" ToolTipService.ToolTip="连接"><FontIcon Glyph="&#xE701;" FontSize="19" /></Button>
-                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="实验" ToolTipService.ToolTip="实验"><FontIcon Glyph="&#xE9F9;" FontSize="19" /></Button>
+                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Tag="算法" AutomationProperties.AutomationId="AlgorithmNavigation" AutomationProperties.Name="算法" ToolTipService.ToolTip="实验"><FontIcon Glyph="&#xE9F9;" FontSize="19" /></Button>
                 <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="统计" ToolTipService.ToolTip="统计"><FontIcon Glyph="&#xE9D9;" FontSize="19" /></Button>
             </StackPanel>
         </ScrollViewer>

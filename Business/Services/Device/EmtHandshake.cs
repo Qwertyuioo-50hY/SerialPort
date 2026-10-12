@@ -7,7 +7,7 @@ namespace Tomography.Business.Services;
 /// <summary>发送设备识别请求，等待完整的 EMT 握手回复。</summary>
 public static class EmtHandshake
 {
-    public static async Task<OperationResult> ExecuteAsync(ISerialService serial, CancellationToken cancellationToken = default)
+    public static async Task<OperationResult> ExecuteAsync(IDeviceChannel serial, CancellationToken cancellationToken = default)
     {
         var expected = Encoding.ASCII.GetBytes("emt ready\r\n");
         var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -36,7 +36,7 @@ public static class EmtHandshake
         serial.DataReceived += Receive;
         try
         {
-            var result = serial.SendText("which emt\r\n", "ASCII");
+            var result = await Task.Run(() => serial.SendText("which emt\r\n", "ASCII"), cancellationToken).ConfigureAwait(false);
             if (!result.IsSuccess) return result;
             var ready = await completion.Task.WaitAsync(TimeSpan.FromSeconds(3), cancellationToken).ConfigureAwait(false);
             return new OperationResult { IsSuccess = ready, Message = ready ? "EMT 握手成功。" : "设备握手回复不匹配。" };

@@ -2,13 +2,9 @@ using Tomography.Data.Models;
 
 namespace Tomography.Data.Interfaces
 {
-    public interface ISerialTransport : IDisposable
+    public interface ISerialTransport : IByteTransport
     {
-        bool IsOpen { get; }
-        event EventHandler<byte[]>? DataReceived;
         string[] GetPortNames();
         void Open(SerialPortParameters config);
-        void Close();
-        void Write(byte[] data);
     }
 }

@@ -7,7 +7,7 @@ namespace Tomography.Business.Services;
 public static class EmtSampling
 {
     // 调用方必须串行采样；接收失败后应断开重连，避免迟到帧影响下一次请求。
-    public static async Task<OperationResult> ExecuteAsync(ISerialService serial, int frequencyKhz, int coilCount,
+    public static async Task<OperationResult> ExecuteAsync(IDeviceChannel serial, int frequencyKhz, int coilCount,
         CancellationToken cancellationToken = default)
     {
         var command = EmtSampleCommand.Build(frequencyKhz, coilCount);
@@ -33,7 +33,7 @@ public static class EmtSampling
         serial.DataReceived += Receive;
         try
         {
-            var sent = serial.SendText(command, "ASCII");
+            var sent = await Task.Run(() => serial.SendText(command, "ASCII"), cancellationToken).ConfigureAwait(false);
             if (!sent.IsSuccess) return sent;
             var complete = await completion.Task.WaitAsync(TimeSpan.FromSeconds(3), cancellationToken).ConfigureAwait(false);
             return complete

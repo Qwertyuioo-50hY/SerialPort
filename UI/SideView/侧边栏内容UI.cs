@@ -10,8 +10,6 @@ namespace Tomography.UI.windows;
 public sealed partial class AppWindow
 {
     private readonly Tomography.UI.SideView.DeviceParametersView _deviceSettings = new();
-    private readonly Expander _deviceParameters = new() { Header = "设备参数配置",
-        HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
 
     private void BuildParameterContents()
     {
@@ -48,16 +46,8 @@ public sealed partial class AppWindow
 
         switch (ViewModel.Section)
         {
+            case "设备":
             case "接口/协议":
-                _protocolSettings ??= new Tomography.UI.SideView.ConnectionProtocolView();
-                _protocolSettings.SetPorts(_serialConnection.GetPortNames());
-                ParameterBody.Children.Add(_protocolSettings);
-                var algorithmPanel = new StackPanel();
-                AddReconstructionSettings(algorithmPanel);
-                ParameterBody.Children.Add(new Expander { Header = "算法参数配置", Content = algorithmPanel,
-                    HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch });
-                _deviceParameters.Content = _deviceSettings;
-                ParameterBody.Children.Add(_deviceParameters);
                 break;
             case "插件":
                 Caption("插件管理");

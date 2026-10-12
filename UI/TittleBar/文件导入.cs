@@ -10,6 +10,8 @@ public sealed partial class AppWindow
     private bool _fileOperation;
     private async Task ImportFileAsync(string role)
     {
+        if (role is "灵敏度矩阵" or "节点坐标" or "物场/Demo数据" or "空场参考")
+        { await ImportExperimentalInputAsync(role); return; }
         if (_fileOperation || _reconstructing || _sampling) return;
         _fileOperation = true;
         try
@@ -27,10 +29,11 @@ public sealed partial class AppWindow
                 role = (string)choice.SelectedItem;
             }
             var asset = await Task.Run(() => _assets.Import(path));
+            _reconstruction.UseAsset(asset, role);
             ProjectPanel.AddAsset(asset);
             ProjectPanel.Visibility = Visibility.Visible;
             ProjectColumn.Width = new GridLength(240);
-            _reconstruction.UseAsset(asset, role);
+            DirectoryPanel.SetAsset(role, asset);
             if (role == "物场/Demo数据") Workspace.ShowMeasurements(_reconstruction.Measurements!);
             if (extension is ".png" or ".jpg" or ".jpeg" or ".bmp" or ".tif" or ".tiff") Workspace.PreviewImage(asset.Path);
             ConnectionStatus.Text = $"已导入 {asset.Name}（{role}）";

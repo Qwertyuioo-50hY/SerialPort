@@ -6,6 +6,9 @@ namespace Tomography.UI.SideView;
 
 public sealed partial class IconRailView : UserControl
 {
+    public event EventHandler<string>? NavigationRequested;
+    public event EventHandler? DirectoryToggleRequested;
+    private void CollapseDirectory(object sender, RoutedEventArgs e) => DirectoryToggleRequested?.Invoke(this, EventArgs.Empty);
     private readonly Brush _selectedBackground;
     private readonly Brush _selectedForeground;
     private readonly Brush _defaultForeground;
@@ -18,6 +21,8 @@ public sealed partial class IconRailView : UserControl
     }
     private void SelectRailItem(object sender, RoutedEventArgs e)
     {
+        if (((Button)sender).Tag is not string section) return;
+        NavigationRequested?.Invoke(this, section);
         foreach (Button button in RailItems.Children)
         {
             var selected = ReferenceEquals(button, sender);

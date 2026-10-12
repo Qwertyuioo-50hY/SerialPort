@@ -27,10 +27,21 @@
                 </Setter>
             </Style>
         </Grid.Resources>
-        <Border Margin="4" BorderBrush="#080808" BorderThickness="8" CornerRadius="24" Background="{ThemeResource ShellBackgroundBrush}">
+        <Border x:Name="ShellFrame" Margin="4" BorderBrush="#080808" BorderThickness="8" CornerRadius="24" Background="{ThemeResource ShellBackgroundBrush}">
             <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition Width="72" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="60" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                 <side:IconRailView x:Name="SideRail" />
+                <Grid x:Name="DeviceShell" Grid.Column="1" RequestedTheme="Light" Background="{ThemeResource DeviceCanvasBrush}" ColumnSpacing="8" Padding="8,0,8,8">
+                    <Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions><ColumnDefinition x:Name="DirectoryColumn" Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
+                        <Button Content="&#xE921;" Tag="Minimize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最小化" AutomationProperties.AutomationId="DeviceMinimize"/>
+                        <Button Content="&#xE922;" Tag="Maximize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最大化或还原" AutomationProperties.AutomationId="DeviceMaximize"/>
+                        <Button Content="&#xE8BB;" Tag="Close" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="关闭" AutomationProperties.AutomationId="DeviceClose"/>
+                    </StackPanel>
+                    <Border Grid.Row="1" Background="{ThemeResource DevicePageBrush}" CornerRadius="14"><navigation:ProjectDirectoryView x:Name="DirectoryPanel"/></Border>
+                    <side:DevicePage x:Name="DeviceView" Grid.Row="1" Grid.Column="1"/>
+                </Grid>
                 <Grid x:Name="ContentGrid" Grid.Column="1" Margin="0,0,4,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition x:Name="ParameterColumn" Width="294" />
@@ -56,7 +67,12 @@
                     </local:ResizeDivider>
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-                        <StackPanel x:Name="ToolsPanel" Visibility="Collapsed" Orientation="Horizontal" Spacing="6"><Button Content="连接" IsEnabled="False" /></StackPanel>
+                        <StackPanel x:Name="ToolsPanel" Visibility="Collapsed" Orientation="Horizontal" Spacing="6">
+                            <Button Content="空场" Tag="Reference" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireReference"/>
+                            <Button Content="单次" Tag="Single" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireSingle"/>
+                            <Button Content="连续" Tag="Live" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireLive"/>
+                            <Button Content="停止" Tag="Stop" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="StopAcquisition"/>
+                        </StackPanel>
                         <ScrollViewer x:Name="WorkspaceScroll" Grid.Row="1" ZoomMode="Enabled" MinZoomFactor="0.5" MaxZoomFactor="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
                             <workspace:ImagingWorkspaceView x:Name="Workspace" />
                         </ScrollViewer>
