@@ -34,7 +34,7 @@ public sealed partial class ProjectDirectoryView : UserControl
     }
     private TreeViewNode Node(string path, bool directory)
     {
-        var node = new TreeViewNode { Content = Path.GetFileName(path), HasUnrealizedChildren = directory };
+        var node = new TreeViewNode { Content = path, HasUnrealizedChildren = directory };
         _paths[node] = path; return node;
     }
     private async Task FillAsync(TreeViewNode node)

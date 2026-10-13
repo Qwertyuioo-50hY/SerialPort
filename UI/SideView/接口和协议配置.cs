@@ -28,7 +28,7 @@ public sealed partial class ConnectionProtocolView : UserControl
     private void RefreshClicked(object sender, RoutedEventArgs e) => RefreshRequested?.Invoke(this, EventArgs.Empty);
     private void UpdateConfiguration()
     {
-        ConnectionType.Visibility = Show(!IsSimulation);
+        ConnectionTypeOption.Visibility = Show(!IsSimulation);
         SerialParameters.Visibility = Show(UsesSerialDevice);
         TcpParameters.Visibility = Show(UsesTcpDevice);
         ProtocolNote.Text = Protocol switch
@@ -41,11 +41,11 @@ public sealed partial class ConnectionProtocolView : UserControl
     private void LayoutChanged(object sender, SizeChangedEventArgs e)
     {
         var narrow = e.NewSize.Width < 680;
-        Grid.SetColumn(ConnectionType, narrow ? 0 : 1); Grid.SetRow(ConnectionType, narrow ? 1 : 0);
-        Grid.SetColumn(DataProtocol, narrow ? 0 : 2); Grid.SetRow(DataProtocol, narrow ? 2 : 0);
-        Grid.SetColumnSpan(DataSource, narrow ? 3 : 1);
-        Grid.SetColumnSpan(ConnectionType, narrow ? 3 : 1);
-        Grid.SetColumnSpan(DataProtocol, narrow ? 3 : 1);
+        Grid.SetColumn(ConnectionTypeOption, narrow ? 0 : 1); Grid.SetRow(ConnectionTypeOption, narrow ? 1 : 0);
+        Grid.SetColumn(DataProtocolOption, narrow ? 0 : 2); Grid.SetRow(DataProtocolOption, narrow ? 2 : 0);
+        Grid.SetColumnSpan(DataSourceOption, narrow ? 3 : 1);
+        Grid.SetColumnSpan(ConnectionTypeOption, narrow ? 3 : 1);
+        Grid.SetColumnSpan(DataProtocolOption, narrow ? 3 : 1);
     }
     public void SetPorts(string[] ports)
     {
