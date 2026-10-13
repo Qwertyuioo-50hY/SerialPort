@@ -45,6 +45,7 @@ public sealed partial class AppWindow : Window
         Closed += WindowClosed;
         Workspace.ReconstructionRequested += WorkspaceReconstructionRequested;
         ProjectPanel.WindowCommandRequested += WindowCommandRequested;
+        SideRail.ThemeRequested += SideRailThemeRequested;
         InitializeDevicePage();
         BuildParameterContents();
     }
@@ -108,6 +109,7 @@ public sealed partial class AppWindow : Window
         _serialConnection.Dispose();
         _tcpConnection.Dispose();
         ViewModel.PropertyChanged -= ViewModelPropertyChanged;
+        SideRail.ThemeRequested -= SideRailThemeRequested;
         Root.ActualThemeChanged -= RootThemeChanged;
         AppWindow.Changed -= AppWindowChanged;
         Closed -= WindowClosed;

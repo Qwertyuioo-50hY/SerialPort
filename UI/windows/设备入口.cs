@@ -113,7 +113,7 @@ public sealed partial class AppWindow
         }
         if (action == "自定义帧") { await EditFrameDefinitionAsync(); return; }
         var text = action == "诊断" ? string.Join("\n", _deviceDiagnostics) : "自定义帧暂未启用：请提供真实帧样例、帧头、总长度、字段类型、字节序、校验和 64 通道映射。不会执行脚本或发送未知设备指令。";
-        await new ContentDialog { XamlRoot = Root.XamlRoot, RequestedTheme = ElementTheme.Light, Title = action,
+        await new ContentDialog { XamlRoot = Root.XamlRoot, RequestedTheme = Root.ActualTheme, Title = action,
             Content = new ScrollViewer { Content = new TextBlock { Text = string.IsNullOrEmpty(text) ? "暂无原始收发记录" : text, TextWrapping = TextWrapping.Wrap }, MaxHeight = 420 }, CloseButtonText = "关闭" }.ShowAsync();
     }
 }

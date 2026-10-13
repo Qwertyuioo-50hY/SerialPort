@@ -31,9 +31,9 @@
                     <SolidColorBrush x:Key="RailSelectedBackgroundBrush" Color="#252525" />
                     <SolidColorBrush x:Key="RailAccentBrush" Color="#18B568" />
                     <SolidColorBrush x:Key="LogoPlateBrush" Color="#F1F0ED" />
-                    <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#1D1D1D" />
-                    <SolidColorBrush x:Key="ParameterBackgroundBrush" Color="#1D1D1D" />
-                    <SolidColorBrush x:Key="WorkspaceStrokeBrush" Color="#2B2B2B" />
+                    <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="ParameterBackgroundBrush" Color="#F4F5F7" />
+                    <SolidColorBrush x:Key="WorkspaceStrokeBrush" Color="#E7E9ED" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="HighContrast">
                     <SolidColorBrush x:Key="DevicePageBrush" Color="{ThemeResource SystemColorWindowColor}" />

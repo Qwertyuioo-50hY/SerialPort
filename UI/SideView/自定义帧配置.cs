@@ -30,7 +30,7 @@ public sealed partial class AppWindow
         map.TextWrapping = TextWrapping.Wrap; map.AcceptsReturn = true;
         panel.Children.Add(new TextBlock { Text = "这是接收帧定义，不发送指令、不执行脚本、不证明固件兼容；请按真实帧填写。", TextWrapping = TextWrapping.Wrap });
         var error = new TextBlock { TextWrapping = TextWrapping.Wrap }; panel.Children.Add(error);
-        var dialog = new ContentDialog { XamlRoot = Root.XamlRoot, RequestedTheme = ElementTheme.Light, Title = "自定义数值帧", Content = new ScrollViewer { Content = panel, MaxHeight = 480 }, PrimaryButtonText = "保存定义", CloseButtonText = "取消" };
+        var dialog = new ContentDialog { XamlRoot = Root.XamlRoot, RequestedTheme = Root.ActualTheme, Title = "自定义数值帧", Content = new ScrollViewer { Content = panel, MaxHeight = 480 }, PrimaryButtonText = "保存定义", CloseButtonText = "取消" };
         CustomFrameDefinition? definition = null;
         dialog.PrimaryButtonClick += (sender, e) =>
         {
