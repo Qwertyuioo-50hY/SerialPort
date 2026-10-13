@@ -34,8 +34,8 @@ public sealed partial class AppWindow : Window
         AppWindow.MoveAndResize(new RectInt32(work.X + (work.Width - width) / 2,
             work.Y + (work.Height - height) / 2, width, height), display);
         AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
-        ExtendsContentIntoTitleBar = false;
         if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
+        ExtendsContentIntoTitleBar = true;
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
             const int DWMWA_BORDER_COLOR = 34;
@@ -48,7 +48,6 @@ public sealed partial class AppWindow : Window
         ViewModel.PropertyChanged += ViewModelPropertyChanged;
         Closed += WindowClosed;
         Workspace.ReconstructionRequested += WorkspaceReconstructionRequested;
-        ProjectPanel.WindowCommandRequested += WindowCommandRequested;
         SideRail.ThemeRequested += SideRailThemeRequested;
         InitializeDevicePage();
         BuildParameterContents();
@@ -108,7 +107,6 @@ public sealed partial class AppWindow : Window
     {
         _acquisitionStop?.Cancel();
         Workspace.ReconstructionRequested -= WorkspaceReconstructionRequested;
-        ProjectPanel.WindowCommandRequested -= WindowCommandRequested;
         _connectionLifetime.Cancel();
         CloseDevice();
         _serialConnection.Dispose();

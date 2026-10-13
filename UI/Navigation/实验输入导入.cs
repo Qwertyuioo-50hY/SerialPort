@@ -37,7 +37,7 @@ public sealed partial class AppWindow
             var description = await ValidateAsync(asset.Path);
             _reconstruction.UseAsset(asset, role);
             _projectSettings.ExperimentInputs[role] = asset.Path;
-            ProjectPanel.AddAsset(asset); DirectoryPanel.SetAsset(role, asset);
+            DirectoryPanel.SetAsset(role, asset);
             if (role == "灵敏度矩阵") DeviceView.SetMatrix($"{asset.Name} · {description}");
             else if (role == "节点坐标") DeviceView.SetCoordinates($"{asset.Name} · {description}");
             else if (role == "物场/Demo数据") { DeviceView.SetSimulation($"{asset.Name} · {description}"); Workspace.ShowMeasurements(_reconstruction.Measurements!); }

@@ -30,10 +30,7 @@ public sealed partial class AppWindow
             }
             var asset = await Task.Run(() => _assets.Import(path));
             _reconstruction.UseAsset(asset, role);
-            ProjectPanel.AddAsset(asset);
-            ProjectPanel.Visibility = Visibility.Visible;
-            ProjectColumn.Width = new GridLength(240);
-            DirectoryPanel.SetAsset(role, asset);
+            DirectoryPanel.SetAsset(asset.Path, asset);
             if (role == "物场/Demo数据") Workspace.ShowMeasurements(_reconstruction.Measurements!);
             if (extension is ".png" or ".jpg" or ".jpeg" or ".bmp" or ".tif" or ".tiff") Workspace.PreviewImage(asset.Path);
             ConnectionStatus.Text = $"已导入 {asset.Name}（{role}）";

@@ -29,26 +29,22 @@
         </Grid.Resources>
         <Border x:Name="ShellFrame" Margin="0" BorderBrush="#080808" BorderThickness="8" CornerRadius="8" Background="{ThemeResource DeviceCanvasBrush}">
             <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition Width="68" /><ColumnDefinition x:Name="DirectoryColumn" Width="260"/><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="68" /><ColumnDefinition x:Name="DirectoryColumn" Width="260"/><ColumnDefinition x:Name="DirectoryDividerColumn" Width="8"/><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                 <side:IconRailView x:Name="SideRail" CornerRadius="8" RequestedTheme="Dark" Margin="8,8,0,8" />
-                <Border x:Name="DirectoryFrame" Grid.Column="1" Background="{ThemeResource DevicePageBrush}" CornerRadius="24" Margin="8,32,8,8"><navigation:ProjectDirectoryView x:Name="DirectoryPanel"/></Border>
-                <Grid x:Name="DeviceShell" Grid.Column="2" Background="{ThemeResource DeviceCanvasBrush}" ColumnSpacing="8" Padding="8,0,8,8">
-                    <Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <Border x:Name="DirectoryFrame" Grid.Column="1" Background="{ThemeResource DevicePageBrush}" CornerRadius="24" Margin="8,8,0,8"><navigation:ProjectDirectoryView x:Name="DirectoryPanel"/></Border>
+                <local:ResizeDivider x:Name="DirectoryDivider" Grid.Column="2" Width="8">
+                    <Thumb Style="{StaticResource DividerStyle}" DragDelta="DirectoryDragDelta" AutomationProperties.Name="调整项目导航宽度"/>
+                </local:ResizeDivider>
+                <Grid x:Name="DeviceShell" Grid.Column="3" Background="{ThemeResource DeviceCanvasBrush}" ColumnSpacing="8" Padding="0,8,8,8">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
-                        <Button Content="&#xE921;" Tag="Minimize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最小化" AutomationProperties.AutomationId="DeviceMinimize"/>
-                        <Button Content="&#xE922;" Tag="Maximize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最大化或还原" AutomationProperties.AutomationId="DeviceMaximize"/>
-                        <Button Content="&#xE8BB;" Tag="Close" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="关闭" AutomationProperties.AutomationId="DeviceClose"/>
-                    </StackPanel>
-                    <side:DevicePage x:Name="DeviceView" Grid.Row="1"/>
+
+                    <side:DevicePage x:Name="DeviceView"/>
                 </Grid>
-                <Grid x:Name="ContentGrid" Grid.Column="2" Margin="0,0,4,0">
+                <Grid x:Name="ContentGrid" Grid.Column="3" Margin="0,8,8,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition x:Name="ParameterColumn" Width="294" />
                         <ColumnDefinition x:Name="DividerColumn" Width="8" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="8" />
-                        <ColumnDefinition x:Name="ProjectColumn" Width="240" />
                     </Grid.ColumnDefinitions>
                     <Border x:Name="ParameterPanel" Style="{StaticResource WorkspaceCardStyle}"
                         Visibility="{x:Bind local:AppWindow.BoolToVisibility(ViewModel.ParametersVisible), Mode=OneWay}">
@@ -66,24 +62,28 @@
                             KeyDown="ParameterDividerKeyDown" AutomationProperties.Name="调整侧边栏宽度" />
                     </local:ResizeDivider>
                     <Grid Grid.Column="2">
-                        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-                        <StackPanel x:Name="ToolsPanel" Visibility="Collapsed" Orientation="Horizontal" Spacing="6">
-                            <Button Content="空场" Tag="Reference" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireReference"/>
-                            <Button Content="单次" Tag="Single" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireSingle"/>
-                            <Button Content="连续" Tag="Live" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireLive"/>
-                            <Button Content="停止" Tag="Stop" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="StopAcquisition"/>
-                        </StackPanel>
-                        <ScrollViewer x:Name="WorkspaceScroll" Grid.Row="1" ZoomMode="Enabled" MinZoomFactor="0.5" MaxZoomFactor="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
-                            <workspace:ImagingWorkspaceView x:Name="Workspace" />
+                        <ScrollViewer x:Name="WorkspaceScroll" ZoomMode="Enabled" MinZoomFactor="0.5" MaxZoomFactor="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
+                            <workspace:ImagingWorkspaceView x:Name="Workspace">
+                                <workspace:ImagingWorkspaceView.Commands>
+                                    <StackPanel x:Name="ToolsPanel" Visibility="Collapsed" Orientation="Horizontal" Spacing="6">
+                                        <Button Content="空场" Tag="Reference" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireReference"/>
+                                        <Button Content="单次" Tag="Single" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireSingle"/>
+                                        <Button Content="连续" Tag="Live" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireLive"/>
+                                        <Button Content="停止" Tag="Stop" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="StopAcquisition"/>
+                                    </StackPanel>
+                                </workspace:ImagingWorkspaceView.Commands>
+                            </workspace:ImagingWorkspaceView>
                         </ScrollViewer>
                     </Grid>
-                    <local:ResizeDivider Grid.Column="3" Width="8">
-                        <Thumb Style="{StaticResource DividerStyle}" DragDelta="ProjectDragDelta" AutomationProperties.Name="调整项目导航宽度" />
-                    </local:ResizeDivider>
-                    <navigation:ImportedFilesView x:Name="ProjectPanel" Grid.Column="4" />
+
                 </Grid>
             </Grid>
         </Border>
+        <StackPanel Margin="8,8,8,0" VerticalAlignment="Top" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
+            <Button Content="&#xE921;" Tag="Minimize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最小化" AutomationProperties.AutomationId="DeviceMinimize"/>
+            <Button Content="&#xE922;" Tag="Maximize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最大化或还原" AutomationProperties.AutomationId="DeviceMaximize"/>
+            <Button Content="&#xE8BB;" Tag="Close" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="关闭" AutomationProperties.AutomationId="DeviceClose"/>
+        </StackPanel>
         <Grid x:Name="WindowDragRegion" Height="12" Margin="88,0,12,0" VerticalAlignment="Top" Background="Transparent" />
     </Grid>
 </Window>

@@ -4,10 +4,6 @@ namespace Tomography.UI.windows;
 
 public sealed partial class AppWindow
 {
-    private void ProjectDragDelta(object sender, Microsoft.UI.Xaml.Controls.Primitives.DragDeltaEventArgs e) =>
-        ProjectColumn.Width = new Microsoft.UI.Xaml.GridLength(Math.Clamp(ProjectColumn.ActualWidth - e.HorizontalChange,
-            180, Math.Max(180, ContentGrid.ActualWidth - ParameterColumn.ActualWidth - 666)));
-
     private async Task<string?> PickImportPathAsync(string role)
     {
         var picker = new FileOpenPicker(AppWindow.Id);

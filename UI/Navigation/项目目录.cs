@@ -11,6 +11,8 @@ public sealed partial class ProjectDirectoryView : UserControl
     private readonly Dictionary<string, TreeViewNode> _assets = new();
     private TextBlock _message => DirectoryMessage;
     private readonly TreeViewNode _inputs = new() { Content = "实验输入", IsExpanded = true };
+    private readonly Dictionary<TreeViewNode, ImportedAsset> _importedAssets = new();
+    public ImportedAsset? SelectedAsset => _tree.SelectedNode is TreeViewNode node && _importedAssets.TryGetValue(node, out var asset) ? asset : null;
     public string DirectoryPath { get; private set; } = FindDirectory();
     public event EventHandler? ChooseDirectoryRequested;
     public ProjectDirectoryView()
@@ -52,7 +54,7 @@ public sealed partial class ProjectDirectoryView : UserControl
     {
         if (_assets.Remove(role, out var old)) _inputs.Children.Remove(old);
         if (asset is null) { FilterProjectFiles(); return; }
-        var node = Node(asset.Path, false); _assets[role] = node; _inputs.Children.Add(node); FilterProjectFiles();
+        var node = Node(asset.Path, false); _importedAssets[node] = asset; _assets[role] = node; _inputs.Children.Add(node); FilterProjectFiles();
     }
     private static string FindDirectory()
     {

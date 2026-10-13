@@ -13,8 +13,7 @@ public sealed partial class AppWindow
         {
             case TitleBarAction.ToggleTools: Toggle(ToolsPanel); break;
             case TitleBarAction.ToggleProject:
-                Toggle(ProjectPanel);
-                ProjectColumn.Width = new GridLength(ProjectPanel.Visibility == Visibility.Visible ? 240 : 0);
+                ToggleProjectNavigation(this, EventArgs.Empty);
                 break;
             case TitleBarAction.ToggleSidebar:
                 Toggle(SideRail);

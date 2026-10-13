@@ -7,7 +7,7 @@ public sealed partial class AppWindow
     private async Task ExportFileAsync()
     {
         if (_fileOperation) return;
-        var asset = ProjectPanel.SelectedAsset;
+        var asset = DirectoryPanel.SelectedAsset;
         if (asset is null) { ConnectionStatus.Text = "请在项目导航选择要导出的文件"; return; }
         _fileOperation = true;
         try
