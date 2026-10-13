@@ -36,8 +36,12 @@ public sealed partial class AppWindow : Window
         AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
         ExtendsContentIntoTitleBar = false;
         if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
-        var borderColor = 0xFFFFFFFEu;
-        DwmSetWindowAttribute(hwnd, 34, ref borderColor, sizeof(uint));
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+        {
+            const int DWMWA_BORDER_COLOR = 34;
+            var borderColor = 0xFFFFFFFEu; // DWMWA_COLOR_NONE
+            DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, ref borderColor, sizeof(uint));
+        }
         _titleBarInput = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
         Root.ActualThemeChanged += RootThemeChanged;
         AppWindow.Changed += AppWindowChanged;
@@ -80,6 +84,7 @@ public sealed partial class AppWindow : Window
         ContentGrid.Visibility = device ? Visibility.Collapsed : Visibility.Visible;
         ShellFrame.BorderThickness = new Thickness(device ? 0 : 8);
         ShellFrame.CornerRadius = new CornerRadius(device ? 14 : 24);
+        SideRail.CornerRadius = ShellFrame.CornerRadius;
         if (ContentGrid.ActualWidth > 0)
             _parameterWidth = Math.Clamp(_parameterWidth, 240, Math.Max(240, Math.Min(430, ContentGrid.ActualWidth - 760)));
         ParameterColumn.Width = new GridLength(ViewModel.ParametersVisible ? _parameterWidth : 0);

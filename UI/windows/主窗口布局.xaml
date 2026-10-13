@@ -27,7 +27,7 @@
                 </Setter>
             </Style>
         </Grid.Resources>
-        <Border x:Name="ShellFrame" Margin="4" BorderBrush="#080808" BorderThickness="8" CornerRadius="24" Background="{ThemeResource DeviceCanvasBrush}">
+        <Border x:Name="ShellFrame" Margin="0" BorderBrush="#080808" BorderThickness="8" CornerRadius="24" Background="{ThemeResource DeviceCanvasBrush}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="68" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                 <side:IconRailView x:Name="SideRail" RequestedTheme="Dark" Margin="8,8,0,8" />
