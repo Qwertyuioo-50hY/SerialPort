@@ -41,9 +41,9 @@
         <StackPanel Grid.Row="2" Spacing="2">
             <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" Margin="0,0,0,10" />
             <Grid>
-                <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="通知" ToolTipService.ToolTip="通知"><FontIcon Glyph="&#xE7F4;" FontSize="18" /></Button>
+                <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="通知" ToolTipService.ToolTip="通知"><FontIcon Glyph="&#xE7F4;" FontSize="18" Foreground="{ThemeResource RailForegroundBrush}" /></Button>
             </Grid>
-            <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="设置" ToolTipService.ToolTip="设置"><FontIcon Glyph="&#xE713;" FontSize="18" /></Button>
+            <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="设置" ToolTipService.ToolTip="设置"><FontIcon Glyph="&#xE713;" FontSize="18" Foreground="{ThemeResource RailForegroundBrush}" /></Button>
             <Button Style="{StaticResource RailButtonStyle}" Click="ToggleTheme" AutomationProperties.AutomationId="ThemeButton" AutomationProperties.Name="切换主题" ToolTipService.ToolTip="切换深色/浅色模式"><FontIcon x:Name="ThemeIcon" Glyph="&#xE706;" FontSize="18" /></Button>
             <ToggleSwitch x:Name="ThemeSwitch" Width="40" MinWidth="0" Padding="0" HorizontalAlignment="Center" Margin="0,2,0,12" OffContent="{x:Null}" OnContent="{x:Null}" Toggled="ThemeToggled" AutomationProperties.AutomationId="ThemeSwitch" AutomationProperties.Name="深色模式" />
             <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />

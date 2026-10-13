@@ -34,7 +34,7 @@ public sealed partial class AppWindow : Window
         AppWindow.MoveAndResize(new RectInt32(work.X + (work.Width - width) / 2,
             work.Y + (work.Height - height) / 2, width, height), display);
         AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
-        ExtendsContentIntoTitleBar = true;
+        ExtendsContentIntoTitleBar = false;
         if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
