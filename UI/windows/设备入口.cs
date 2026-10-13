@@ -26,7 +26,7 @@ public sealed partial class AppWindow
         _protocolSettings.Changed += DeviceConfigurationChanged; _deviceSettings.Changed += DeviceConfigurationChanged;
         DeviceView.ActionRequested += DeviceActionRequested;
         SideRail.NavigationRequested += (_, section) => { ViewModel.Section = section; ViewModel.ParametersVisible = section == "算法"; ToolsPanel.Visibility = section == "采集" ? Visibility.Visible : Visibility.Collapsed; };
-        SideRail.DirectoryToggleRequested += (_, _) => DirectoryColumn.Width = new GridLength(DirectoryColumn.ActualWidth > 0 ? 0 : 220);
+        SideRail.DirectoryToggleRequested += ToggleProjectNavigation;
         DirectoryPanel.ChooseDirectoryRequested += async (_, _) =>
         {
             if (_connecting || ActiveChannel.IsOpen || _sampling || _fileOperation || _reconstructing) { ShowDeviceError("请先结束采集、断开设备并完成当前操作，再切换实验项目。"); return; }

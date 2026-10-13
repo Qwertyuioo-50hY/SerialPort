@@ -45,7 +45,7 @@
             </Grid>
             <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="设置" ToolTipService.ToolTip="设置"><FontIcon Glyph="&#xE713;" FontSize="18" /></Button>
             <Button Style="{StaticResource RailButtonStyle}" Click="ToggleTheme" AutomationProperties.AutomationId="ThemeButton" AutomationProperties.Name="切换主题" ToolTipService.ToolTip="切换深色/浅色模式"><FontIcon x:Name="ThemeIcon" Glyph="&#xE706;" FontSize="18" /></Button>
-            <ToggleSwitch x:Name="ThemeSwitch" MinWidth="0" HorizontalAlignment="Center" Margin="0,2,0,12" OffContent="" OnContent="" Toggled="ThemeToggled" AutomationProperties.AutomationId="ThemeSwitch" AutomationProperties.Name="深色模式" />
+            <ToggleSwitch x:Name="ThemeSwitch" Width="40" MinWidth="0" Padding="0" HorizontalAlignment="Center" Margin="0,2,0,12" OffContent="{x:Null}" OnContent="{x:Null}" Toggled="ThemeToggled" AutomationProperties.AutomationId="ThemeSwitch" AutomationProperties.Name="深色模式" />
             <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />
             <Grid Margin="0,14,0,0">
                 <Border Width="38" Height="38" CornerRadius="10" Background="{ThemeResource RailSelectedBackgroundBrush}" HorizontalAlignment="Center"><PersonPicture DisplayName="EMT" Width="32" Height="32" /></Border>

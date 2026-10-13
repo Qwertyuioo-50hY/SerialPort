@@ -29,20 +29,20 @@
         </Grid.Resources>
         <Border x:Name="ShellFrame" Margin="0" BorderBrush="#080808" BorderThickness="8" CornerRadius="8" Background="{ThemeResource DeviceCanvasBrush}">
             <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition Width="68" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="68" /><ColumnDefinition x:Name="DirectoryColumn" Width="260"/><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                 <side:IconRailView x:Name="SideRail" CornerRadius="8" RequestedTheme="Dark" Margin="8,8,0,8" />
-                <Grid x:Name="DeviceShell" Grid.Column="1" Background="{ThemeResource DeviceCanvasBrush}" ColumnSpacing="8" Padding="8,0,8,8">
+                <Border x:Name="DirectoryFrame" Grid.Column="1" Background="{ThemeResource DevicePageBrush}" CornerRadius="24" Margin="8,32,8,8"><navigation:ProjectDirectoryView x:Name="DirectoryPanel"/></Border>
+                <Grid x:Name="DeviceShell" Grid.Column="2" Background="{ThemeResource DeviceCanvasBrush}" ColumnSpacing="8" Padding="8,0,8,8">
                     <Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions><ColumnDefinition x:Name="DirectoryColumn" Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
                         <Button Content="&#xE921;" Tag="Minimize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最小化" AutomationProperties.AutomationId="DeviceMinimize"/>
                         <Button Content="&#xE922;" Tag="Maximize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最大化或还原" AutomationProperties.AutomationId="DeviceMaximize"/>
                         <Button Content="&#xE8BB;" Tag="Close" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="关闭" AutomationProperties.AutomationId="DeviceClose"/>
                     </StackPanel>
-                    <Border Grid.Row="1" Background="{ThemeResource DevicePageBrush}" CornerRadius="14"><navigation:ProjectDirectoryView x:Name="DirectoryPanel"/></Border>
-                    <side:DevicePage x:Name="DeviceView" Grid.Row="1" Grid.Column="1"/>
+                    <side:DevicePage x:Name="DeviceView" Grid.Row="1"/>
                 </Grid>
-                <Grid x:Name="ContentGrid" Grid.Column="1" Margin="0,0,4,0">
+                <Grid x:Name="ContentGrid" Grid.Column="2" Margin="0,0,4,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition x:Name="ParameterColumn" Width="294" />
                         <ColumnDefinition x:Name="DividerColumn" Width="8" />

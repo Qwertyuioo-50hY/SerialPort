@@ -1,48 +1,38 @@
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using System.IO;
 using Tomography.Business.Models;
 
 namespace Tomography.UI.Navigation;
 
-public sealed class ProjectDirectoryView : UserControl
+public sealed partial class ProjectDirectoryView : UserControl
 {
-    private readonly TreeView _tree = new() { SelectionMode = TreeViewSelectionMode.Single, CanDragItems = false, AllowDrop = false };
+    private TreeView _tree => ProjectTree;
     private readonly Dictionary<TreeViewNode, string> _paths = new();
     private readonly Dictionary<string, TreeViewNode> _assets = new();
-    private readonly TextBlock _message = new() { TextWrapping = TextWrapping.Wrap };
+    private TextBlock _message => DirectoryMessage;
     private readonly TreeViewNode _inputs = new() { Content = "实验输入", IsExpanded = true };
     public string DirectoryPath { get; private set; } = FindDirectory();
     public event EventHandler? ChooseDirectoryRequested;
     public ProjectDirectoryView()
     {
-        AutomationProperties.SetAutomationId(_tree, "ProjectDirectory");
-        AutomationProperties.SetName(_tree, "当前项目目录");
-        var choose = new Button { Content = "打开文件夹", HorizontalAlignment = HorizontalAlignment.Stretch };
-        AutomationProperties.SetAutomationId(choose, "ChooseProjectDirectory");
-        choose.Click += (_, _) => ChooseDirectoryRequested?.Invoke(this, EventArgs.Empty);
-        var grid = new Grid { Padding = new Thickness(8), RowSpacing = 8 };
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        grid.RowDefinitions.Add(new RowDefinition());
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        Grid.SetRow(_tree, 1); Grid.SetRow(_message, 2);
-        grid.Children.Add(choose); grid.Children.Add(_tree); grid.Children.Add(_message); Content = grid;
+        InitializeComponent();
+        ChooseProjectDirectory.Click += (_, _) => ChooseDirectoryRequested?.Invoke(this, EventArgs.Empty);
+        SearchBox.TextChanged += (_, _) => FilterProjectFiles();
         _tree.Expanding += async (_, e) => { if (e.Node.HasUnrealizedChildren) await FillAsync(e.Node); };
-        Loaded += async (_, _) => { if (_tree.RootNodes.Count == 0) await LoadAsync(DirectoryPath); };
+        Loaded += async (_, _) => { if (_projectRoots.Length == 0) await LoadAsync(DirectoryPath); };
     }
     public async Task LoadAsync(string path)
     {
+        SearchBox.Text = "";
         DirectoryPath = Path.GetFullPath(path); _paths.Clear(); _tree.RootNodes.Clear();
         var root = Node(DirectoryPath, true); _tree.RootNodes.Add(root); _tree.RootNodes.Add(_inputs);
         await FillAsync(root);
+        _projectRoots = _tree.RootNodes.ToArray();
+        FilterProjectFiles();
     }
     private TreeViewNode Node(string path, bool directory)
     {
-        var content = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        content.Children.Add(new FontIcon { Glyph = directory ? "\uE8B7" : "\uE8A5", FontSize = 16 });
-        content.Children.Add(new TextBlock { Text = Path.GetFileName(path), VerticalAlignment = VerticalAlignment.Center });
-        var node = new TreeViewNode { Content = content, HasUnrealizedChildren = directory };
+        var node = new TreeViewNode { Content = Path.GetFileName(path), HasUnrealizedChildren = directory };
         _paths[node] = path; return node;
     }
     private async Task FillAsync(TreeViewNode node)
@@ -61,8 +51,8 @@ public sealed class ProjectDirectoryView : UserControl
     public void SetAsset(string role, ImportedAsset? asset)
     {
         if (_assets.Remove(role, out var old)) _inputs.Children.Remove(old);
-        if (asset is null) return;
-        var node = Node(asset.Path, false); _assets[role] = node; _inputs.Children.Add(node);
+        if (asset is null) { FilterProjectFiles(); return; }
+        var node = Node(asset.Path, false); _assets[role] = node; _inputs.Children.Add(node); FilterProjectFiles();
     }
     private static string FindDirectory()
     {
