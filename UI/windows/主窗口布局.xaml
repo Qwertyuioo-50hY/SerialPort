@@ -5,7 +5,7 @@
     xmlns:side="using:Tomography.UI.SideView"
     xmlns:navigation="using:Tomography.UI.Navigation"
     xmlns:workspace="using:Tomography.UI.workspace" Title="Tomography">
-    <Grid x:Name="Root" Background="{ThemeResource DeviceCanvasBrush}" RequestedTheme="Light" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
+    <Grid x:Name="Root" Background="#080808" RequestedTheme="Light" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
         <Grid.Resources>
             <Style x:Key="DividerStyle" TargetType="Thumb">
                 <Setter Property="UseSystemFocusVisuals" Value="False" />
@@ -27,10 +27,10 @@
                 </Setter>
             </Style>
         </Grid.Resources>
-        <Border x:Name="ShellFrame" Margin="0" BorderBrush="#080808" BorderThickness="8" CornerRadius="24" Background="{ThemeResource DeviceCanvasBrush}">
+        <Border x:Name="ShellFrame" Margin="0" BorderBrush="#080808" BorderThickness="8" CornerRadius="8" Background="{ThemeResource DeviceCanvasBrush}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="68" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                <side:IconRailView x:Name="SideRail" RequestedTheme="Dark" Margin="8,8,0,8" />
+                <side:IconRailView x:Name="SideRail" CornerRadius="8" RequestedTheme="Dark" Margin="8,8,0,8" />
                 <Grid x:Name="DeviceShell" Grid.Column="1" Background="{ThemeResource DeviceCanvasBrush}" ColumnSpacing="8" Padding="8,0,8,8">
                     <Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                     <Grid.ColumnDefinitions><ColumnDefinition x:Name="DirectoryColumn" Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>

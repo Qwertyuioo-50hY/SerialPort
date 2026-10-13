@@ -34,7 +34,7 @@ public sealed partial class AppWindow : Window
         AppWindow.MoveAndResize(new RectInt32(work.X + (work.Width - width) / 2,
             work.Y + (work.Height - height) / 2, width, height), display);
         AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
-        ExtendsContentIntoTitleBar = false;
+        ExtendsContentIntoTitleBar = true;
         if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
@@ -82,8 +82,8 @@ public sealed partial class AppWindow : Window
         var device = ViewModel.Section is "设备" or "接口/协议";
         DeviceShell.Visibility = device ? Visibility.Visible : Visibility.Collapsed;
         ContentGrid.Visibility = device ? Visibility.Collapsed : Visibility.Visible;
-        ShellFrame.BorderThickness = new Thickness(device ? 0 : 8);
-        ShellFrame.CornerRadius = new CornerRadius(device ? 14 : 24);
+        ShellFrame.BorderThickness = new Thickness(8);
+        ShellFrame.CornerRadius = new CornerRadius(8);
         SideRail.CornerRadius = ShellFrame.CornerRadius;
         if (ContentGrid.ActualWidth > 0)
             _parameterWidth = Math.Clamp(_parameterWidth, 240, Math.Max(240, Math.Min(430, ContentGrid.ActualWidth - 760)));
