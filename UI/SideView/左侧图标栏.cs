@@ -23,9 +23,13 @@ public sealed partial class IconRailView : UserControl
     {
         if (((Button)sender).Tag is not string section) return;
         NavigationRequested?.Invoke(this, section);
-        foreach (Button button in RailItems.Children.OfType<Button>().Append(AiRailItem))
+        SetSection(section);
+    }
+    public void SetSection(string section)
+    {
+        foreach (Button button in RailItems.Children.OfType<Button>().Append(AiRailItem).Append(SettingsRailItem))
         {
-            var selected = ReferenceEquals(button, sender);
+            var selected = button.Tag as string == section;
             button.Background = selected ? _selectedBackground : new SolidColorBrush(Microsoft.UI.Colors.Transparent);
             var color = selected ? _selectedForeground : _defaultForeground;
             button.Foreground = ((FontIcon)button.Content).Foreground = color;

@@ -41,6 +41,7 @@
 
                     <side:DevicePage x:Name="DeviceView"/>
                 </Grid>
+                <side:AiSettingsView x:Name="AiSettingsPanel" Grid.Column="3" Margin="0,8,8,8" Visibility="Collapsed"/>
                 <bottom:AiChatPanelView x:Name="AiChatView" Grid.Column="3" Margin="0,8,8,8" Visibility="Collapsed"/>
                 <Grid x:Name="ContentGrid" Grid.Column="3" Margin="0,8,8,8">
                     <Grid.ColumnDefinitions>
@@ -75,8 +76,7 @@
                                             <Button Content="多次采集" Tag="Batch" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireBatch"/>
                                             <NumberBox x:Name="BatchFrameCount" Grid.Column="1" Value="10" Minimum="1" Maximum="2147483647" SmallChange="1" SpinButtonPlacementMode="Hidden" CornerRadius="10" VerticalAlignment="Stretch" AutomationProperties.Name="多次采集数量（帧）" AutomationProperties.AutomationId="BatchFrameCount" ToolTipService.ToolTip="采集数量（帧）"/>
                                         </Grid>
-                                        <Button Content="实时采集" Tag="Live" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireLive"/>
-                                        <Button Content="停止" Tag="Stop" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="StopAcquisition"/>
+                                        <Button Content="实时采集" Tag="Live" ToolTipService.ToolTip="再次点击可停止实时采集" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireLive"/>
                                     </StackPanel>
                                 </workspace:ImagingWorkspaceView.Commands>
                             </workspace:ImagingWorkspaceView>

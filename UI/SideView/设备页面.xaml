@@ -7,7 +7,7 @@
   <Style TargetType="NumberBox"><Setter Property="CornerRadius" Value="10"/></Style>
  </UserControl.Resources>
  <Border Background="{ThemeResource DevicePageBrush}" CornerRadius="24">
-  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
    <StackPanel Margin="24,32,24,24" Spacing="16">
     <StackPanel Orientation="Horizontal" Spacing="8">
      <Button x:Name="ConnectButton" Content="连接" Click="ConnectClicked" Style="{StaticResource AccentButtonStyle}" CornerRadius="10" AutomationProperties.AutomationId="DeviceConnect"/>
@@ -15,13 +15,16 @@
      <Button x:Name="DisconnectButton" Content="断开" Click="DisconnectClicked" IsEnabled="False" AutomationProperties.AutomationId="DeviceDisconnect"/>
      <ProgressRing x:Name="Progress" Width="16" Height="16" IsActive="False"/>
     </StackPanel>
-    <TextBlock x:Name="Status" Text="未连接" TextWrapping="Wrap" AutomationProperties.AutomationId="DeviceStatus"/>
+    <TextBlock x:Name="Status" Visibility="Collapsed" TextWrapping="Wrap" AutomationProperties.AutomationId="DeviceStatus"/>
     <InfoBar x:Name="Error" IsOpen="False" Severity="Error" AutomationProperties.AutomationId="DeviceError"/>
+    <Border Background="{ThemeResource DeviceToolbarBrush}" BorderBrush="{ThemeResource DeviceDividerBrush}" BorderThickness="1" CornerRadius="16" Padding="20">
+     <ContentControl x:Name="ConnectionHost" HorizontalContentAlignment="Stretch"/>
+    </Border>
     <Grid x:Name="Modules" ColumnSpacing="16" RowSpacing="16" SizeChanged="ModulesSizeChanged">
      <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition x:Name="ParametersColumn"/></Grid.ColumnDefinitions>
      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
      <Border Background="{ThemeResource DeviceToolbarBrush}" BorderBrush="{ThemeResource DeviceDividerBrush}" BorderThickness="1" CornerRadius="16" Padding="20">
-      <ContentControl x:Name="ConnectionHost" HorizontalContentAlignment="Stretch"/>
+      <ContentControl x:Name="TransportParametersHost" HorizontalContentAlignment="Stretch"/>
      </Border>
      <Border x:Name="DeviceParametersModule" Grid.Column="1" Background="{ThemeResource DeviceToolbarBrush}" BorderBrush="{ThemeResource DeviceDividerBrush}" BorderThickness="1" CornerRadius="16" Padding="20" VerticalAlignment="Top">
       <StackPanel Spacing="20">

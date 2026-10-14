@@ -6,7 +6,7 @@
     <Grid Padding="20" RowSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Spacing="12">
             <FontIcon Glyph="&#xE8B7;" FontSize="20" Foreground="{ThemeResource RailAccentBrush}"/>
@@ -73,6 +73,10 @@
             <FontIcon Glyph="&#xE8B7;" FontSize="32" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             <TextBlock Text="未找到项目文件" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
         </StackPanel>
-        <TextBlock x:Name="DirectoryMessage" Grid.Row="4" TextWrapping="Wrap"/>
+        <StackPanel Grid.Row="4" Spacing="8">
+            <Button Content="＋ 新建对话" Click="NewChatClicked" HorizontalAlignment="Stretch" CornerRadius="12" AutomationProperties.AutomationId="NewAiConversation"/>
+            <ListView x:Name="ChatConversations" MaxHeight="220" SelectionChanged="ChatSelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Hidden" AutomationProperties.AutomationId="AiConversations"/>
+        </StackPanel>
+        <TextBlock x:Name="DirectoryMessage" Grid.Row="5" TextWrapping="Wrap"/>
     </Grid>
 </UserControl>

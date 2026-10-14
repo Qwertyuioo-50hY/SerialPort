@@ -17,7 +17,6 @@
  </UserControl.Resources>
  <Border Style="{StaticResource WorkspaceCardStyle}">
   <StackPanel Spacing="20">
-   <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,24,0,0"><FontIcon Glyph="&#xE9D9;" FontSize="22" Foreground="{ThemeResource RailAccentBrush}"/><TextBlock Text="数据分析" FontSize="24" FontWeight="SemiBold"/></StackPanel>
    <Border x:Name="WaveformModule" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16" CornerRadius="16">
     <Grid ColumnSpacing="20">
      <Grid.ColumnDefinitions><ColumnDefinition Width="240"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>

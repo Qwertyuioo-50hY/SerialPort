@@ -9,10 +9,10 @@ public sealed partial class DevicePage : UserControl
     public TextBlock StatusText => Status;
     public DevicePage() => InitializeComponent();
     public void Attach(ConnectionProtocolView connection, DeviceParametersView parameters)
-    { ConnectionHost.Content = connection; ParametersHost.Content = parameters; }
+    { ConnectionHost.Content = connection; TransportParametersHost.Content = connection.DetachTransportParameters(); ParametersHost.Content = parameters; }
     public void SetState(string text, bool busy, bool connected, string? error = null)
     {
-        Status.Text = text; Progress.IsActive = busy;
+        Status.Text = text; Status.Visibility = text == "未连接" ? Visibility.Collapsed : Visibility.Visible; Progress.IsActive = busy;
         ConnectButton.IsEnabled = !busy && !connected;
         HandshakeButton.IsEnabled = connected && !busy;
         DisconnectButton.IsEnabled = connected || busy;

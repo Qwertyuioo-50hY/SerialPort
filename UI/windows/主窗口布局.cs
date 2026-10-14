@@ -50,6 +50,7 @@ public sealed partial class AppWindow : Window
         Workspace.ReconstructionRequested += WorkspaceReconstructionRequested;
         SideRail.ThemeRequested += SideRailThemeRequested;
         InitializeDevicePage();
+        InitializeAi();
         AddReconstructionSettings(Workspace.AlgorithmPanel);
         _reconstructionSettings!.CustomAlgorithmRequested += async (_, _) => await ImportFileAsync("自定义算法");
         BuildParameterContents();
@@ -82,8 +83,9 @@ public sealed partial class AppWindow : Window
     {
         var device = ViewModel.Section is "设备" or "接口/协议";
         DeviceShell.Visibility = device ? Visibility.Visible : Visibility.Collapsed;
+        AiSettingsPanel.Visibility = ViewModel.Section == "设置" ? Visibility.Visible : Visibility.Collapsed;
         AiChatView.Visibility = ViewModel.Section == "AI" ? Visibility.Visible : Visibility.Collapsed;
-        ContentGrid.Visibility = device || ViewModel.Section is "采集" or "AI" ? Visibility.Collapsed : Visibility.Visible;
+        ContentGrid.Visibility = device || ViewModel.Section is "采集" or "AI" or "设置" ? Visibility.Collapsed : Visibility.Visible;
         ShellFrame.BorderThickness = new Thickness(8);
         ShellFrame.CornerRadius = new CornerRadius(8);
         SideRail.CornerRadius = ShellFrame.CornerRadius;

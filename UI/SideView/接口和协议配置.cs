@@ -6,6 +6,7 @@ namespace Tomography.UI.SideView;
 public sealed partial class ConnectionProtocolView : UserControl
 {
     private bool _ready;
+    private ContentControl? _transportParameters;
     public event EventHandler? Changed;
     public event EventHandler? RefreshRequested;
     public bool IsSimulation => DataSource.SelectedIndex == 1;
@@ -31,6 +32,13 @@ public sealed partial class ConnectionProtocolView : UserControl
         ConnectionTypeOption.Visibility = Show(!IsSimulation);
         SerialParameters.Visibility = Show(UsesSerialDevice);
         TcpParameters.Visibility = Show(UsesTcpDevice);
+    }
+    public UIElement DetachTransportParameters()
+    {
+        var content = (UIElement)TransportHost.Content;
+        TransportHost.Content = null;
+        _transportParameters = new ContentControl { Content = content, HorizontalContentAlignment = HorizontalAlignment.Stretch };
+        return _transportParameters;
     }
     public void SetPorts(string[] ports)
     {
@@ -78,6 +86,6 @@ public sealed partial class ConnectionProtocolView : UserControl
         }
         finally { _ready = true; UpdateConfiguration(); }
     }
-    public void SetBusy(bool busy) => IsEnabled = !busy;
+    public void SetBusy(bool busy) { IsEnabled = !busy; if (_transportParameters is not null) _transportParameters.IsEnabled = !busy; }
     private static Visibility Show(bool visible) => visible ? Visibility.Visible : Visibility.Collapsed;
 }

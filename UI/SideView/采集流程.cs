@@ -9,12 +9,14 @@ public sealed partial class AppWindow
     private readonly AcquisitionRecords _acquisitionRecords = new();
     private CancellationTokenSource? _acquisitionStop;
     private bool _sampling;
+    private AcquisitionMode _activeAcquisitionMode;
     private int _batchFrameTarget = 10;
     private bool _acquiringReference;
     private void StopAcquisition(object? sender, EventArgs e) => _acquisitionStop?.Cancel();
     private async void AcquisitionRequested(object? sender, AcquisitionMode mode)
     {
         if (_sampling || _connecting || _fileOperation || (mode == AcquisitionMode.Reference && _reconstructing)) return;
+        _activeAcquisitionMode = mode;
         if (mode == AcquisitionMode.Batch)
         {
             if (!IsInteger(BatchFrameCount.Value, 1, int.MaxValue))

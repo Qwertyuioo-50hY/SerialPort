@@ -62,6 +62,7 @@ public sealed partial class ProjectDirectoryView : UserControl
         await FillAsync(root);
         _projectRoots = _tree.RootNodes.ToArray();
         FilterProjectFiles();
+        ProjectChanged?.Invoke(this, EventArgs.Empty);
     }
     private TreeViewNode Node(string path, bool directory)
     {

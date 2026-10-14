@@ -43,7 +43,7 @@ public sealed partial class AppWindow
     private void AcquisitionButtonClicked(object sender, RoutedEventArgs e)
     {
         var command = (string)((Microsoft.UI.Xaml.Controls.Button)sender).Tag;
-        if (command == "Stop") { if (_fireWater is not null || _customFrame is not null) EndStreamAcquisition(); else StopAcquisition(sender, EventArgs.Empty); }
+        if (command == "Stop" || (command == "Live" && _sampling && _activeAcquisitionMode == AcquisitionMode.Live)) { if (_fireWater is not null || _customFrame is not null) EndStreamAcquisition(); else StopAcquisition(sender, EventArgs.Empty); }
         else AcquisitionRequested(sender, Enum.Parse<AcquisitionMode>(command));
     }
 }
