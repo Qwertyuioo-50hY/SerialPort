@@ -82,7 +82,8 @@ public sealed partial class AppWindow : Window
     {
         var device = ViewModel.Section is "设备" or "接口/协议";
         DeviceShell.Visibility = device ? Visibility.Visible : Visibility.Collapsed;
-        ContentGrid.Visibility = device || ViewModel.Section == "采集" ? Visibility.Collapsed : Visibility.Visible;
+        AiChatView.Visibility = ViewModel.Section == "AI" ? Visibility.Visible : Visibility.Collapsed;
+        ContentGrid.Visibility = device || ViewModel.Section is "采集" or "AI" ? Visibility.Collapsed : Visibility.Visible;
         ShellFrame.BorderThickness = new Thickness(8);
         ShellFrame.CornerRadius = new CornerRadius(8);
         SideRail.CornerRadius = ShellFrame.CornerRadius;

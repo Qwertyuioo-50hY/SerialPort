@@ -32,16 +32,13 @@
             <StackPanel x:Name="RailItems" Spacing="4" Margin="0,14,0,0" HorizontalAlignment="Center">
                 <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Tag="采集" AutomationProperties.AutomationId="AcquisitionNavigation" AutomationProperties.Name="采集" ToolTipService.ToolTip="概览"><FontIcon Glyph="&#xE80A;" FontSize="19" /></Button>
                 <Button x:Name="SelectedRailItem" Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Background="{ThemeResource RailSelectedBackgroundBrush}" Foreground="{ThemeResource RailAccentBrush}" Tag="设备" AutomationProperties.AutomationId="DeviceNavigation" AutomationProperties.Name="设备" ToolTipService.ToolTip="设备"><FontIcon Foreground="{ThemeResource RailAccentBrush}" Glyph="&#xE8A5;" FontSize="19" /></Button>
-                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="成员" ToolTipService.ToolTip="成员"><FontIcon Glyph="&#xE716;" FontSize="19" /></Button>
-                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="连接" ToolTipService.ToolTip="连接"><FontIcon Glyph="&#xE701;" FontSize="19" /></Button>
                 <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Tag="算法" AutomationProperties.AutomationId="AlgorithmNavigation" AutomationProperties.Name="数据分析" ToolTipService.ToolTip="数据分析"><FontIcon Glyph="&#xE9F9;" FontSize="19" /></Button>
-                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="统计" ToolTipService.ToolTip="统计"><FontIcon Glyph="&#xE9D9;" FontSize="19" /></Button>
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="2" Spacing="2">
             <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" Margin="0,0,0,10" />
             <Grid>
-                <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="通知" ToolTipService.ToolTip="通知"><FontIcon Glyph="&#xE7F4;" FontSize="18" Foreground="{ThemeResource RailForegroundBrush}" /></Button>
+                <Button x:Name="AiRailItem" Click="SelectRailItem" Tag="AI" Style="{StaticResource RailButtonStyle}" AutomationProperties.AutomationId="AiNavigation" AutomationProperties.Name="AI" ToolTipService.ToolTip="AI 聊天"><FontIcon Glyph="&#xE8F2;" FontSize="18" /></Button>
             </Grid>
             <Button Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="设置" ToolTipService.ToolTip="设置"><FontIcon Glyph="&#xE713;" FontSize="18" Foreground="{ThemeResource RailForegroundBrush}" /></Button>
             <Button Style="{StaticResource RailButtonStyle}" Click="ToggleTheme" AutomationProperties.AutomationId="ThemeButton" AutomationProperties.Name="切换主题" ToolTipService.ToolTip="切换深色/浅色模式"><FontIcon x:Name="ThemeIcon" Glyph="&#xE706;" FontSize="18" /></Button>

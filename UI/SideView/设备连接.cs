@@ -62,13 +62,13 @@ public sealed partial class AppWindow
             _customFrame = _protocolSettings.Protocol == 2 ? new CustomFrameDecoder(_projectSettings.CustomFrame!) : null;
             _selectedChannel.DataReceived += DeviceBytesReceived;
             if (_fireWater is not null || _customFrame is not null)
-            { DeviceView.SetState("流式接口已打开，等待合法 64 通道数据；设备身份未识别", false, true); return; }
-            DeviceView.SetState("识别中：等待 EMT 握手", true, true);
+            { DeviceView.SetState("已连接，等待数据", false, true); return; }
+            DeviceView.SetState("握手中", true, true);
             _deviceDiagnostics.Enqueue("TX: 776869636820656D740D0A (which emt)");
             var result = await EmtHandshake.ExecuteAsync(_selectedChannel, token);
             if (!result.IsSuccess) throw new InvalidOperationException(result.Message, result.Exception);
             _deviceReady = true;
-            DeviceView.SetState("EMT 已连接：握手通过；未提供型号、序列号或固件版本", false, true);
+            DeviceView.SetState("握手成功", false, true);
         }
         catch (Exception ex)
         {
@@ -77,6 +77,34 @@ public sealed partial class AppWindow
                 DeviceView.SetState("未连接", false, false, ex is OperationCanceledException ? "连接已取消" : ex.Message);
         }
         finally { _connecting = false; if (!ActiveChannel.IsOpen) { _protocolSettings.SetBusy(false); _deviceSettings.IsEnabled = true; } }
+    }
+    private async Task RepeatDeviceHandshakeAsync()
+    {
+        if (_connecting || _sampling || _reconstructing || _fileOperation) return;
+        if (!ActiveChannel.IsOpen) { ShowDeviceError("请先连接设备。"); return; }
+        if (_protocolSettings!.Protocol != 0 || _protocolSettings.IsSimulation)
+        { ShowDeviceError("当前协议不支持 EMT 握手。"); return; }
+        _connecting = true;
+        _deviceReady = false;
+        var channel = ActiveChannel;
+        var token = _deviceStop?.Token ?? _connectionLifetime.Token;
+        DeviceView.SetState("握手中", true, true);
+        try
+        {
+            _deviceDiagnostics.Enqueue("TX: 776869636820656D740D0A (which emt)");
+            var result = await EmtHandshake.ExecuteAsync(channel, token);
+            if (!result.IsSuccess) throw new InvalidOperationException(result.Message, result.Exception);
+            token.ThrowIfCancellationRequested();
+            _deviceReady = true;
+            DeviceView.SetState("握手成功", false, true);
+        }
+        catch (Exception ex)
+        {
+            CloseDevice();
+            if (!_connectionLifetime.IsCancellationRequested)
+                DeviceView.SetState("未连接", false, false, ex is OperationCanceledException ? null : ex.Message);
+        }
+        finally { _connecting = false; }
     }
     private void DeviceBytesReceived(object? sender, LogEntry entry)
     {
@@ -93,7 +121,7 @@ public sealed partial class AppWindow
                     {
                         if (!ReferenceEquals(sender, _selectedChannel) || _connectionLifetime.IsCancellationRequested) return;
                         AcceptStreamFrame(frame);
-                        DeviceView.SetState("数据流有效：64 通道；设备身份未验证", false, true);
+                        DeviceView.SetState("数据接收中", false, true);
                     });
             }
             catch (Exception ex) { DispatcherQueue.TryEnqueue(() => { CloseDevice(); ShowDeviceError(ex.Message); }); }

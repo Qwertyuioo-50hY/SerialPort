@@ -4,6 +4,7 @@
     xmlns:local="using:Tomography.UI.windows"
     xmlns:side="using:Tomography.UI.SideView"
     xmlns:navigation="using:Tomography.UI.Navigation"
+    xmlns:bottom="using:Tomography.UI.Bottom"
     xmlns:workspace="using:Tomography.UI.workspace" Title="Tomography">
     <Grid x:Name="Root" Background="#080808" RequestedTheme="Light" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
         <Grid.Resources>
@@ -40,6 +41,7 @@
 
                     <side:DevicePage x:Name="DeviceView"/>
                 </Grid>
+                <bottom:AiChatPanelView x:Name="AiChatView" Grid.Column="3" Margin="0,8,8,8" Visibility="Collapsed"/>
                 <Grid x:Name="ContentGrid" Grid.Column="3" Margin="0,8,8,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition x:Name="ParameterColumn" Width="294" />

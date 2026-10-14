@@ -1,50 +1,30 @@
 <UserControl x:Class="Tomography.UI.SideView.ConnectionProtocolView"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
- <StackPanel Spacing="20" SizeChanged="LayoutChanged">
-  <Border Background="{ThemeResource DeviceToolbarBrush}" CornerRadius="12" Padding="16">
-   <Grid x:Name="Options" ColumnSpacing="20" RowSpacing="12">
-    <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
-    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-    <Grid x:Name="DataSourceOption" Grid.Column="0" ColumnSpacing="12">
-     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-     <FontIcon Glyph="&#xE8F1;" FontSize="18" VerticalAlignment="Center"/>
-     <TextBlock Grid.Column="1" Text="数据源" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-     <ComboBox x:Name="DataSource" Grid.Column="2" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.Name="数据源" AutomationProperties.AutomationId="DataSource"><x:String>实物设备</x:String><x:String>仿真数据</x:String></ComboBox>
-    </Grid>
-    <Grid x:Name="ConnectionTypeOption" Grid.Column="1" ColumnSpacing="12">
-     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-     <FontIcon Glyph="&#xE968;" FontSize="18" VerticalAlignment="Center"/>
-     <TextBlock Grid.Column="1" Text="连接方式" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-     <ComboBox x:Name="ConnectionType" Grid.Column="2" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.Name="连接方式" AutomationProperties.AutomationId="ConnectionType"><x:String>串口</x:String><x:String>TCP</x:String></ComboBox>
-    </Grid>
-    <Grid x:Name="DataProtocolOption" Grid.Column="2" ColumnSpacing="12">
-     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-     <FontIcon Glyph="&#xE8A5;" FontSize="18" VerticalAlignment="Center"/>
-     <TextBlock Grid.Column="1" Text="数据协议" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-     <ComboBox x:Name="DataProtocol" Grid.Column="2" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.Name="数据协议" AutomationProperties.AutomationId="DataProtocol"><x:String>EMT 二进制（现有固件）</x:String><x:String>FireWater</x:String><x:String>自定义帧</x:String></ComboBox>
-    </Grid>
-   </Grid>
-  </Border>
-  <TextBlock x:Name="ProtocolNote" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-  <StackPanel x:Name="SerialParameters" Spacing="16" Width="420" HorizontalAlignment="Left" Margin="24,8,0,0">
+ <StackPanel Spacing="20">
+  <RadioButtons x:Name="DataSource" Header="数据源" MaxColumns="1" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.Name="数据源" AutomationProperties.AutomationId="DataSource"><x:String>实物设备</x:String><x:String>仿真数据</x:String></RadioButtons>
+  <Border Height="1" Background="{ThemeResource DeviceDividerBrush}"/>
+  <StackPanel x:Name="ConnectionTypeOption">
+   <RadioButtons x:Name="ConnectionType" Header="连接方式" MaxColumns="1" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.Name="连接方式" AutomationProperties.AutomationId="ConnectionType"><x:String>串口</x:String><x:String>TCP</x:String></RadioButtons>
+  </StackPanel>
+  <Border Height="1" Background="{ThemeResource DeviceDividerBrush}"/>
+  <RadioButtons x:Name="DataProtocol" Header="数据协议" MaxColumns="1" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.Name="数据协议" AutomationProperties.AutomationId="DataProtocol"><x:String>EMT 二进制</x:String><x:String>FireWater</x:String><x:String>自定义帧</x:String></RadioButtons>
+  <Border Height="1" Background="{ThemeResource DeviceDividerBrush}"/>
+  <StackPanel x:Name="SerialParameters" Spacing="16" HorizontalAlignment="Stretch">
    <Grid ColumnSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition Width="88"/><ColumnDefinition Width="*"/><ColumnDefinition Width="40"/></Grid.ColumnDefinitions><TextBlock Text="端口" VerticalAlignment="Center"/><ComboBox x:Name="DevicePortField" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.AutomationId="DevicePortField" AutomationProperties.Name="端口"><x:String>选择端口</x:String></ComboBox><Button Grid.Column="2" Click="RefreshClicked" AutomationProperties.Name="刷新串口" AutomationProperties.AutomationId="RefreshPorts" ToolTipService.ToolTip="刷新串口"><FontIcon Glyph="&#xE72C;" FontSize="16"/></Button></Grid>
    <Grid ColumnSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition Width="88"/><ColumnDefinition Width="*"/><ColumnDefinition Width="40"/></Grid.ColumnDefinitions><TextBlock Text="波特率" VerticalAlignment="Center"/><ComboBox x:Name="BaudRateField" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.AutomationId="BaudRateField" AutomationProperties.Name="波特率"><x:String>115200</x:String><x:String>57600</x:String><x:String>38400</x:String><x:String>19200</x:String><x:String>9600</x:String></ComboBox></Grid>
    <Grid ColumnSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition Width="88"/><ColumnDefinition Width="*"/><ColumnDefinition Width="40"/></Grid.ColumnDefinitions><TextBlock Text="数据位" VerticalAlignment="Center"/><ComboBox x:Name="DataBitsField" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.AutomationId="DataBitsField" AutomationProperties.Name="数据位"><x:String>8</x:String><x:String>7</x:String><x:String>6</x:String><x:String>5</x:String></ComboBox></Grid>
    <Grid ColumnSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition Width="88"/><ColumnDefinition Width="*"/><ColumnDefinition Width="40"/></Grid.ColumnDefinitions><TextBlock Text="校验位" VerticalAlignment="Center"/><ComboBox x:Name="ParityField" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.AutomationId="ParityField" AutomationProperties.Name="校验位"><x:String>None</x:String><x:String>Odd</x:String><x:String>Even</x:String></ComboBox></Grid>
    <Grid ColumnSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition Width="88"/><ColumnDefinition Width="*"/><ColumnDefinition Width="40"/></Grid.ColumnDefinitions><TextBlock Text="停止位" VerticalAlignment="Center"/><ComboBox x:Name="StopBitsField" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.AutomationId="StopBitsField" AutomationProperties.Name="停止位"><x:String>1</x:String><x:String>2</x:String><x:String>1.5</x:String></ComboBox></Grid>
-   <Expander Header="高级设置" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
     <StackPanel Spacing="12">
 <ComboBox x:Name="FlowControlField" Header="流控" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.AutomationId="FlowControlField"><x:String>None</x:String><x:String>XOnXOff</x:String><x:String>RequestToSend</x:String><x:String>RequestToSendXOnXOff</x:String></ComboBox>
 <ComboBox x:Name="EncodingField" Header="编码" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="ConfigurationChanged" AutomationProperties.AutomationId="EncodingField"><x:String>UTF-8</x:String><x:String>GBK</x:String><x:String>ASCII</x:String><x:String>Unicode</x:String></ComboBox>
      <StackPanel Orientation="Horizontal" Spacing="20"><CheckBox x:Name="DTRField" Content="DTR" Checked="FlagChanged" Unchecked="FlagChanged" AutomationProperties.AutomationId="DTR"/><CheckBox x:Name="RTSField" Content="RTS" Checked="FlagChanged" Unchecked="FlagChanged" AutomationProperties.AutomationId="RTS"/></StackPanel>
     </StackPanel>
-   </Expander>
   </StackPanel>
-  <StackPanel x:Name="TcpParameters" Spacing="12" MaxWidth="420" HorizontalAlignment="Left" Visibility="Collapsed">
+  <StackPanel x:Name="TcpParameters" Spacing="12" HorizontalAlignment="Stretch" Visibility="Collapsed">
    <TextBox x:Name="TcpHost" Header="主机" Text="127.0.0.1" TextChanged="TextChanged" AutomationProperties.AutomationId="TcpHost"/>
    <NumberBox x:Name="TcpPort" Header="端口" Value="1346" Minimum="1" Maximum="65535" ValueChanged="NumberChanged" AutomationProperties.AutomationId="TcpPort"/>
    <NumberBox x:Name="TcpTimeout" Header="超时 / 秒" Value="3" Minimum="1" Maximum="60" ValueChanged="NumberChanged" AutomationProperties.AutomationId="TcpTimeout"/>
-   <TextBlock Text="EMT 模式仅在收到 emt ready 握手后就绪；TCP 固件采样仍需实机确认。" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
   </StackPanel>
  </StackPanel>
 </UserControl>

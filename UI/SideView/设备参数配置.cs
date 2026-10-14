@@ -18,7 +18,7 @@ public sealed class DeviceParametersView : UserControl
         AutomationProperties.SetAutomationId(_coils, "CoilCount");
         _frequency.ValueChanged += (_, _) => Changed?.Invoke(this, EventArgs.Empty);
         _coils.ValueChanged += (_, _) => Changed?.Invoke(this, EventArgs.Empty);
-        var panel = new Grid { ColumnSpacing = 24, RowSpacing = 12, Margin = new Microsoft.UI.Xaml.Thickness(24, 0, 24, 0) };
+        var panel = new Grid { ColumnSpacing = 24, RowSpacing = 12, Margin = new Microsoft.UI.Xaml.Thickness(0) };
         panel.ColumnDefinitions.Add(new ColumnDefinition());
         panel.ColumnDefinitions.Add(new ColumnDefinition());
         panel.RowDefinitions.Add(new RowDefinition { Height = Microsoft.UI.Xaml.GridLength.Auto });

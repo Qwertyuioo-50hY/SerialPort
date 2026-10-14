@@ -102,6 +102,12 @@ public sealed partial class AppWindow
     private async void DeviceActionRequested(object? sender, string action)
     {
         if (action == "连接") { ToggleDeviceConnection(); return; }
+        if (action == "握手") { await RepeatDeviceHandshakeAsync(); return; }
+        if (action == "断开")
+        {
+            if (_connecting) _deviceStop?.Cancel(); else CloseDevice();
+            return;
+        }
         if (action == "刷新") { RefreshDevicePorts(); return; }
         if (action is "灵敏度矩阵" or "节点坐标" or "物场/Demo数据" or "空场参考") { await ImportExperimentalInputAsync(action); return; }
         if (action == "移除矩阵")

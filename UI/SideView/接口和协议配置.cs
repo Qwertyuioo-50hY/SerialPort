@@ -31,21 +31,6 @@ public sealed partial class ConnectionProtocolView : UserControl
         ConnectionTypeOption.Visibility = Show(!IsSimulation);
         SerialParameters.Visibility = Show(UsesSerialDevice);
         TcpParameters.Visibility = Show(UsesTcpDevice);
-        ProtocolNote.Text = Protocol switch
-        {
-            1 => "FireWater：逗号分隔，换行结束，可带名称前缀。按 CSV 顺序映射 64 通道；与 EMT 二进制帧不同。",
-            2 => "自定义帧需提供固件帧样例、长度、字段、字节序、校验与通道映射；当前不发送未知协议指令。",
-            _ => "现有 EMT 固件：which emt 握手，256 字节二进制采样帧，固定 64 个测量通道。"
-        };
-    }
-    private void LayoutChanged(object sender, SizeChangedEventArgs e)
-    {
-        var narrow = e.NewSize.Width < 680;
-        Grid.SetColumn(ConnectionTypeOption, narrow ? 0 : 1); Grid.SetRow(ConnectionTypeOption, narrow ? 1 : 0);
-        Grid.SetColumn(DataProtocolOption, narrow ? 0 : 2); Grid.SetRow(DataProtocolOption, narrow ? 2 : 0);
-        Grid.SetColumnSpan(DataSourceOption, narrow ? 3 : 1);
-        Grid.SetColumnSpan(ConnectionTypeOption, narrow ? 3 : 1);
-        Grid.SetColumnSpan(DataProtocolOption, narrow ? 3 : 1);
     }
     public void SetPorts(string[] ports)
     {
