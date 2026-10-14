@@ -29,14 +29,11 @@ public sealed partial class AppWindow
         SideRail.DirectoryToggleRequested += ToggleProjectNavigation;
         DirectoryPanel.ChooseDirectoryRequested += async (_, _) =>
         {
-            if (_aiBusy || _connecting || ActiveChannel.IsOpen || _sampling || _fileOperation || _reconstructing) { ShowDeviceError("请先结束采集、断开设备并完成当前操作，再切换实验项目。"); return; }
+            if (!CanChangeProject()) return;
             var folder = await new FolderPicker(AppWindow.Id).PickSingleFolderAsync();
-            if (folder is null) return;
-            _saveDeviceTimer.Stop(); await SaveDeviceSettingsAsync();
-            foreach (var role in _projectSettings.ExperimentInputs.Keys) DirectoryPanel.SetAsset(role, null);
-            _reconstruction.ClearInputs(); _projectSettings = new();
-            await DirectoryPanel.LoadAsync(folder.Path); await RestoreDeviceSettingsAsync();
+            if (folder is not null) await SwitchProjectAsync(folder.Path);
         };
+        DirectoryPanel.CreateProjectRequested += async (_, _) => await CreateProjectAsync();
         _saveDeviceTimer.Tick += async (_, _) => { _saveDeviceTimer.Stop(); await SaveDeviceSettingsAsync(); };
         DeviceView.Loaded += async (_, _) => { if (!_devicePageLoaded) { _devicePageLoaded = true; await RestoreDeviceSettingsAsync(); } };
         _tcpConnection.Disconnected += (_, reason) => DispatcherQueue.TryEnqueue(() => { if (!_connectionLifetime.IsCancellationRequested) { CloseDevice(); ShowDeviceError(reason); } });

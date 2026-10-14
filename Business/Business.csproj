@@ -11,6 +11,7 @@
     <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.6" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Python\AI\*.json;Python\AI\requirements.txt;Python\AI\README.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="Python\**\*.py" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

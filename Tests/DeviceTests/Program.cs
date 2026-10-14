@@ -4,6 +4,7 @@ using Tomography.Data;
 using System.Text;
 using System.Buffers.Binary;
 
+AiProjectStoreTests.Run();
 await DeviceTransportTests.RunAsync();
 var tests = 0;
 void Check(bool condition, string message) { if (!condition) throw new Exception(message); tests++; }

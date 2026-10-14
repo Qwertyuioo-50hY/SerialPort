@@ -17,7 +17,7 @@ public sealed partial class AppWindow
     private bool _aiClosed;
     private bool _historyReadable = true;
     private static string AiSettingsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tomography", "ai-settings.json");
-    private string AiHistoryPath => Path.Combine(Path.GetDirectoryName(ProjectSettingsPath)!, "conversations.json");
+    private string LegacyAiHistoryPath => Path.Combine(Path.GetDirectoryName(ProjectSettingsPath)!, "conversations.json");
     private void InitializeAi()
     {
         try
@@ -37,19 +37,39 @@ public sealed partial class AppWindow
         }
         catch (Exception) { AiSettingsPanel.SetStatus("配置读取失败，请重新填写并保存。"); }
         AiSettingsPanel.LoadSettings(_aiSettings, _aiKey);
-        AiChatView.SetModel(_aiSettings.Model);
+        AiChatView.SetConfiguration(_aiSettings);
         AiSettingsPanel.SaveRequested += (_, _) => SaveAiSettings();
         AiChatView.SendRequested += async (_, message) => await SendAiMessageAsync(message);
-        DirectoryPanel.NewChatRequested += (_, _) =>
-        {
-            if (!_historyReadable) { AiChatView.SetStatus("请先恢复项目对话记录文件，再新建对话。"); return; }
-            _conversation = new AiConversation(); _conversations.Insert(0, _conversation);
-            ShowAiConversation(); SaveAiHistory();
-        };
+        DirectoryPanel.NewChatRequested += (_, _) => NewAiConversation();
+        AiChatView.NewConversationRequested += (_, _) => NewAiConversation();
+        AiChatView.ConfigurationRequested += (_, selection) => ChangeComposerConfiguration(selection.Model, selection.Effort);
+        AiChatView.SettingsRequested += (_, _) => { ViewModel.Section = "设置"; ViewModel.ParametersVisible = false; SideRail.SetSection("设置"); };
         DirectoryPanel.ChatRequested += (_, conversation) => { _conversation = conversation; ShowAiConversation(); };
         DirectoryPanel.ProjectChanged += (_, _) => { if (!_aiBusy) LoadAiHistory(); };
         Closed += (_, _) => _aiClosed = true;
         LoadAiHistory();
+    }
+    private void ChangeComposerConfiguration(string model, string effort)
+    {
+        if (_aiBusy) { AiChatView.SetStatus("请等待当前回复完成后切换模型配置。"); return; }
+        var oldModel = _aiSettings.Model; var oldEffort = _aiSettings.ReasoningEffort;
+        try
+        {
+            _aiSettings.Model = model; _aiSettings.ReasoningEffort = effort;
+            WriteAiJson(AiSettingsPath, _aiSettings);
+            AiSettingsPanel.LoadSettings(_aiSettings, _aiKey); AiChatView.SetConfiguration(_aiSettings);
+        }
+        catch (Exception)
+        {
+            _aiSettings.Model = oldModel; _aiSettings.ReasoningEffort = oldEffort;
+            AiChatView.SetStatus("模型配置保存失败。");
+        }
+    }
+    private void NewAiConversation()
+    {
+        if (!_historyReadable) { AiChatView.SetStatus("请先恢复项目对话记录文件，再新建对话。"); return; }
+        _conversation = new AiConversation(); _conversations.Insert(0, _conversation);
+        AiChatView.ClearInput(); ShowAiConversation(); SaveAiHistory();
     }
     private void ShowAiConversation()
     {
@@ -62,9 +82,7 @@ public sealed partial class AppWindow
         _historyReadable = true;
         try
         {
-            _conversations = File.Exists(AiHistoryPath)
-                ? JsonSerializer.Deserialize<List<AiConversation>>(File.ReadAllText(AiHistoryPath)) ?? new() : new();
-            if (_conversations.Any(item => item.Messages is null)) throw new InvalidDataException();
+            _conversations = AiProjectStore.Load(DirectoryPanel.DirectoryPath, LegacyAiHistoryPath);
             _conversation = _conversations.FirstOrDefault();
             AiChatView.ShowConversation(_conversation); AiChatView.SetStatus("");
         }
@@ -78,32 +96,39 @@ public sealed partial class AppWindow
     private static void WriteAiJson<T>(string path, T value)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(value));
+        File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true }));
         File.Move(path + ".tmp", path, true);
     }
     private void SaveAiSettings()
     {
+        if (_aiBusy) { AiSettingsPanel.SetStatus("请等待当前回复完成后保存配置。"); return; }
         try
         {
             var settings = AiSettingsPanel.ReadSettings();
-            new PasswordVault().Add(new PasswordCredential("Tomography.AI", settings.BaseUrl, AiSettingsPanel.Key));
+            if (!string.IsNullOrWhiteSpace(AiSettingsPanel.Key)) new PasswordVault().Add(new PasswordCredential("Tomography.AI", settings.BaseUrl, AiSettingsPanel.Key));
+            if (string.IsNullOrWhiteSpace(AiSettingsPanel.Key))
+            {
+                var vault = new PasswordVault();
+                try { vault.Remove(vault.Retrieve("Tomography.AI", settings.BaseUrl)); }
+                catch (System.Runtime.InteropServices.COMException ex) when (ex.HResult == unchecked((int)0x80070490)) { }
+            }
             WriteAiJson(AiSettingsPath, settings);
             _aiSettings = settings; _aiKey = AiSettingsPanel.Key;
-            AiChatView.SetModel(settings.Model); AiSettingsPanel.SetStatus("已保存");
+            AiChatView.SetConfiguration(settings); AiSettingsPanel.SetStatus("已保存");
         }
         catch (Exception ex) { AiSettingsPanel.SetStatus(ex is ArgumentException ? ex.Message : "保存失败，请检查凭据和文件存储权限。"); }
     }
     private void SaveAiHistory()
     {
         if (!_historyReadable) return;
-        try { WriteAiJson(AiHistoryPath, _conversations); }
+        try { AiProjectStore.Save(DirectoryPanel.DirectoryPath, _conversations); }
         catch (Exception) { AiChatView.SetStatus("对话保存失败，请检查文件存储权限。"); }
     }
     private async Task SendAiMessageAsync(string message)
     {
         if (_aiBusy) return;
         if (!_historyReadable) { AiChatView.SetStatus("项目对话记录读取失败，暂不能保存新消息。"); return; }
-        if (string.IsNullOrWhiteSpace(_aiSettings.Model) || string.IsNullOrWhiteSpace(_aiSettings.BaseUrl) || string.IsNullOrWhiteSpace(_aiKey))
+        if (string.IsNullOrWhiteSpace(_aiSettings.Model) || string.IsNullOrWhiteSpace(_aiSettings.BaseUrl))
         { AiChatView.SetStatus("请先在设置中配置 API 地址、密钥和模型。"); return; }
         var conversation = _conversation;
         if (conversation is null)
@@ -119,7 +144,7 @@ public sealed partial class AppWindow
         AiChatView.ShowConversation(conversation); DirectoryPanel.SetConversations(_conversations, _conversation); SaveAiHistory();
         try
         {
-            var reply = await _chatService.SendAsync(_aiSettings, _aiKey, conversation.Messages.ToArray());
+            var reply = await _chatService.SendAsync(AiSettingsPath, _aiSettings.PythonDll, _aiKey, conversation.Messages.ToArray());
             if (_aiClosed) return;
             conversation.Messages.Add(new AiMessage("assistant", reply));
             AiChatView.SetStatus("");

@@ -1,0 +1,21 @@
+{
+  "BaseUrl": "https://api.openai.com/v1",
+  "Model": "gpt-6.1-sol",
+  "PythonDll": "",
+  "Models": [
+    "gpt-6.1-sol"
+  ],
+  "ApiMode": "responses",
+  "ReasoningMode": "standard",
+  "ReasoningEffort": "medium",
+  "ServiceTier": "default",
+  "Verbosity": "default",
+  "Tone": "默认",
+  "Language": "跟随用户",
+  "OutputFormat": "text",
+  "OutputInstructions": "",
+  "Instructions": "",
+  "MaxOutputTokens": 0,
+  "TimeoutSeconds": 120,
+  "ApiKeyEnvironmentVariable": "OPENAI_API_KEY"
+}

@@ -26,6 +26,8 @@ public sealed partial class ProjectDirectoryView : UserControl
         _tree.ItemInvoked += (_, e) =>
         {
             if (e.InvokedItem is not TreeViewNode node) return;
+            if (_chatNodes.TryGetValue(node, out var conversation))
+            { DispatcherQueue.TryEnqueue(() => ChatRequested?.Invoke(this, conversation)); return; }
             var selected = node != _lastInvoked;
             _lastInvoked = selected ? node : null;
             node.IsExpanded = selected;
@@ -58,7 +60,7 @@ public sealed partial class ProjectDirectoryView : UserControl
         SearchBox.Text = "";
         _lastInvoked = null;
         DirectoryPath = Path.GetFullPath(path); _paths.Clear(); _tree.RootNodes.Clear();
-        var root = Node(DirectoryPath, true); _tree.RootNodes.Add(root); _tree.RootNodes.Add(_inputs);
+        var root = Node(DirectoryPath, true); _tree.RootNodes.Add(_chats); _tree.RootNodes.Add(root); _tree.RootNodes.Add(_inputs);
         await FillAsync(root);
         _projectRoots = _tree.RootNodes.ToArray();
         FilterProjectFiles();
@@ -75,7 +77,7 @@ public sealed partial class ProjectDirectoryView : UserControl
         try
         {
             var entries = await Task.Run(() => Directory.EnumerateFileSystemEntries(_paths[node])
-                .Where(path => Path.GetFileName(path) != ".git")
+                .Where(path => Path.GetFileName(path) != ".git" && !(Path.GetFileName(path) == "聊天" && string.Equals(Path.GetDirectoryName(path), DirectoryPath, StringComparison.OrdinalIgnoreCase)))
                 .OrderByDescending(Directory.Exists).ThenBy(path => path, StringComparer.OrdinalIgnoreCase).ToArray());
             foreach (var path in entries) node.Children.Add(Node(path, Directory.Exists(path)));
             _message.Text = "";

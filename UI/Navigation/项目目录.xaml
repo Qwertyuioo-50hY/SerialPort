@@ -6,7 +6,7 @@
     <Grid Padding="20" RowSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Spacing="12">
             <FontIcon Glyph="&#xE8B7;" FontSize="20" Foreground="{ThemeResource RailAccentBrush}"/>
@@ -14,8 +14,13 @@
         </StackPanel>
         <TextBox x:Name="SearchBox" Grid.Row="1" PlaceholderText="搜索项目文件…" CornerRadius="10"
             AutomationProperties.Name="搜索项目文件" AutomationProperties.AutomationId="SearchProjectDirectory"/>
-        <Button x:Name="ChooseProjectDirectory" Grid.Row="2" Content="打开文件夹" HorizontalAlignment="Stretch"
-            AutomationProperties.Name="打开项目文件夹" AutomationProperties.AutomationId="ChooseProjectDirectory"/>
+        <StackPanel Grid.Row="2" Spacing="8">
+            <Grid ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Button Content="新建项目" Click="CreateProjectClicked" HorizontalAlignment="Stretch" CornerRadius="10" AutomationProperties.AutomationId="CreateProject"/>
+                <Button x:Name="ChooseProjectDirectory" Grid.Column="1" Content="打开文件夹" HorizontalAlignment="Stretch" CornerRadius="10" AutomationProperties.Name="打开项目文件夹" AutomationProperties.AutomationId="ChooseProjectDirectory"/>
+            </Grid>
+            <Button Content="＋ 新建对话" Click="NewChatClicked" HorizontalAlignment="Stretch" CornerRadius="12" AutomationProperties.AutomationId="NewAiConversation"/>
+        </StackPanel>
         <TreeView x:Name="ProjectTree" Grid.Row="3" SelectionMode="Single" CanDragItems="False" AllowDrop="False"
             AutomationProperties.Name="当前项目目录" AutomationProperties.AutomationId="ProjectDirectory">
             <TreeView.Resources>
@@ -73,10 +78,6 @@
             <FontIcon Glyph="&#xE8B7;" FontSize="32" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             <TextBlock Text="未找到项目文件" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
         </StackPanel>
-        <StackPanel Grid.Row="4" Spacing="8">
-            <Button Content="＋ 新建对话" Click="NewChatClicked" HorizontalAlignment="Stretch" CornerRadius="12" AutomationProperties.AutomationId="NewAiConversation"/>
-            <ListView x:Name="ChatConversations" MaxHeight="220" SelectionChanged="ChatSelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Hidden" AutomationProperties.AutomationId="AiConversations"/>
-        </StackPanel>
-        <TextBlock x:Name="DirectoryMessage" Grid.Row="5" TextWrapping="Wrap"/>
+        <TextBlock x:Name="DirectoryMessage" Grid.Row="4" TextWrapping="Wrap"/>
     </Grid>
 </UserControl>

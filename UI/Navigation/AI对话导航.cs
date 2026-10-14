@@ -6,29 +6,26 @@ namespace Tomography.UI.Navigation;
 
 public sealed partial class ProjectDirectoryView
 {
-    private bool _updatingChats;
+    private readonly TreeViewNode _chats = new() { Content = "聊天", IsExpanded = true };
+    private readonly Dictionary<TreeViewNode, AiConversation> _chatNodes = new();
     public event EventHandler? NewChatRequested;
+    public event EventHandler? CreateProjectRequested;
     public event EventHandler<AiConversation>? ChatRequested;
     public event EventHandler? ProjectChanged;
     public void SetConversations(IEnumerable<AiConversation> conversations, AiConversation? selected)
     {
-        _updatingChats = true;
-        try
+        _chatNodes.Clear(); _chats.Children.Clear();
+        TreeViewNode? selection = null;
+        foreach (var conversation in conversations)
         {
-            ChatConversations.Items.Clear();
-            foreach (var conversation in conversations)
-            {
-                var item = new ListViewItem { Content = conversation.Title, Tag = conversation };
-                ChatConversations.Items.Add(item);
-                if (conversation == selected) ChatConversations.SelectedItem = item;
-            }
+            var node = new TreeViewNode { Content = conversation };
+            _chats.Children.Add(node); _chatNodes[node] = conversation;
+            if (conversation == selected) selection = node;
         }
-        finally { _updatingChats = false; }
+        FilterProjectFiles();
+        if (selection is not null && string.IsNullOrWhiteSpace(SearchBox.Text))
+        { _chats.IsExpanded = true; _tree.SelectedNode = selection; }
     }
     private void NewChatClicked(object sender, RoutedEventArgs e) => NewChatRequested?.Invoke(this, EventArgs.Empty);
-    private void ChatSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (!_updatingChats && ChatConversations.SelectedItem is ListViewItem { Tag: AiConversation conversation })
-            ChatRequested?.Invoke(this, conversation);
-    }
+    private void CreateProjectClicked(object sender, RoutedEventArgs e) => CreateProjectRequested?.Invoke(this, EventArgs.Empty);
 }

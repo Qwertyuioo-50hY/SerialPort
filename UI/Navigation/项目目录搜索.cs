@@ -26,6 +26,7 @@ public sealed partial class ProjectDirectoryView
         if (children.Length == 0 && !(source.Content?.ToString()?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)) return null;
         var node = new TreeViewNode { Content = source.Content, IsExpanded = true };
         if (_importedAssets.TryGetValue(source, out var asset)) _importedAssets[node] = asset;
+        if (_chatNodes.TryGetValue(source, out var conversation)) _chatNodes[node] = conversation;
         foreach (var child in children) node.Children.Add(child);
         return node;
     }

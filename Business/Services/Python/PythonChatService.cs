@@ -6,21 +6,22 @@ namespace Tomography.Business.Services;
 
 public sealed class PythonChatService
 {
-    public async Task<string> SendAsync(AiApiSettings settings, string apiKey, IReadOnlyList<AiMessage> messages)
+    public async Task<string> SendAsync(string configPath, string pythonDll, string apiKey, IReadOnlyList<AiMessage> messages)
     {
-        if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(settings.Model))
-            throw new InvalidOperationException("请先在设置中填写 API 密钥和模型。");
+        if (!File.Exists(configPath)) throw new FileNotFoundException("请先在设置中保存 AI 配置。", configPath);
         return await Task.Run(() =>
         {
-            PythonRuntimeHost.Initialize(settings.PythonDll);
+            PythonRuntimeHost.Initialize(pythonDll);
             using var gil = Py.GIL();
             using var scope = Py.CreateScope();
             scope.Set("scripts", Path.Combine(AppContext.BaseDirectory, "Python"));
+            scope.Set("config_path", configPath);
+            scope.Set("api_key", apiKey);
             scope.Set("request_json", JsonSerializer.Serialize(new {
-                provider = "openai", base_url = settings.BaseUrl, api_key = apiKey, model = settings.Model,
                 messages = messages.Select(message => new { role = message.Role, content = message.Content })
             }));
-            scope.Exec("import sys\nif scripts not in sys.path: sys.path.insert(0, scripts)\nfrom AI.ai_bridge import run\nresponse_json = run(request_json)");
+            try { scope.Exec("import sys\nif scripts not in sys.path: sys.path.insert(0, scripts)\nfrom AI.config_api import run_from_file\nresponse_json = run_from_file(config_path, request_json, api_key)"); }
+            catch (PythonException ex) { throw new InvalidOperationException(ex.Message, ex); }
             using var response = scope.Get("response_json");
             using var json = JsonDocument.Parse(response.As<string>());
             return json.RootElement.GetProperty("reply").GetString() ?? "";
