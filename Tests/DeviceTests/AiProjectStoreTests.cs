@@ -15,9 +15,9 @@ public static class AiProjectStoreTests
             AiProjectStore.Save(project, new[] { chat });
             var path = Path.Combine(project, "聊天", chat.Id, "conversation.json");
             if (!File.Exists(path) || AiProjectStore.Load(project).Single().Messages.Single().Content != "你好") throw new Exception("project chat roundtrip");
-            chat.Messages.Add(new("assistant", "回复"));
+            chat.Messages.Add(new("assistant", "回复", "接口返回的摘要"));
             AiProjectStore.Save(project, new[] { chat });
-            if (AiProjectStore.Load(project).Single().Messages.Count != 2) throw new Exception("chat update");
+            if (AiProjectStore.Load(project).Single().Messages.Count != 2 || AiProjectStore.Load(project).Single().Messages[1].ReasoningSummary != "接口返回的摘要") throw new Exception("chat update");
             var old = new AiConversation { Title = "旧聊天" };
             var legacy = Path.Combine(root, "conversations.json");
             File.WriteAllText(legacy, JsonSerializer.Serialize(new[] { old, new AiConversation { Id = chat.Id, Title = "旧版本" } }));

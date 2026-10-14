@@ -4,6 +4,7 @@ using Tomography.Data;
 using System.Text;
 using System.Buffers.Binary;
 
+if (args.Contains("--python-chat")) await PythonChatBridgeTests.RunAsync();
 AiProjectStoreTests.Run();
 await DeviceTransportTests.RunAsync();
 var tests = 0;

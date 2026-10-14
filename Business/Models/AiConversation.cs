@@ -8,7 +8,9 @@ public sealed class AiConversation
     public override string ToString() => Title;
 }
 
-public sealed record AiMessage(string Role, string Content);
+public sealed record AiMessage(string Role, string Content, string ReasoningSummary = "");
+
+public sealed record AiChatReply(string Reply, string ReasoningSummary);
 
 public sealed class AiApiSettings
 {

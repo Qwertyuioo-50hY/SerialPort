@@ -85,8 +85,9 @@ def build_request(config, messages):
     return options
 
 
-def run_from_file(config_path, request_json, api_key=""):
+def run_from_file(config_path, request_json, api_key="", on_event=None):
     from openai import OpenAI, APIError
+    from .response_reader import read_response
     config = read_config(config_path)
     key = api_key or os.environ.get(config.get("ApiKeyEnvironmentVariable", "OPENAI_API_KEY"), "")
     if not key or not key.isascii() or any(character.isspace() for character in key):
@@ -99,14 +100,15 @@ def run_from_file(config_path, request_json, api_key=""):
     try:
         with OpenAI(api_key=key, base_url=config["BaseUrl"], timeout=config["TimeoutSeconds"], max_retries=0) as client:
             if config["ApiMode"] == "responses":
-                response = client.responses.create(**options)
-                reply = response.output_text
+                if on_event:
+                    options["reasoning"]["summary"] = "auto"
+                response = client.responses.create(**options, stream=on_event is not None)
             else:
-                response = client.chat.completions.create(**options)
-                reply = response.choices[0].message.content
+                response = client.chat.completions.create(**options, stream=on_event is not None)
+            result = read_response(response, on_event)
     except APIError as error:
         status = getattr(error, "status_code", None)
         raise RuntimeError("API 请求失败" + ("（HTTP %s）" % status if status else "，请检查网络与接口配置") + "。") from None
-    if not reply:
+    if not result["reply"]:
         raise ValueError("API 未返回文本，请检查模型、输出上限或接口协议。")
-    return json.dumps({"reply": reply}, ensure_ascii=False)
+    return json.dumps(result, ensure_ascii=False)

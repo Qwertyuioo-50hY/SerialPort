@@ -13,6 +13,9 @@ public sealed partial class AppWindow
     private string _aiKey = "";
     private List<AiConversation> _conversations = new();
     private AiConversation? _conversation;
+    private AiConversation? _pendingConversation;
+    private string _pendingReply = "";
+    private string _pendingReasoning = "";
     private bool _aiBusy;
     private bool _aiClosed;
     private bool _historyReadable = true;
@@ -75,6 +78,7 @@ public sealed partial class AppWindow
     {
         ViewModel.Section = "AI"; ViewModel.ParametersVisible = false; SideRail.SetSection("AI");
         AiChatView.ShowConversation(_conversation);
+        if (_pendingConversation == _conversation && _pendingConversation is not null) AiChatView.ShowPending(_pendingReasoning, _pendingReply);
         DirectoryPanel.SetConversations(_conversations, _conversation);
     }
     private void LoadAiHistory()
@@ -140,23 +144,34 @@ public sealed partial class AppWindow
         if (conversation.Messages.LastOrDefault() is not { Role: "user" } last || last.Content != message)
             conversation.Messages.Add(userMessage);
         if (conversation.Title == "新对话") conversation.Title = message.Length > 24 ? message[..24] + "…" : message;
-        _aiBusy = true; AiChatView.SetBusy(true); AiChatView.SetStatus("正在回复…");
-        AiChatView.ShowConversation(conversation); DirectoryPanel.SetConversations(_conversations, _conversation); SaveAiHistory();
+        _aiBusy = true; _pendingConversation = conversation; _pendingReply = ""; _pendingReasoning = "";
+        AiChatView.SetBusy(true); AiChatView.SetStatus(""); AiChatView.ClearInput();
+        AiChatView.ShowConversation(conversation); AiChatView.ShowPending("", ""); DirectoryPanel.SetConversations(_conversations, _conversation); SaveAiHistory();
         try
         {
-            var reply = await _chatService.SendAsync(AiSettingsPath, _aiSettings.PythonDll, _aiKey, conversation.Messages.ToArray());
+            var reply = await _chatService.SendAsync(AiSettingsPath, _aiSettings.PythonDll, _aiKey, conversation.Messages.ToArray(), (kind, delta) =>
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (_aiClosed || _pendingConversation != conversation) return;
+                    if (kind == "reasoning_summary") _pendingReasoning += delta;
+                    else if (kind == "reply") _pendingReply += delta;
+                    if (_conversation == conversation) AiChatView.ShowPending(_pendingReasoning, _pendingReply);
+                }));
             if (_aiClosed) return;
-            conversation.Messages.Add(new AiMessage("assistant", reply));
+            conversation.Messages.Add(new AiMessage("assistant", reply.Reply, reply.ReasoningSummary));
             AiChatView.SetStatus("");
             SaveAiHistory();
-            if (_conversation == conversation) { AiChatView.ShowConversation(conversation); AiChatView.ClearInput(); }
+            if (_conversation == conversation) AiChatView.ShowConversation(conversation);
         }
         catch (Exception ex)
         {
             if (!_aiClosed)
+            {
+                if (_conversation == conversation) AiChatView.RestoreInput(message);
                 AiChatView.SetStatus(ex is FileNotFoundException or ArgumentException or InvalidOperationException
                     ? ex.Message : "API 请求失败，请检查接口配置、模型名称和 Python 运行时。");
+            }
         }
-        finally { _aiBusy = false; if (!_aiClosed) AiChatView.SetBusy(false); }
+        finally { _pendingConversation = null; _aiBusy = false; if (!_aiClosed) AiChatView.SetBusy(false); }
     }
 }

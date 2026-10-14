@@ -26,11 +26,11 @@ class ConfigApiTests(unittest.TestCase):
         fixtures.ApiTests.tearDown(self)
         self.folder.cleanup()
 
-    def send_config(self, key="test-only-key"):
+    def send_config(self, key="test-only-key", on_event=None):
         self.path.write_text(json.dumps(self.config, ensure_ascii=False), encoding="utf-8")
         return json.loads(run_from_file(str(self.path), json.dumps({"messages": [
             {"role": "user", "content": "你好"}, {"role": "assistant", "content": "你好！"},
-            {"role": "user", "content": "继续"}]}), key))
+            {"role": "user", "content": "继续"}]}), key, on_event))
 
     def test_sdk_responses_parameters_and_history(self):
         self.assertEqual(self.send_config()["reply"], "完成")
@@ -95,3 +95,37 @@ class ConfigApiTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.send_config()
         self.assertFalse(self.requests)
+
+    def test_mislabeled_string_response(self):
+        self.content_type = "text/plain"
+        self.assertEqual(self.send_config()["reply"], "完成")
+
+    def test_proxy_ignores_stream_request(self):
+        self.content_type = "text/plain"
+        events = []
+        self.assertEqual(self.send_config(on_event=lambda kind, text: events.append((kind, text)))["reply"], "完成")
+        self.assertEqual(events, [("reply", "完成")])
+        self.assertTrue(self.requests[0][2]["stream"])
+        self.assertEqual(self.requests[0][2]["reasoning"]["summary"], "auto")
+
+    def test_real_sdk_stream_summary_then_answer(self):
+        self.content_type = "text/event-stream"
+        final = self.body
+        final["output"].insert(0, {"type": "reasoning", "id": "rs_test", "summary": [{"type": "summary_text", "text": "返回的摘要"}]})
+        events = [
+            {"type": "response.reasoning_summary_text.delta", "delta": "返回的摘要"},
+            {"type": "response.output_text.delta", "delta": "完"},
+            {"type": "response.output_text.delta", "delta": "成"},
+            {"type": "response.completed", "response": final},
+        ]
+        self.body = "".join("data: " + json.dumps(event) + "\n\n" for event in events)
+        received = []
+        result = self.send_config(on_event=lambda kind, text: received.append((kind, text)))
+        self.assertEqual(result, {"reply": "完成", "reasoning_summary": "返回的摘要"})
+        self.assertEqual(received, [("reasoning_summary", "返回的摘要"), ("reply", "完"), ("reply", "成")])
+
+    def test_truncated_stream_is_not_success(self):
+        self.content_type = "text/event-stream"
+        self.body = 'data: {"type":"response.output_text.delta","delta":"partial"}\n\n'
+        with self.assertRaisesRegex(ValueError, "提前结束"):
+            self.send_config(on_event=lambda *_: None)

@@ -19,3 +19,9 @@ API Key 由 Windows 凭据管理器保存并在调用时注入；也可使用 JS
 - [GPT-6.1 Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol)
 - [推理模式与强度](https://developers.openai.com/api/docs/guides/reasoning)
 - [Responses Python SDK 参数](https://developers.openai.com/api/reference/python/resources/responses/methods/create)
+
+聊天默认使用紧凑单行输入区，Enter 发送、Shift+Enter 换行；中文输入法选词期间不触发发送。强度面板采用五档滑块，并保留模型选择及恢复默认入口。
+
+界面请求流式返回，Python 将服务实际返回的 `response.reasoning_summary_text.delta` 和 `response.output_text.delta` 分别传给 C#。等待时显示闪烁圆点；没有摘要时不显示摘要区域。摘要随对话存入项目文件，但不作为后续用户消息重新发送。解析兼容 SDK 对象、JSON、字符串和 SSE；未收到流完成标记时报错，不将截断内容当成完整答案。
+
+流式事件依据：[OpenAI 官方流式文档](https://developers.openai.com/api/docs/guides/streaming-responses)。本地端到端测试：`dotnet run --project Tests/DeviceTests/DeviceTests.csproj -- --python-chat`（使用本机 CPython 与回环模拟接口）。

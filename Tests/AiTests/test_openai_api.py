@@ -22,11 +22,11 @@ class ApiTests(unittest.TestCase):
                 owner.requests.append((self.path, self.headers.get("Authorization"),
                     json.loads(self.rfile.read(int(self.headers["Content-Length"])))))
                 self.send_response(owner.code)
-                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Type", getattr(owner, "content_type", "application/json"))
                 if owner.code == 302:
                     self.send_header("Location", "/redirected")
                 self.end_headers()
-                self.wfile.write(json.dumps(owner.body).encode())
+                self.wfile.write((owner.body if isinstance(owner.body, str) else json.dumps(owner.body)).encode())
 
             def log_message(self, *args):
                 pass
