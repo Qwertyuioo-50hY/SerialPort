@@ -18,7 +18,7 @@ public sealed partial class ChannelWaveformView : UserControl
         Chart.Series = new ISeries[] { _reference, _measurements };
         Chart.XAxes = new[] { new Axis { MinLimit = 1, MaxLimit = 64, MinStep = 1, TextSize = 11, SeparatorsPaint = null } };
         Chart.YAxes = new[] { new Axis { TextSize = 11, SeparatorsPaint = null } };
-        Chart.DrawMargin = new LiveChartsCore.Measure.Margin(44, 32, 12, 24);
+        Chart.DrawMargin = new LiveChartsCore.Measure.Margin(44, 32, 40, 24);
         Chart.LegendTextSize = 12;
         Chart.AnimationsSpeed = TimeSpan.Zero;
     }

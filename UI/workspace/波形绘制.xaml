@@ -3,6 +3,8 @@
  <Grid Background="Black">
   <lvc:CartesianChart x:Name="Chart" LegendPosition="Top"/>
   <TextBlock Text="幅值 (V)" FontSize="11" Margin="8,6,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" IsHitTestVisible="False"/>
-  <TextBlock Text="通道" FontSize="11" Margin="0,0,6,2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="White" IsHitTestVisible="False"/>
+  <Grid Height="40" Margin="0,0,4,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsHitTestVisible="False">
+   <TextBlock Text="通道" FontSize="11" VerticalAlignment="Center" Foreground="White"/>
+  </Grid>
  </Grid>
 </UserControl>
