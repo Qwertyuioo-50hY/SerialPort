@@ -41,7 +41,7 @@ public sealed partial class AppWindow
             if (role == "灵敏度矩阵") DeviceView.SetMatrix($"{asset.Name} · {description}");
             else if (role == "节点坐标") DeviceView.SetCoordinates($"{asset.Name} · {description}");
             else if (role == "物场/Demo数据") { DeviceView.SetSimulation($"{asset.Name} · {description}"); Workspace.ShowMeasurements(_reconstruction.Measurements!); }
-            else DeviceView.SetParameterStatus("空场参考已校验；参数尚未由下位机采样应答确认。");
+            else { Workspace.ShowReference(_reconstruction.Reference!); DeviceView.SetParameterStatus("空场参考已校验；参数尚未由下位机采样应答确认。"); }
             UpdateDeviceInputs();
             await SaveDeviceSettingsAsync();
         }

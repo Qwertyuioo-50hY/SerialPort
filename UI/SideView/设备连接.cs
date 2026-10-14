@@ -92,7 +92,6 @@ public sealed partial class AppWindow
                     DispatcherQueue.TryEnqueue(() =>
                     {
                         if (!ReferenceEquals(sender, _selectedChannel) || _connectionLifetime.IsCancellationRequested) return;
-                        Workspace.ShowMeasurements(frame);
                         AcceptStreamFrame(frame);
                         DeviceView.SetState("数据流有效：64 通道；设备身份未验证", false, true);
                     });

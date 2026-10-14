@@ -1,40 +1,35 @@
+using LiveChartsCore;
+using LiveChartsCore.Defaults;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using Windows.Foundation;
+using SkiaSharp;
 
 namespace Tomography.UI.workspace;
 
-/// <summary>显示最新一帧 64 通道值，按数据范围绘制折线。</summary>
 public sealed partial class ChannelWaveformView : UserControl
 {
-    private double[]? _channels;
-    public ChannelWaveformView() => InitializeComponent();
+    private readonly LineSeries<ObservablePoint> _reference = new() { Name = "空场", GeometrySize = 0, Fill = null, Stroke = new SolidColorPaint(SKColors.DodgerBlue, 2) };
+    private readonly LineSeries<ObservablePoint> _measurements = new() { Name = "物场", GeometrySize = 0, Fill = null, Stroke = new SolidColorPaint(SKColors.OrangeRed, 2) };
 
-    public void ShowChannels(uint[] channels) => ShowMeasurements(channels.Select(value => (double)value).ToArray());
-
-    public void ShowMeasurements(double[] channels)
+    public ChannelWaveformView()
     {
-        if (channels.Length != 64 || channels.Any(value => !double.IsFinite(value))) throw new ArgumentException("必须提供 64 个通道值。", nameof(channels));
-        _channels = channels.ToArray();
-        EmptyMessage.Visibility = Visibility.Collapsed;
-        Draw();
+        InitializeComponent();
+        Chart.Series = new ISeries[] { _reference, _measurements };
+        Chart.XAxes = new[] { new Axis { Name = "通道", MinLimit = 1, MaxLimit = 64, MinStep = 1 } };
+        Chart.YAxes = new[] { new Axis { Name = "幅值" } };
+        Chart.AnimationsSpeed = TimeSpan.Zero;
     }
 
-    private void PlotSizeChanged(object sender, SizeChangedEventArgs e) => Draw();
+    public void ShowChannels(uint[] channels) => ShowMeasurements(channels.Select(value => (double)value).ToArray());
+    public void ShowMeasurements(double[] channels) => SetValues(_measurements, channels);
+    public void ShowReference(double[] channels) => SetValues(_reference, channels);
 
-    private void Draw()
+    private void SetValues(LineSeries<ObservablePoint> series, double[] values)
     {
-        if (_channels is null || PlotArea.ActualWidth <= 4 || PlotArea.ActualHeight <= 4) return;
-        double minimum = _channels.Min(), maximum = _channels.Max();
-        if (maximum == minimum) { minimum = Math.Max(0, minimum - 1); maximum += 1; }
-        MinimumLabel.Text = minimum.ToString("0");
-        MiddleLabel.Text = ((minimum + maximum) / 2).ToString("0.##");
-        MaximumLabel.Text = maximum.ToString("0");
-        var points = new PointCollection();
-        for (var i = 0; i < _channels.Length; i++)
-            points.Add(new Point(2 + i * (PlotArea.ActualWidth - 4) / 63,
-                2 + (maximum - _channels[i]) / (maximum - minimum) * (PlotArea.ActualHeight - 4)));
-        ChannelLine.Points = points;
+        if (values.Length != 64 || values.Any(value => !double.IsFinite(value))) throw new ArgumentException("必须提供 64 个有限通道值。", nameof(values));
+        series.Values = values.Select((value, index) => new ObservablePoint(index + 1, value)).ToArray();
+        EmptyMessage.Visibility = Visibility.Collapsed;
     }
 }

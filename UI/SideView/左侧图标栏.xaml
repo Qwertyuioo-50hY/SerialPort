@@ -34,7 +34,7 @@
                 <Button x:Name="SelectedRailItem" Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Background="{ThemeResource RailSelectedBackgroundBrush}" Foreground="{ThemeResource RailAccentBrush}" Tag="设备" AutomationProperties.AutomationId="DeviceNavigation" AutomationProperties.Name="设备" ToolTipService.ToolTip="设备"><FontIcon Foreground="{ThemeResource RailAccentBrush}" Glyph="&#xE8A5;" FontSize="19" /></Button>
                 <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="成员" ToolTipService.ToolTip="成员"><FontIcon Glyph="&#xE716;" FontSize="19" /></Button>
                 <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="连接" ToolTipService.ToolTip="连接"><FontIcon Glyph="&#xE701;" FontSize="19" /></Button>
-                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Tag="算法" AutomationProperties.AutomationId="AlgorithmNavigation" AutomationProperties.Name="算法" ToolTipService.ToolTip="实验"><FontIcon Glyph="&#xE9F9;" FontSize="19" /></Button>
+                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Tag="算法" AutomationProperties.AutomationId="AlgorithmNavigation" AutomationProperties.Name="数据分析" ToolTipService.ToolTip="数据分析"><FontIcon Glyph="&#xE9F9;" FontSize="19" /></Button>
                 <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="统计" ToolTipService.ToolTip="统计"><FontIcon Glyph="&#xE9D9;" FontSize="19" /></Button>
             </StackPanel>
         </ScrollViewer>

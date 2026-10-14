@@ -62,13 +62,14 @@
                             KeyDown="ParameterDividerKeyDown" AutomationProperties.Name="调整侧边栏宽度" />
                     </local:ResizeDivider>
                     <Grid Grid.Column="2">
-                        <ScrollViewer x:Name="WorkspaceScroll" ZoomMode="Enabled" MinZoomFactor="0.5" MaxZoomFactor="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
+                        <ScrollViewer x:Name="WorkspaceScroll" ZoomMode="Enabled" MinZoomFactor="0.5" MaxZoomFactor="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled">
                             <workspace:ImagingWorkspaceView x:Name="Workspace">
                                 <workspace:ImagingWorkspaceView.Commands>
-                                    <StackPanel x:Name="ToolsPanel" Visibility="Collapsed" Orientation="Horizontal" Spacing="6">
-                                        <Button Content="空场" Tag="Reference" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireReference"/>
-                                        <Button Content="单次" Tag="Single" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireSingle"/>
-                                        <Button Content="连续" Tag="Live" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireLive"/>
+                                    <StackPanel x:Name="ToolsPanel" Orientation="Vertical" Spacing="12">
+                                        <Button Content="空场采集" Tag="Reference" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireReference"/>
+                                        <Button Content="单次采集" Tag="Single" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireSingle"/>
+                                        <Button Content="多次采集" Tag="Batch" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireBatch"/>
+                                        <Button Content="实时采集" Tag="Live" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireLive"/>
                                         <Button Content="停止" Tag="Stop" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="StopAcquisition"/>
                                     </StackPanel>
                                 </workspace:ImagingWorkspaceView.Commands>

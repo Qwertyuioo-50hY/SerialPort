@@ -13,7 +13,6 @@ public sealed partial class AppWindow
 
     private void BuildParameterContents()
     {
-        if (_reconstructionSettings?.Parent is Panel algorithmParent) algorithmParent.Children.Remove(_reconstructionSettings);
         ParameterBody.Children.Clear();
         void Caption(string text) => ParameterBody.Children.Add(new TextBlock
         {
@@ -54,7 +53,7 @@ public sealed partial class AppWindow
                 ParameterBody.Children.Add(new TextBlock { Text = "暂无已安装插件", TextWrapping = TextWrapping.Wrap });
                 break;
             case "算法":
-                AddReconstructionSettings(ParameterBody);
+                if (_reconstructionSettings is null) AddReconstructionSettings(Workspace.AlgorithmPanel);
                 break;
             case "登录":
                 Caption("账户登录");

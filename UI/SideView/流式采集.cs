@@ -30,13 +30,13 @@ public sealed partial class AppWindow
             if (_streamReference.Count == 10)
             {
                 var mean = Enumerable.Range(0, 64).Select(i => _streamReference.Average(row => row[i])).ToArray();
-                _reconstruction.SetReference(mean); _acquisitionRecords.SetReference(_streamReference, mean);
+                _reconstruction.SetReference(mean); _acquisitionRecords.SetReference(_streamReference, mean); Workspace.ShowReference(mean);
                 EndStreamAcquisition(); DeviceView.SetParameterStatus("数值流 空场参考已更新；不代表下位机 EMT 参数已应用。");
             }
         }
         else
         {
-            _reconstruction.SetMeasurements(frame); _acquisitionRecords.AddObject(frame); QueueRealtimeReconstruction();
+            _reconstruction.SetMeasurements(frame); Workspace.ShowMeasurements(frame); _acquisitionRecords.AddObject(frame); QueueRealtimeReconstruction();
             if (_streamMode == AcquisitionMode.Single || (_streamMode == AcquisitionMode.Batch && _streamCount >= 10)) EndStreamAcquisition();
         }
     }

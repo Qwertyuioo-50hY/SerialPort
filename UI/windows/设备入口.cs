@@ -25,7 +25,7 @@ public sealed partial class AppWindow
         _protocolSettings.RefreshRequested += (_, _) => RefreshDevicePorts();
         _protocolSettings.Changed += DeviceConfigurationChanged; _deviceSettings.Changed += DeviceConfigurationChanged;
         DeviceView.ActionRequested += DeviceActionRequested;
-        SideRail.NavigationRequested += (_, section) => { ViewModel.Section = section; ViewModel.ParametersVisible = section == "算法"; ToolsPanel.Visibility = section == "采集" ? Visibility.Visible : Visibility.Collapsed; };
+        SideRail.NavigationRequested += (_, section) => { ViewModel.Section = section; ViewModel.ParametersVisible = false; ToolsPanel.Visibility = Visibility.Visible; };
         SideRail.DirectoryToggleRequested += ToggleProjectNavigation;
         DirectoryPanel.ChooseDirectoryRequested += async (_, _) =>
         {

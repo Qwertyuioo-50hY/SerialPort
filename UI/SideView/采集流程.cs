@@ -19,7 +19,7 @@ public sealed partial class AppWindow
             if (!_projectSettings.ExperimentInputs.TryGetValue("物场/Demo数据", out var input)) { ShowDeviceError("请先导入仿真数据。"); return; }
             try { _reconstruction.SetMeasurements(ExperimentInputValidator.ReadChannels(input));
                 if (mode == AcquisitionMode.Reference) _reconstruction.CaptureReference();
-                Workspace.ShowMeasurements(_reconstruction.Measurements!); ConnectionStatus.Text = "仿真数据已载入；未操作实物设备"; }
+                if (mode == AcquisitionMode.Reference) Workspace.ShowReference(_reconstruction.Reference!); else Workspace.ShowMeasurements(_reconstruction.Measurements!); ConnectionStatus.Text = "仿真数据已载入；未操作实物设备"; }
             catch (Exception ex) { ShowDeviceError(ex.Message); }
             return;
         }
@@ -40,7 +40,7 @@ public sealed partial class AppWindow
                 mode, 10, frame =>
                 {
                     if (_connectionLifetime.IsCancellationRequested) return;
-                    count++; Workspace.ShowChannels(frame);
+                    count++; if (mode != AcquisitionMode.Reference) Workspace.ShowChannels(frame);
                     if (mode == AcquisitionMode.Reference) referenceFrames.Add(frame.ToArray());
                     else
                     {
@@ -55,7 +55,7 @@ public sealed partial class AppWindow
             {
                 _reconstruction.SetReference(mean);
                 _acquisitionRecords.SetReference(referenceFrames, mean);
-                Workspace.ShowMeasurements(mean);
+                Workspace.ShowReference(mean);
             }
             if (!result.IsSuccess) { CloseDevice(); ConnectionIcon.Glyph = "\uECCA"; }
             else if (count > 0) DeviceView.SetParameterStatus("本次 EMT 采样已收到应答；所用参数已由采样链路确认（无独立参数回读）。");
