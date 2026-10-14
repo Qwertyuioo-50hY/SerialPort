@@ -50,7 +50,6 @@ public sealed partial class AppWindow : Window
         Workspace.ReconstructionRequested += WorkspaceReconstructionRequested;
         SideRail.ThemeRequested += SideRailThemeRequested;
         InitializeDevicePage();
-        Workspace.SetStatusSource(ConnectionStatus);
         AddReconstructionSettings(Workspace.AlgorithmPanel);
         _reconstructionSettings!.CustomAlgorithmRequested += async (_, _) => await ImportFileAsync("自定义算法");
         BuildParameterContents();

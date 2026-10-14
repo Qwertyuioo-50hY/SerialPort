@@ -66,8 +66,10 @@
                             <workspace:ImagingWorkspaceView x:Name="Workspace">
                                 <workspace:ImagingWorkspaceView.Commands>
                                     <StackPanel x:Name="ToolsPanel" Orientation="Vertical" Spacing="12">
+                                        <StackPanel.Resources><Style TargetType="Button"><Setter Property="HorizontalAlignment" Value="Stretch"/></Style></StackPanel.Resources>
                                         <Button Content="空场采集" Tag="Reference" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireReference"/>
                                         <Button Content="单次采集" Tag="Single" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireSingle"/>
+                                        <NumberBox x:Name="BatchFrameCount" Header="采集数量（帧）" Value="10" Minimum="1" Maximum="2147483647" SmallChange="1" SpinButtonPlacementMode="Compact" AutomationProperties.AutomationId="BatchFrameCount"/>
                                         <Button Content="多次采集" Tag="Batch" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireBatch"/>
                                         <Button Content="实时采集" Tag="Live" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireLive"/>
                                         <Button Content="停止" Tag="Stop" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="StopAcquisition"/>

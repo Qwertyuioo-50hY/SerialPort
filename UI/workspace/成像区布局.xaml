@@ -3,11 +3,11 @@
  <Border Style="{StaticResource WorkspaceCardStyle}">
   <StackPanel Spacing="20">
    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,24,0,0"><FontIcon Glyph="&#xE9D9;" FontSize="22" Foreground="{ThemeResource RailAccentBrush}"/><TextBlock Text="数据分析" FontSize="24" FontWeight="SemiBold"/></StackPanel>
-   <Border x:Name="WaveformModule" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16">
+   <Border x:Name="WaveformModule" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16" CornerRadius="8">
     <Grid ColumnSpacing="20">
      <Grid.ColumnDefinitions><ColumnDefinition Width="180"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-     <StackPanel Spacing="16"><TextBlock Text="数据采集" FontSize="16" FontWeight="SemiBold"/><ContentControl x:Name="CommandHost"/><TextBlock x:Name="AnalysisStatus" Text="未连接" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/><TextBlock Text="多次采集：10 帧" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"/></StackPanel>
-     <Grid Grid.Column="1" RowSpacing="12"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="340"/></Grid.RowDefinitions>
+     <ContentControl x:Name="CommandHost" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+     <Grid Grid.Column="1" RowSpacing="8"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="340"/></Grid.RowDefinitions>
       <TextBlock Text="空场与物场波形" FontSize="16" FontWeight="SemiBold"/><local:ChannelWaveformView x:Name="ChannelWaveform" Grid.Row="1"/>
      </Grid>
     </Grid>
@@ -15,19 +15,19 @@
    <Grid ColumnSpacing="16" RowSpacing="16">
     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-    <Border x:Name="DataModule" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16">
-     <StackPanel Spacing="12"><TextBlock Text="数据表格" FontSize="16" FontWeight="SemiBold"/><local:ChannelDataView x:Name="ChannelTable"/></StackPanel>
+    <Border x:Name="DataModule" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16" CornerRadius="8">
+     <local:ChannelDataView x:Name="ChannelTable"/>
     </Border>
-    <Border x:Name="ReconstructionModule" Grid.Column="1" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16">
+    <Border x:Name="ReconstructionModule" Grid.Column="1" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16" CornerRadius="8">
      <Grid RowSpacing="12"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-      <Grid><TextBlock Text="二维重建" FontSize="16" FontWeight="SemiBold"/><Button Content="重建" Click="ReconstructionClicked" HorizontalAlignment="Right" AutomationProperties.AutomationId="ReconstructImage"/></Grid>
+      <Grid><Button Content="重建" Click="ReconstructionClicked" HorizontalAlignment="Right" AutomationProperties.AutomationId="ReconstructImage"/></Grid>
       <local:ReconstructionImageView x:Name="ReconstructionImage" Grid.Row="1" MinHeight="360"/>
      </Grid>
     </Border>
-    <Border Grid.Row="1" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16">
+    <Border Grid.Row="1" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16" CornerRadius="8">
      <StackPanel Spacing="12"><TextBlock Text="算法配置" FontSize="16" FontWeight="SemiBold"/><StackPanel x:Name="AlgorithmBody" Spacing="12"/></StackPanel>
     </Border>
-    <Border x:Name="CameraModule" Grid.Row="1" Grid.Column="1" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16">
+    <Border x:Name="CameraModule" Grid.Row="1" Grid.Column="1" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16" CornerRadius="8">
      <StackPanel Spacing="12"><TextBlock Text="相机模块" FontSize="16" FontWeight="SemiBold"/><local:CameraPreviewView MinHeight="320"/></StackPanel>
     </Border>
    </Grid>

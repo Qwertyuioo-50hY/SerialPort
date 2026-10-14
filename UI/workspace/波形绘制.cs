@@ -2,7 +2,6 @@ using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SkiaSharp;
 
@@ -17,8 +16,10 @@ public sealed partial class ChannelWaveformView : UserControl
     {
         InitializeComponent();
         Chart.Series = new ISeries[] { _reference, _measurements };
-        Chart.XAxes = new[] { new Axis { Name = "通道", MinLimit = 1, MaxLimit = 64, MinStep = 1 } };
-        Chart.YAxes = new[] { new Axis { Name = "幅值" } };
+        Chart.XAxes = new[] { new Axis { MinLimit = 1, MaxLimit = 64, MinStep = 1, TextSize = 11, SeparatorsPaint = null } };
+        Chart.YAxes = new[] { new Axis { TextSize = 11, SeparatorsPaint = null } };
+        Chart.DrawMargin = new LiveChartsCore.Measure.Margin(44, 32, 12, 24);
+        Chart.LegendTextSize = 12;
         Chart.AnimationsSpeed = TimeSpan.Zero;
     }
 
@@ -30,6 +31,5 @@ public sealed partial class ChannelWaveformView : UserControl
     {
         if (values.Length != 64 || values.Any(value => !double.IsFinite(value))) throw new ArgumentException("必须提供 64 个有限通道值。", nameof(values));
         series.Values = values.Select((value, index) => new ObservablePoint(index + 1, value)).ToArray();
-        EmptyMessage.Visibility = Visibility.Collapsed;
     }
 }

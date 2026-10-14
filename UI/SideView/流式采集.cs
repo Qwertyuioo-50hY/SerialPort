@@ -37,7 +37,7 @@ public sealed partial class AppWindow
         else
         {
             _reconstruction.SetMeasurements(frame); Workspace.ShowMeasurements(frame); _acquisitionRecords.AddObject(frame); QueueRealtimeReconstruction();
-            if (_streamMode == AcquisitionMode.Single || (_streamMode == AcquisitionMode.Batch && _streamCount >= 10)) EndStreamAcquisition();
+            if (_streamMode == AcquisitionMode.Single || (_streamMode == AcquisitionMode.Batch && _streamCount >= _batchFrameTarget)) EndStreamAcquisition();
         }
     }
     private void AcquisitionButtonClicked(object sender, RoutedEventArgs e)

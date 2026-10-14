@@ -9,11 +9,18 @@ public sealed partial class AppWindow
     private readonly AcquisitionRecords _acquisitionRecords = new();
     private CancellationTokenSource? _acquisitionStop;
     private bool _sampling;
+    private int _batchFrameTarget = 10;
     private bool _acquiringReference;
     private void StopAcquisition(object? sender, EventArgs e) => _acquisitionStop?.Cancel();
     private async void AcquisitionRequested(object? sender, AcquisitionMode mode)
     {
         if (_sampling || _connecting || _fileOperation || (mode == AcquisitionMode.Reference && _reconstructing)) return;
+        if (mode == AcquisitionMode.Batch)
+        {
+            if (!IsInteger(BatchFrameCount.Value, 1, int.MaxValue))
+            { ShowDeviceError("采集数量必须为正整数。"); return; }
+            _batchFrameTarget = (int)BatchFrameCount.Value;
+        }
         if (_protocolSettings?.IsSimulation == true)
         {
             if (!_projectSettings.ExperimentInputs.TryGetValue("物场/Demo数据", out var input)) { ShowDeviceError("请先导入仿真数据。"); return; }
@@ -37,7 +44,7 @@ public sealed partial class AppWindow
             if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 99))
                 throw new ArgumentException("激励频率必须为 1–999 kHz 的整数，线圈数必须为 1–99 的整数。");
             var result = await _acquisition.RunAsync(ActiveChannel, (int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount,
-                mode, 10, frame =>
+                mode, _batchFrameTarget, frame =>
                 {
                     if (_connectionLifetime.IsCancellationRequested) return;
                     count++; if (mode != AcquisitionMode.Reference) Workspace.ShowChannels(frame);

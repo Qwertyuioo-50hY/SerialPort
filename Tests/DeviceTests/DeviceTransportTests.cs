@@ -25,6 +25,14 @@ public static class DeviceTransportTests
         fake.Response = _ => { fake.Emit(binary[..13]); fake.Emit(binary[13..]); };
         var sampled = await EmtSampling.ExecuteAsync(fake, 100, 8);
         if (!sampled.IsSuccess || ((uint[])sampled.Data!)[63] != 64 || fake.Last != "10008sample\r\n") throw new Exception("split binary sample");
+        foreach (var target in new[] { 1, 3, 12 })
+        {
+            var received = 0;
+            var result = await new EmtAcquisition().RunAsync(fake, 100, 8, AcquisitionMode.Batch,
+                target, _ => received++, CancellationToken.None);
+            if (!result.IsSuccess || received != target || fake.SubscriberCount != 0)
+                throw new Exception($"batch target {target}: received {received}");
+        }
         fake.Response = _ => fake.Emit(new byte[257]); if ((await EmtSampling.ExecuteAsync(fake, 100, 8)).IsSuccess) throw new Exception("ambiguous binary overflow accepted");
         if (fake.SubscriberCount != 0) throw new Exception("leaked sample subscription");
         var listener = new TcpListener(IPAddress.Loopback, 0); listener.Start();
@@ -57,7 +65,7 @@ public static class DeviceTransportTests
         if (refused.IsOpen) throw new Exception("failed TCP leaked state");
         try { await refused.OpenAsync("127.0.0.1", port, TimeSpan.FromSeconds(1), cancel.Token); throw new Exception("cancelled TCP accepted"); }
         catch (OperationCanceledException) { }
-        Console.WriteLine("PASS: handshake correct/wrong/timeout/cancel; shared serial-style/TCP split sampling, overflow rejection, subscription cleanup, refused/disconnected/cancelled TCP.");
+        Console.WriteLine("PASS: handshake correct/wrong/timeout/cancel; shared serial-style/TCP split sampling, overflow rejection, selectable batch counts (1/3/12), subscription cleanup, refused/disconnected/cancelled TCP.");
     }
     private static async Task<string> ReadLine(NetworkStream stream)
     {

@@ -19,12 +19,38 @@
         <TreeView x:Name="ProjectTree" Grid.Row="3" SelectionMode="Single" CanDragItems="False" AllowDrop="False"
             AutomationProperties.Name="当前项目目录" AutomationProperties.AutomationId="ProjectDirectory">
             <TreeView.Resources>
-                <SolidColorBrush x:Key="TreeViewItemBackgroundSelected" Color="#E6F5ED"/>
-                <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPointerOver" Color="#D9F0E4"/>
-                <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPressed" Color="#D9F0E4"/>
-                <SolidColorBrush x:Key="TreeViewItemForegroundSelected" Color="#0C9D52"/>
-                <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPointerOver" Color="#0C9D52"/>
-                <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPressed" Color="#0C9D52"/>
+                <ResourceDictionary>
+                    <ResourceDictionary.ThemeDictionaries>
+                        <ResourceDictionary x:Key="Dark">
+                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelected" Color="#203B2D"/>
+                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPointerOver" Color="#284936"/>
+                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPressed" Color="#284936"/>
+                            <SolidColorBrush x:Key="TreeViewItemForegroundSelected" Color="#18B568"/>
+                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPointerOver" Color="#18B568"/>
+                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPressed" Color="#18B568"/>
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="Light">
+                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelected" Color="#D9F0E4"/>
+                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPointerOver" Color="#CBE8D9"/>
+                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPressed" Color="#CBE8D9"/>
+                            <SolidColorBrush x:Key="TreeViewItemForegroundSelected" Color="#0C9D52"/>
+                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPointerOver" Color="#0C9D52"/>
+                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPressed" Color="#0C9D52"/>
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="HighContrast">
+                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelected" Color="{ThemeResource SystemColorHighlightColor}"/>
+                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPointerOver" Color="{ThemeResource SystemColorHighlightColor}"/>
+                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPressed" Color="{ThemeResource SystemColorHighlightColor}"/>
+                            <SolidColorBrush x:Key="TreeViewItemForegroundSelected" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPressed" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+                        </ResourceDictionary>
+                    </ResourceDictionary.ThemeDictionaries>
+                    <SolidColorBrush x:Key="TreeViewItemSelectionIndicatorForeground" Color="Transparent"/>
+                    <SolidColorBrush x:Key="TreeViewItemSelectionIndicatorForegroundPointerOver" Color="Transparent"/>
+                    <SolidColorBrush x:Key="TreeViewItemSelectionIndicatorForegroundPressed" Color="Transparent"/>
+                    <SolidColorBrush x:Key="TreeViewItemSelectionIndicatorForegroundDisabled" Color="Transparent"/>
+                </ResourceDictionary>
             </TreeView.Resources>
             <TreeView.ItemContainerStyle>
                 <Style TargetType="TreeViewItem">
@@ -36,7 +62,7 @@
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="10" Loaded="NodeContentLoaded">
                         <FontIcon Glyph="{Binding Content, Converter={StaticResource NodePresentation}, ConverterParameter=Icon}" FontSize="16" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding Content, Converter={StaticResource NodePresentation}}" FontSize="14" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
