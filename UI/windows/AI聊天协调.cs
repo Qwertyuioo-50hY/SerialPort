@@ -46,7 +46,6 @@ public sealed partial class AppWindow
         DirectoryPanel.NewChatRequested += (_, _) => NewAiConversation();
         AiChatView.NewConversationRequested += (_, _) => NewAiConversation();
         AiChatView.ConfigurationRequested += (_, selection) => ChangeComposerConfiguration(selection.Model, selection.Effort);
-        AiChatView.SettingsRequested += (_, _) => { ViewModel.Section = "设置"; ViewModel.ParametersVisible = false; SideRail.SetSection("设置"); };
         DirectoryPanel.ChatRequested += (_, conversation) => { _conversation = conversation; ShowAiConversation(); };
         DirectoryPanel.ProjectChanged += (_, _) => { if (!_aiBusy) LoadAiHistory(); };
         Closed += (_, _) => _aiClosed = true;

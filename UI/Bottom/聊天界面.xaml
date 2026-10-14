@@ -21,20 +21,33 @@
    <Border Grid.Row="3" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="28" Padding="10,8">
     <Grid ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
      <Button Click="NewConversationClicked" Width="32" Height="32" CornerRadius="16" Background="Transparent" BorderThickness="0" Padding="0" VerticalAlignment="Bottom" AutomationProperties.Name="新建对话" AutomationProperties.AutomationId="ComposerNewChat"><FontIcon Glyph="&#xE710;" FontSize="18"/></Button>
-     <TextBox x:Name="MessageInput" Grid.Column="1" PlaceholderText="询问 AI" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="32" MaxHeight="160" Background="Transparent" BorderThickness="0" CornerRadius="16" VerticalAlignment="Center" TextChanged="MessageInputChanged" KeyDown="MessageInputKeyDown" AutomationProperties.Name="聊天消息" AutomationProperties.AutomationId="ChatInput"/>
+     <TextBox x:Name="MessageInput" Grid.Column="1" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="32" MaxHeight="160" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" CornerRadius="16" VerticalAlignment="Center" TextChanged="MessageInputChanged" KeyDown="MessageInputKeyDown" AutomationProperties.Name="聊天消息" AutomationProperties.AutomationId="ChatInput">
+      <TextBox.Resources>
+       <SolidColorBrush x:Key="TextControlBorderBrush" Color="Transparent"/>
+       <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="Transparent"/>
+       <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="Transparent"/>
+       <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="Transparent"/>
+       <SolidColorBrush x:Key="TextControlBackground" Color="Transparent"/>
+       <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Transparent"/>
+       <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="Transparent"/>
+       <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="Transparent"/>
+       <Thickness x:Key="TextControlBorderThemeThickness">0</Thickness>
+       <Thickness x:Key="TextControlBorderThemeThicknessFocused">0</Thickness>
+      </TextBox.Resources>
+     </TextBox>
      <Button Grid.Column="2" x:Name="ModelButton" Background="Transparent" BorderThickness="0" CornerRadius="16" Padding="10,6" VerticalAlignment="Bottom" AutomationProperties.Name="模型和思考设置" AutomationProperties.AutomationId="ChatModelSettings">
-      <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock x:Name="ModelLabel" Text="选择强度" VerticalAlignment="Center"/><FontIcon Glyph="&#xE70D;" FontSize="10"/></StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock x:Name="ModelLabel" FontSize="12" FontWeight="SemiBold" Text="选择强度" VerticalAlignment="Center"/><FontIcon Glyph="&#xE70D;" FontSize="10"/></StackPanel>
       <Button.Flyout>
        <Flyout x:Name="ModeFlyout" Opened="ModeFlyoutOpened" Placement="Top">
-        <Flyout.FlyoutPresenterStyle><Style TargetType="FlyoutPresenter"><Setter Property="CornerRadius" Value="20"/><Setter Property="Padding" Value="16"/><Setter Property="Background" Value="{ThemeResource DevicePageBrush}"/><Setter Property="BorderBrush" Value="{ThemeResource DeviceDividerBrush}"/><Setter Property="BorderThickness" Value="1"/></Style></Flyout.FlyoutPresenterStyle>
-        <StackPanel Width="264" Spacing="10">
+        <Flyout.FlyoutPresenterStyle><Style TargetType="FlyoutPresenter"><Setter Property="CornerRadius" Value="18"/><Setter Property="Padding" Value="12"/><Setter Property="Background" Value="{ThemeResource DevicePageBrush}"/><Setter Property="BorderBrush" Value="{ThemeResource DeviceDividerBrush}"/><Setter Property="BorderThickness" Value="1"/></Style></Flyout.FlyoutPresenterStyle>
+        <StackPanel Width="208" Spacing="6">
          <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="32"/><ColumnDefinition Width="*"/><ColumnDefinition Width="32"/></Grid.ColumnDefinitions>
           <FontIcon Glyph="&#xE945;" FontSize="18" VerticalAlignment="Top"/>
-          <TextBlock x:Name="EffortHeading" Grid.Column="1" Text="中等" Foreground="{ThemeResource ChatEffortAccentBrush}" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="EffortHeading" Grid.Column="1" Text="中等" Foreground="{ThemeResource ChatEffortAccentBrush}" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center"/>
           <Button Grid.Column="2" Click="ResetEffortClicked" Padding="6" Background="Transparent" BorderThickness="0" AutomationProperties.Name="恢复默认强度" AutomationProperties.AutomationId="ResetChatEffort"><FontIcon Glyph="&#xE777;" FontSize="16"/></Button>
          </Grid>
-         <ComboBox x:Name="ModelChoice" HorizontalAlignment="Stretch" CornerRadius="12" SelectionChanged="ModelChoiceChanged" AutomationProperties.Name="选择模型" AutomationProperties.AutomationId="ComposerModel"/>
-         <Slider x:Name="EffortSlider" Minimum="0" Maximum="4" StepFrequency="1" SnapsTo="StepValues" TickFrequency="1" ValueChanged="EffortValueChanged" AutomationProperties.Name="思考强度" AutomationProperties.AutomationId="ChatEffort">
+         <Grid Height="36">
+         <Slider x:Name="EffortSlider" Minimum="0" Maximum="4" StepFrequency="1" SnapsTo="StepValues" TickPlacement="None" ValueChanged="EffortValueChanged" AutomationProperties.Name="思考强度" AutomationProperties.AutomationId="ChatEffort">
           <Slider.Resources>
            <ResourceDictionary>
             <ResourceDictionary.ThemeDictionaries>
@@ -42,13 +55,21 @@
              <ResourceDictionary x:Key="Light"><SolidColorBrush x:Key="SliderTrackValueFill" Color="#984C25"/><SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#984C25"/><SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#984C25"/></ResourceDictionary>
              <ResourceDictionary x:Key="HighContrast"><SolidColorBrush x:Key="SliderTrackValueFill" Color="{ThemeResource SystemColorHighlightColor}"/><SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="{ThemeResource SystemColorHighlightColor}"/><SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="{ThemeResource SystemColorHighlightColor}"/></ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
-            <x:Double x:Key="SliderTrackThemeHeight">28</x:Double><x:Double x:Key="SliderHorizontalHeight">36</x:Double>
-            <CornerRadius x:Key="SliderTrackCornerRadius">14</CornerRadius><CornerRadius x:Key="SliderThumbCornerRadius">18</CornerRadius>
-            <x:Double x:Key="SliderHorizontalThumbWidth">34</x:Double><x:Double x:Key="SliderHorizontalThumbHeight">34</x:Double>
+            <x:Double x:Key="SliderTrackThemeHeight">22</x:Double><x:Double x:Key="SliderHorizontalHeight">36</x:Double>
+            <CornerRadius x:Key="SliderTrackCornerRadius">11</CornerRadius><CornerRadius x:Key="SliderThumbCornerRadius">14</CornerRadius>
+            <x:Double x:Key="SliderHorizontalThumbWidth">28</x:Double><x:Double x:Key="SliderHorizontalThumbHeight">28</x:Double>
+            <x:Double x:Key="SliderInnerThumbWidth">0</x:Double><x:Double x:Key="SliderInnerThumbHeight">0</x:Double>
            </ResourceDictionary>
           </Slider.Resources>
          </Slider>
-         <Button Content="更多设置" Click="OpenSettingsClicked" HorizontalAlignment="Center" Background="Transparent" BorderThickness="0" CornerRadius="12" AutomationProperties.AutomationId="ComposerMoreSettings"/>
+          <Grid Margin="14,0" IsHitTestVisible="False"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+           <Ellipse x:Name="EffortDot0" Grid.Column="0" Width="4" Height="4" Fill="{ThemeResource TextFillColorPrimaryBrush}" Opacity="0.4" VerticalAlignment="Center"/>
+           <Ellipse x:Name="EffortDot1" Grid.Column="2" Width="4" Height="4" Fill="{ThemeResource TextFillColorPrimaryBrush}" Opacity="0.4" VerticalAlignment="Center"/>
+           <Ellipse x:Name="EffortDot2" Grid.Column="4" Width="4" Height="4" Fill="{ThemeResource TextFillColorPrimaryBrush}" Opacity="0.4" VerticalAlignment="Center"/>
+           <Ellipse x:Name="EffortDot3" Grid.Column="6" Width="4" Height="4" Fill="{ThemeResource TextFillColorPrimaryBrush}" Opacity="0.4" VerticalAlignment="Center"/>
+           <Ellipse x:Name="EffortDot4" Grid.Column="8" Width="4" Height="4" Fill="{ThemeResource TextFillColorPrimaryBrush}" Opacity="0.4" VerticalAlignment="Center"/>
+          </Grid>
+         </Grid>
         </StackPanel>
        </Flyout>
       </Button.Flyout>

@@ -14,7 +14,6 @@ public sealed partial class AiChatPanelView : UserControl
 {
     public event EventHandler<string>? SendRequested;
     public event EventHandler? NewConversationRequested;
-    public event EventHandler? SettingsRequested;
     public event EventHandler<(string Model, string Effort)>? ConfigurationRequested;
     private AiApiSettings _configuration = new();
     private static readonly string[] Efforts = { "low", "medium", "high", "xhigh", "max" };
@@ -57,30 +56,30 @@ public sealed partial class AiChatPanelView : UserControl
         _updatingMode = true;
         try
         {
-            ModelChoice.ItemsSource = (_configuration.Models ?? new()).Append(_configuration.Model).Where(model => !string.IsNullOrWhiteSpace(model)).Distinct().ToArray();
-            ModelChoice.SelectedItem = _configuration.Model;
             var index = Array.IndexOf(Efforts, _configuration.ReasoningEffort);
             EffortSlider.Value = index < 0 ? 1 : index;
             EffortHeading.Text = index < 0 ? "默认" : EffortNames[index];
+            UpdateEffortDots(index < 0 ? 1 : index);
         }
         finally { _updatingMode = false; }
     }
     private void ModeFlyoutOpened(object? sender, object e) => UpdateModeControls();
-    private void ModelChoiceChanged(object sender, SelectionChangedEventArgs e)
+    private void UpdateEffortDots(int selected)
     {
-        if (!_updatingMode && ModelChoice.SelectedItem is string model)
-            ConfigurationRequested?.Invoke(this, (model, _configuration.ReasoningEffort));
+        if (EffortDot4 is null) return;
+        var dots = new[] { EffortDot0, EffortDot1, EffortDot2, EffortDot3, EffortDot4 };
+        for (var i = 0; i < dots.Length; i++) dots[i].Opacity = i == selected ? 0 : 0.4;
     }
     private void EffortValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
     {
         if (_updatingMode || EffortHeading is null) return;
         var index = Math.Clamp((int)Math.Round(e.NewValue), 0, 4);
         EffortHeading.Text = EffortNames[index];
+        UpdateEffortDots(index);
         ConfigurationRequested?.Invoke(this, (_configuration.Model, Efforts[index]));
     }
     private void ResetEffortClicked(object sender, RoutedEventArgs e) => ConfigurationRequested?.Invoke(this, (_configuration.Model, "default"));
     private void NewConversationClicked(object sender, RoutedEventArgs e) => NewConversationRequested?.Invoke(this, EventArgs.Empty);
-    private void OpenSettingsClicked(object sender, RoutedEventArgs e) { ModeFlyout.Hide(); SettingsRequested?.Invoke(this, EventArgs.Empty); }
     public void SetBusy(bool busy)
     {
         _busy = busy; ModelButton.IsEnabled = !busy; UpdateSendState();
