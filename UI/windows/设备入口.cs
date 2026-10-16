@@ -16,7 +16,8 @@ public sealed partial class AppWindow
     private readonly DispatcherTimer _saveDeviceTimer = new() { Interval = TimeSpan.FromMilliseconds(400) };
     private bool _restoringDevice;
     private string _referenceConfiguration = "";
-    private string ProjectSettingsPath => System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+    private string ProjectSettingsPath => System.IO.Path.Combine(DirectoryPanel.DirectoryPath, ProjectStore.ConfigFileName);
+    private string LegacyProjectSettingsPath => System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "Tomography", "Projects", Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(DirectoryPanel.DirectoryPath.ToUpperInvariant()))), "settings.json");
     private void InitializeDevicePage()
     {
@@ -46,7 +47,13 @@ public sealed partial class AppWindow
         {
             RefreshDevicePorts();
             var path = ProjectSettingsPath;
-            var result = await Task.Run(() => _projectConfig.Load(path));
+            var source = !System.IO.File.Exists(path) && System.IO.File.Exists(LegacyProjectSettingsPath) ? LegacyProjectSettingsPath : path;
+            var result = await Task.Run(() => _projectConfig.Load(source));
+            if (source != path && result.IsSuccess && result.Data is AppSettings migrated)
+            {
+                var saved = await Task.Run(() => _projectConfig.Save(migrated, path));
+                if (!saved.IsSuccess) ShowDeviceError(saved.Message);
+            }
             _projectSettings = result.IsSuccess && result.Data is AppSettings settings ? settings : new AppSettings();
             _protocolSettings!.Restore(_projectSettings);
             _deviceSettings.Restore(_projectSettings.Device.FrequencyKhz, _projectSettings.Device.CoilCount);

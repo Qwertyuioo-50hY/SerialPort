@@ -7,6 +7,8 @@ from urllib.parse import urlsplit
 
 def read_config(path):
     config = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    if isinstance(config, dict) and "AI" in config:
+        config = config["AI"]
     if not isinstance(config, dict):
         raise ValueError("AI 配置必须是 JSON 对象。")
     base = config.get("BaseUrl", "").strip().rstrip("/")

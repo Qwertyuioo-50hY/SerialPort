@@ -13,7 +13,9 @@ API Key 由 Windows 凭据管理器保存并在调用时注入；也可使用 JS
 - `OutputFormat`：`text`、`markdown`、`json_object`。Markdown、`Tone`、`Language`、`Instructions`、`OutputInstructions` 合并为模型指令；语气和语言不是独立 SDK 参数。
 - `TimeoutSeconds`：请求超时秒数。界面配置的参数会真实传入 Python；服务端不支持时返回错误，不静默降级。请求使用 `store=false`，本地保存全部文本历史。
 
-新建项目：输入项目名并选择父目录。聊天以 `项目目录/聊天/<对话ID>/conversation.json` 保存，导航顶部“聊天”文件夹可展开并恢复对话。旧 AppData 项目聊天在首次读取时复制到项目目录；原文件保留。
+全局配置统一保存在 `%LOCALAPPDATA%/Tomography/setting.json`，其中 `AI` 为 AI 配置、`Theme` 为现有主题选择。C# 负责读写，Python 读取同一文件中的 `AI`（兼容原平铺 JSON）。API Key 继续由 Windows 凭据管理器保存。首次读取自动迁移旧 `ai-settings.json`，原文件保留。
+
+新建项目：输入项目名并选择父目录，生成 `project.json`、`data/` 和 `chats/`。设备及实验输入配置保存至项目根目录的 `project.json`；聊天以 `chats/<对话ID>/conversation.json` 保存。旧 AppData 项目配置和聊天、项目内旧中文聊天目录均兼容迁移，原文件保留。项目导航仅显示新建项目、打开文件夹和新建对话入口。设置分类顺序为通用、外观、AI、快捷键、语言和地区；新增分类仅提供页面占位。
 
 官方依据（2026-10-14 核对）：
 - [GPT-6.1 Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol)

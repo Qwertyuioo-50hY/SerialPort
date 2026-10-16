@@ -1,83 +1,14 @@
 <UserControl x:Class="Tomography.UI.Navigation.ProjectDirectoryView"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Tomography.UI.Navigation">
-    <UserControl.Resources><local:ProjectNodePresentation x:Key="NodePresentation"/></UserControl.Resources>
-    <Grid Padding="20" RowSpacing="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Spacing="12">
-            <FontIcon Glyph="&#xE8B7;" FontSize="20" Foreground="{ThemeResource RailAccentBrush}"/>
-            <TextBlock Text="项目导航" FontSize="20" FontWeight="SemiBold"/>
-        </StackPanel>
-        <TextBox x:Name="SearchBox" Grid.Row="1" PlaceholderText="搜索项目文件…" CornerRadius="10"
-            AutomationProperties.Name="搜索项目文件" AutomationProperties.AutomationId="SearchProjectDirectory"/>
-        <StackPanel Grid.Row="2" Spacing="8">
-            <Grid ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                <Button Content="新建项目" Click="CreateProjectClicked" HorizontalAlignment="Stretch" CornerRadius="10" AutomationProperties.AutomationId="CreateProject"/>
-                <Button x:Name="ChooseProjectDirectory" Grid.Column="1" Content="打开文件夹" HorizontalAlignment="Stretch" CornerRadius="10" AutomationProperties.Name="打开项目文件夹" AutomationProperties.AutomationId="ChooseProjectDirectory"/>
-            </Grid>
-            <Button Content="＋ 新建对话" Click="NewChatClicked" HorizontalAlignment="Stretch" CornerRadius="12" AutomationProperties.AutomationId="NewAiConversation"/>
-        </StackPanel>
-        <TreeView x:Name="ProjectTree" Grid.Row="3" SelectionMode="Single" CanDragItems="False" AllowDrop="False"
-            AutomationProperties.Name="当前项目目录" AutomationProperties.AutomationId="ProjectDirectory">
-            <TreeView.Resources>
-                <ResourceDictionary>
-                    <ResourceDictionary.ThemeDictionaries>
-                        <ResourceDictionary x:Key="Dark">
-                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelected" Color="#203B2D"/>
-                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPointerOver" Color="#284936"/>
-                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPressed" Color="#284936"/>
-                            <SolidColorBrush x:Key="TreeViewItemForegroundSelected" Color="#18B568"/>
-                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPointerOver" Color="#18B568"/>
-                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPressed" Color="#18B568"/>
-                        </ResourceDictionary>
-                        <ResourceDictionary x:Key="Light">
-                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelected" Color="#D9F0E4"/>
-                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPointerOver" Color="#CBE8D9"/>
-                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPressed" Color="#CBE8D9"/>
-                            <SolidColorBrush x:Key="TreeViewItemForegroundSelected" Color="#0C9D52"/>
-                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPointerOver" Color="#0C9D52"/>
-                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPressed" Color="#0C9D52"/>
-                        </ResourceDictionary>
-                        <ResourceDictionary x:Key="HighContrast">
-                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelected" Color="{ThemeResource SystemColorHighlightColor}"/>
-                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPointerOver" Color="{ThemeResource SystemColorHighlightColor}"/>
-                            <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPressed" Color="{ThemeResource SystemColorHighlightColor}"/>
-                            <SolidColorBrush x:Key="TreeViewItemForegroundSelected" Color="{ThemeResource SystemColorHighlightTextColor}"/>
-                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemColorHighlightTextColor}"/>
-                            <SolidColorBrush x:Key="TreeViewItemForegroundSelectedPressed" Color="{ThemeResource SystemColorHighlightTextColor}"/>
-                        </ResourceDictionary>
-                    </ResourceDictionary.ThemeDictionaries>
-                    <SolidColorBrush x:Key="TreeViewItemSelectionIndicatorForeground" Color="Transparent"/>
-                    <SolidColorBrush x:Key="TreeViewItemSelectionIndicatorForegroundPointerOver" Color="Transparent"/>
-                    <SolidColorBrush x:Key="TreeViewItemSelectionIndicatorForegroundPressed" Color="Transparent"/>
-                    <SolidColorBrush x:Key="TreeViewItemSelectionIndicatorForegroundDisabled" Color="Transparent"/>
-                </ResourceDictionary>
-            </TreeView.Resources>
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="TreeViewItem">
-                    <Setter Property="MinHeight" Value="36"/>
-                    <Setter Property="CornerRadius" Value="6"/>
-                    <Setter Property="Padding" Value="4,4,8,4"/>
-                    <Setter Property="FontSize" Value="14"/>
-                </Style>
-            </TreeView.ItemContainerStyle>
-            <TreeView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="10" Loaded="NodeContentLoaded">
-                        <FontIcon Glyph="{Binding Content, Converter={StaticResource NodePresentation}, ConverterParameter=Icon}" FontSize="16" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding Content, Converter={StaticResource NodePresentation}}" FontSize="14" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                    </StackPanel>
-                </DataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
-        <StackPanel x:Name="EmptyProjectMessage" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Visibility="Collapsed">
-            <FontIcon Glyph="&#xE8B7;" FontSize="32" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            <TextBlock Text="未找到项目文件" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-        </StackPanel>
-        <TextBlock x:Name="DirectoryMessage" Grid.Row="4" TextWrapping="Wrap"/>
-    </Grid>
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+ <StackPanel Padding="20" Spacing="16">
+  <StackPanel Orientation="Horizontal" Spacing="12">
+   <FontIcon Glyph="&#xE8B7;" FontSize="20" Foreground="{ThemeResource RailAccentBrush}"/>
+   <TextBlock Text="项目导航" FontSize="20" FontWeight="SemiBold"/>
+  </StackPanel>
+  <StackPanel Spacing="8">
+   <Button Content="新建项目" Click="CreateProjectClicked" HorizontalAlignment="Stretch" CornerRadius="10" AutomationProperties.AutomationId="CreateProject"/>
+   <Button x:Name="ChooseProjectDirectory" Content="打开文件夹" HorizontalAlignment="Stretch" CornerRadius="10" AutomationProperties.AutomationId="ChooseProjectDirectory"/>
+   <Button Content="＋ 新建对话" Click="NewChatClicked" HorizontalAlignment="Stretch" CornerRadius="12" AutomationProperties.AutomationId="NewAiConversation"/>
+  </StackPanel>
+ </StackPanel>
 </UserControl>

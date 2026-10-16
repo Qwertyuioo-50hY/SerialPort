@@ -25,6 +25,7 @@ public sealed partial class AppWindow
     {
         if (!CanChangeProject()) return;
         var nameField = new TextBox { Header = "项目名称", PlaceholderText = "输入项目名称" };
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(nameField, "ProjectName");
         var dialog = new ContentDialog { XamlRoot = Root.XamlRoot, RequestedTheme = Root.ActualTheme,
             Title = "新建项目", Content = nameField, PrimaryButtonText = "选择保存位置", CloseButtonText = "取消" };
         if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
@@ -35,9 +36,7 @@ public sealed partial class AppWindow
         if (parent is null || !CanChangeProject()) return;
         try
         {
-            var path = Path.Combine(parent.Path, name);
-            if (Directory.Exists(path) || File.Exists(path)) { ShowProjectError("同名文件或文件夹已存在，请打开已有项目或使用其他名称。"); return; }
-            Directory.CreateDirectory(Path.Combine(path, AiProjectStore.FolderName));
+            var path = ProjectStore.Create(parent.Path, name);
             await SwitchProjectAsync(path);
         }
         catch (Exception ex) { ShowProjectError("创建项目失败：" + ex.Message); }

@@ -1,9 +1,25 @@
 <UserControl x:Class="Tomography.UI.SideView.AiSettingsView"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
  <Border Style="{StaticResource WorkspaceCardStyle}">
-  <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+  <Grid ColumnSpacing="24" Padding="16">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="176"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+   <StackPanel Spacing="16">
+    <AutoSuggestBox x:Name="SettingsSearch" PlaceholderText="搜索设置" QueryIcon="Find" CornerRadius="16" TextChanged="SettingsSearchChanged" AutomationProperties.Name="搜索设置" AutomationProperties.AutomationId="SettingsSearch"/>
+    <ListView x:Name="SettingsCategories" SelectionMode="Single" SelectionChanged="SettingsCategoryChanged" AutomationProperties.Name="设置分类" AutomationProperties.AutomationId="SettingsCategories">
+     <ListViewItem Content="通用" Tag="General" AutomationProperties.AutomationId="SettingsGeneral"/>
+     <ListViewItem Content="外观" Tag="Appearance" AutomationProperties.AutomationId="SettingsAppearance"/>
+     <ListViewItem Content="AI" Tag="AI" AutomationProperties.AutomationId="SettingsAI"/>
+     <ListViewItem Content="快捷键" Tag="Shortcuts" AutomationProperties.AutomationId="SettingsShortcuts"/>
+     <ListViewItem Content="语言和地区" Tag="LanguageRegion" AutomationProperties.AutomationId="SettingsLanguageRegion"/>
+    </ListView>
+    <TextBlock x:Name="SettingsSearchEmpty" Text="未找到设置分类" Visibility="Collapsed" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+   </StackPanel>
+   <StackPanel x:Name="CategoryPlaceholder" Grid.Column="1" Margin="12,16" Spacing="12" Visibility="Collapsed">
+    <TextBlock x:Name="CategoryTitle" FontSize="20" FontWeight="SemiBold"/>
+    <TextBlock Text="暂无可配置项" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+   </StackPanel>
+  <ScrollViewer x:Name="AiSettingsContent" Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
    <StackPanel Spacing="20" MaxWidth="640" HorizontalAlignment="Stretch" Margin="12,24">
-    <TextBlock Text="设置" FontSize="24" FontWeight="SemiBold"/>
     <TextBox x:Name="BaseUrl" Header="API 地址（Base URL，Anthropic 可填主机根地址）" CornerRadius="12" AutomationProperties.AutomationId="AiBaseUrl"/>
     <TextBox x:Name="KeyEnvironment" Header="API Key 环境变量（未填写密钥时使用）" CornerRadius="12" AutomationProperties.AutomationId="AiKeyEnvironment"/>
     <PasswordBox x:Name="ApiKey" Header="API Key" CornerRadius="12" AutomationProperties.AutomationId="AiApiKey"/>
@@ -26,5 +42,6 @@
     <TextBlock x:Name="SaveStatus" TextWrapping="Wrap" AutomationProperties.AutomationId="AiSettingsStatus"/>
    </StackPanel>
   </ScrollViewer>
+  </Grid>
  </Border>
 </UserControl>

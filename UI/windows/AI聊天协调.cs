@@ -1,5 +1,4 @@
 using System.IO;
-using System.Text.Json;
 using Tomography.Business.Models;
 using Tomography.Business.Services;
 using Windows.Security.Credentials;
@@ -10,6 +9,7 @@ public sealed partial class AppWindow
 {
     private readonly PythonChatService _chatService = new();
     private AiApiSettings _aiSettings = new();
+    private GlobalSettings _globalSettings = new();
     private string _aiKey = "";
     private List<AiConversation> _conversations = new();
     private AiConversation? _conversation;
@@ -19,14 +19,16 @@ public sealed partial class AppWindow
     private bool _aiBusy;
     private bool _aiClosed;
     private bool _historyReadable = true;
-    private static string AiSettingsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tomography", "ai-settings.json");
-    private string LegacyAiHistoryPath => Path.Combine(Path.GetDirectoryName(ProjectSettingsPath)!, "conversations.json");
+    private static string AiSettingsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tomography", "setting.json");
+    private string LegacyAiHistoryPath => Path.Combine(Path.GetDirectoryName(LegacyProjectSettingsPath)!, "conversations.json");
     private void InitializeAi()
     {
         try
         {
-            if (File.Exists(AiSettingsPath))
-                _aiSettings = JsonSerializer.Deserialize<AiApiSettings>(File.ReadAllText(AiSettingsPath)) ?? new();
+            _globalSettings = GlobalSettingsStore.Load(AiSettingsPath, Path.Combine(Path.GetDirectoryName(AiSettingsPath)!, "ai-settings.json"));
+            _aiSettings = _globalSettings.AI;
+            Root.RequestedTheme = Enum.Parse<Microsoft.UI.Xaml.ElementTheme>(_globalSettings.Theme);
+            SideRail.RestoreTheme(Root.RequestedTheme);
             if (string.IsNullOrWhiteSpace(_aiSettings.PythonDll)) _aiSettings.PythonDll = PythonRuntimeHost.FindPythonDll();
             try
             {
@@ -46,7 +48,6 @@ public sealed partial class AppWindow
         DirectoryPanel.NewChatRequested += (_, _) => NewAiConversation();
         AiChatView.NewConversationRequested += (_, _) => NewAiConversation();
         AiChatView.ConfigurationRequested += (_, selection) => ChangeComposerConfiguration(selection.Model, selection.Effort);
-        DirectoryPanel.ChatRequested += (_, conversation) => { _conversation = conversation; ShowAiConversation(); };
         DirectoryPanel.ProjectChanged += (_, _) => { if (!_aiBusy) LoadAiHistory(); };
         Closed += (_, _) => _aiClosed = true;
         LoadAiHistory();
@@ -58,7 +59,7 @@ public sealed partial class AppWindow
         try
         {
             _aiSettings.Model = model; _aiSettings.ReasoningEffort = effort;
-            WriteAiJson(AiSettingsPath, _aiSettings);
+            SaveGlobalSettings();
             AiSettingsPanel.LoadSettings(_aiSettings, _aiKey); AiChatView.SetConfiguration(_aiSettings);
         }
         catch (Exception)
@@ -78,7 +79,6 @@ public sealed partial class AppWindow
         ViewModel.Section = "AI"; ViewModel.ParametersVisible = false; SideRail.SetSection("AI");
         AiChatView.ShowConversation(_conversation);
         if (_pendingConversation == _conversation && _pendingConversation is not null) AiChatView.ShowPending(_pendingReasoning, _pendingReply);
-        DirectoryPanel.SetConversations(_conversations, _conversation);
     }
     private void LoadAiHistory()
     {
@@ -94,13 +94,11 @@ public sealed partial class AppWindow
             _conversations = new(); _conversation = null; _historyReadable = false;
             AiChatView.ShowConversation(null); AiChatView.SetStatus("对话记录读取失败，原文件已保留。");
         }
-        DirectoryPanel.SetConversations(_conversations, _conversation);
     }
-    private static void WriteAiJson<T>(string path, T value)
+    private void SaveGlobalSettings()
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true }));
-        File.Move(path + ".tmp", path, true);
+        _globalSettings.AI = _aiSettings;
+        GlobalSettingsStore.Save(AiSettingsPath, _globalSettings);
     }
     private void SaveAiSettings()
     {
@@ -115,7 +113,8 @@ public sealed partial class AppWindow
                 try { vault.Remove(vault.Retrieve("Tomography.AI", settings.BaseUrl)); }
                 catch (System.Runtime.InteropServices.COMException ex) when (ex.HResult == unchecked((int)0x80070490)) { }
             }
-            WriteAiJson(AiSettingsPath, settings);
+            _globalSettings.AI = settings;
+            GlobalSettingsStore.Save(AiSettingsPath, _globalSettings);
             _aiSettings = settings; _aiKey = AiSettingsPanel.Key;
             AiChatView.SetConfiguration(settings); AiSettingsPanel.SetStatus("已保存");
         }
@@ -145,7 +144,7 @@ public sealed partial class AppWindow
         if (conversation.Title == "新对话") conversation.Title = message.Length > 24 ? message[..24] + "…" : message;
         _aiBusy = true; _pendingConversation = conversation; _pendingReply = ""; _pendingReasoning = "";
         AiChatView.SetBusy(true); AiChatView.SetStatus(""); AiChatView.ClearInput();
-        AiChatView.ShowConversation(conversation); AiChatView.ShowPending("", ""); DirectoryPanel.SetConversations(_conversations, _conversation); SaveAiHistory();
+        AiChatView.ShowConversation(conversation); AiChatView.ShowPending("", ""); SaveAiHistory();
         try
         {
             var reply = await _chatService.SendAsync(AiSettingsPath, _aiSettings.PythonDll, _aiKey, conversation.Messages.ToArray(), (kind, delta) =>

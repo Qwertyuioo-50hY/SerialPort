@@ -7,13 +7,37 @@ namespace Tomography.UI.SideView;
 public sealed partial class AiSettingsView : UserControl
 {
     public event EventHandler? SaveRequested;
-    public AiSettingsView() => InitializeComponent();
+    public AiSettingsView()
+    {
+        InitializeComponent();
+        SettingsCategories.SelectedIndex = 2;
+    }
+    private void SettingsCategoryChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (AiSettingsContent is null || CategoryPlaceholder is null) return;
+        var item = SettingsCategories.SelectedItem as ListViewItem;
+        var ai = item?.Tag as string == "AI";
+        AiSettingsContent.Visibility = ai ? Visibility.Visible : Visibility.Collapsed;
+        CategoryPlaceholder.Visibility = item is not null && !ai ? Visibility.Visible : Visibility.Collapsed;
+        CategoryTitle.Text = item?.Content?.ToString() ?? "";
+    }
+    private void SettingsSearchChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (SettingsCategories is null) return;
+        var query = sender.Text.Trim();
+        var visible = SettingsCategories.Items.OfType<ListViewItem>().Where(item =>
+            item.Content.ToString()!.Contains(query, StringComparison.OrdinalIgnoreCase)).ToArray();
+        foreach (var item in SettingsCategories.Items.OfType<ListViewItem>())
+            item.Visibility = visible.Contains(item) ? Visibility.Visible : Visibility.Collapsed;
+        if (!visible.Contains(SettingsCategories.SelectedItem)) SettingsCategories.SelectedItem = visible.FirstOrDefault();
+        SettingsSearchEmpty.Visibility = visible.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
     public string Key => ApiKey.Password.Trim();
     public void LoadSettings(AiApiSettings settings, string key)
     {
         BaseUrl.Text = settings.BaseUrl ?? ""; PythonDll.Text = settings.PythonDll ?? "";
         settings.Models ??= new(); KeyEnvironment.Text = settings.ApiKeyEnvironmentVariable ?? ""; ApiKey.Password = key;
-        Model.ItemsSource = settings.Models; Model.Text = settings.Model ?? "";
+        Model.ItemsSource = settings.Models; Model.SelectedItem = settings.Model; Model.Text = settings.Model ?? "";
         Models.Text = string.Join(Environment.NewLine, settings.Models);
         SelectValue(ApiMode, settings.ApiMode); SelectValue(ReasoningMode, settings.ReasoningMode);
         SelectValue(ReasoningEffort, settings.ReasoningEffort); SelectValue(ServiceTier, settings.ServiceTier);

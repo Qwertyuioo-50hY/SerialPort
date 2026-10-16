@@ -52,6 +52,12 @@ class ConfigApiTests(unittest.TestCase):
         self.send_config()
         self.assertEqual(self.requests[-1][2]["model"], "custom-relay-model")
 
+    def test_global_setting_json(self):
+        self.path.write_text(json.dumps({"AI": self.config, "Theme": "Dark"}), encoding="utf-8")
+        config = read_config(self.path)
+        self.assertEqual(config["Model"], self.config["Model"])
+        self.assertEqual(build_request(config, [])["model"], self.config["Model"])
+
     def test_chat_compatibility(self):
         self.config.update(ApiMode="chat_completions", ReasoningMode="standard", ServiceTier="default")
         self.body = {"choices": [{"message": {"content": "兼容回复"}}]}

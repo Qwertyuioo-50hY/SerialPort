@@ -18,7 +18,7 @@ public static class PythonChatBridgeTests
         {
             var port = ((IPEndPoint)listener.LocalEndpoint).Port;
             var config = Path.Combine(root, "config.json");
-            File.WriteAllText(config, JsonSerializer.Serialize(new AiApiSettings { BaseUrl = $"http://127.0.0.1:{port}/v1", Model = "gpt-6.1-sol" }));
+            GlobalSettingsStore.Save(config, new GlobalSettings { AI = new AiApiSettings { BaseUrl = $"http://127.0.0.1:{port}/v1", Model = "gpt-6.1-sol" } });
             var server = Task.Run(async () =>
             {
                 using var peer = await listener.AcceptTcpClientAsync();

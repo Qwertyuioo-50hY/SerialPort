@@ -5,13 +5,13 @@ namespace Tomography.Business.Services;
 
 public static class AiProjectStore
 {
-    public const string FolderName = "聊天";
+    public const string FolderName = "chats";
     public static List<AiConversation> Load(string project, string? legacyPath = null)
     {
         var root = Path.Combine(project, FolderName);
         var items = new List<AiConversation>();
-        if (Directory.Exists(root))
-            foreach (var folder in Directory.EnumerateDirectories(root))
+        foreach (var source in new[] { root, Path.Combine(project, "聊天") }.Where(Directory.Exists))
+            foreach (var folder in Directory.EnumerateDirectories(source))
             {
                 if (!Guid.TryParseExact(Path.GetFileName(folder), "N", out _)) continue;
                 var path = Path.Combine(folder, "conversation.json");
@@ -19,6 +19,8 @@ public static class AiProjectStore
                 var item = JsonSerializer.Deserialize<AiConversation>(File.ReadAllText(path)) ?? throw new InvalidDataException("对话文件为空。");
                 Validate(item);
                 if (item.Id != Path.GetFileName(folder)) throw new InvalidDataException("对话 ID 与目录不一致。");
+                if (items.Any(existing => existing.Id == item.Id)) continue;
+                if (source != root) Save(project, new[] { item });
                 items.Add(item);
             }
         if (legacyPath is not null && File.Exists(legacyPath))

@@ -13,7 +13,7 @@ public static class AiProjectStoreTests
         {
             var chat = new AiConversation { Title = "项目聊天", Messages = new() { new("user", "你好") } };
             AiProjectStore.Save(project, new[] { chat });
-            var path = Path.Combine(project, "聊天", chat.Id, "conversation.json");
+            var path = Path.Combine(project, AiProjectStore.FolderName, chat.Id, "conversation.json");
             if (!File.Exists(path) || AiProjectStore.Load(project).Single().Messages.Single().Content != "你好") throw new Exception("project chat roundtrip");
             chat.Messages.Add(new("assistant", "回复", "接口返回的摘要"));
             AiProjectStore.Save(project, new[] { chat });
@@ -24,6 +24,12 @@ public static class AiProjectStoreTests
             var migrated = AiProjectStore.Load(project, legacy);
             if (migrated.Count != 2 || !File.Exists(legacy) || migrated.Single(item => item.Id == chat.Id).Messages.Count != 2) throw new Exception("legacy migration overwrote current chat or source");
             if (AiProjectStore.Load(project, legacy).Count != 2) throw new Exception("migration duplicates");
+            var chinese = new AiConversation { Title = "中文目录旧对话" };
+            var chineseFolder = Path.Combine(project, "聊天", chinese.Id);
+            Directory.CreateDirectory(chineseFolder);
+            File.WriteAllText(Path.Combine(chineseFolder, "conversation.json"), JsonSerializer.Serialize(chinese));
+            if (AiProjectStore.Load(project).Count != 3 || !File.Exists(Path.Combine(project, "chats", chinese.Id, "conversation.json")))
+                throw new Exception("Chinese chat folder migration");
             try { AiProjectStore.Save(project, new[] { new AiConversation { Id = "../escape" } }); throw new Exception("unsafe ID accepted"); }
             catch (InvalidDataException) { }
             File.WriteAllText(path, "{broken");

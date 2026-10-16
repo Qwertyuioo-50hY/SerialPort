@@ -6,6 +6,7 @@ using System.Buffers.Binary;
 
 if (args.Contains("--python-chat")) await PythonChatBridgeTests.RunAsync();
 AiProjectStoreTests.Run();
+SettingsAndProjectTests.Run();
 await DeviceTransportTests.RunAsync();
 var tests = 0;
 void Check(bool condition, string message) { if (!condition) throw new Exception(message); tests++; }
@@ -36,7 +37,7 @@ foreach (var checksum in new[] { "None", "XOR8", "SUM8" })
 }
 Reject(() => new CustomFrameDecoder(new CustomFrameDefinition()), "undefined custom protocol accepted");
 Reject(() => new CustomFrameDecoder(new CustomFrameDefinition { HeaderHex = "AA", Length = 256, DataOffset = 1 }), "bad frame size accepted");
-var folder = Path.Combine(Path.GetTempPath(), "emt-input-tests-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(folder);
+var folder = Path.Combine(AppContext.BaseDirectory, "obj", "emt-input-tests-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(folder);
 try
 {
     var matrix = Path.Combine(folder, "sen.csv"); var xy = Path.Combine(folder, "xy.csv"); var channels = Path.Combine(folder, "data.csv");
