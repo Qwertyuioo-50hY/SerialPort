@@ -129,3 +129,31 @@ class ConfigApiTests(unittest.TestCase):
         self.body = 'data: {"type":"response.output_text.delta","delta":"partial"}\n\n'
         with self.assertRaisesRegex(ValueError, "提前结束"):
             self.send_config(on_event=lambda *_: None)
+
+    def test_anthropic_root_and_v1_paths(self):
+        self.config.update(ApiMode="anthropic_messages", Model="claude-sonnet-5")
+        self.body = {"id": "msg_test", "type": "message", "role": "assistant", "model": "claude-sonnet-5",
+                     "content": [{"type": "text", "text": "完成"}], "stop_reason": "end_turn", "usage": {"input_tokens": 1, "output_tokens": 1}}
+        for base in (self.base, self.base.removesuffix("/v1")):
+            self.config["BaseUrl"] = base
+            self.assertEqual(self.send_config()["reply"], "完成")
+            path, _, body = self.requests[-1]
+            self.assertEqual(path, "/proxy/v1/messages")
+            self.assertEqual(body["max_tokens"], 4096)
+            self.assertNotIn("reasoning", body)
+            self.assertNotIn("service_tier", body)
+            self.assertIn("精确回答", body["system"])
+
+    def test_anthropic_stream_and_truncation(self):
+        self.config.update(ApiMode="anthropic_messages", Model="claude-sonnet-5")
+        self.content_type = "text/event-stream"
+        events = [{"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": "完成"}},
+                  {"type": "message_delta", "delta": {"stop_reason": "end_turn"}, "usage": {"output_tokens": 1}},
+                  {"type": "message_stop"}]
+        self.body = "".join("event: " + event["type"] + "\n" + "data: " + json.dumps(event) + "\n\n" for event in events)
+        received = []
+        self.assertEqual(self.send_config(on_event=lambda *args: received.append(args))["reply"], "完成")
+        self.assertEqual(received, [("reply", "完成")])
+        self.body = 'event: content_block_delta\ndata: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"partial"}}\n\n'
+        with self.assertRaisesRegex(ValueError, "提前结束"):
+            self.send_config(on_event=lambda *_: None)

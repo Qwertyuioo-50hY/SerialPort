@@ -26,6 +26,10 @@ def snapshot(value):
         raise ValueError("中转站返回了无效响应或 API 错误。")
     if value.get("status") in ("incomplete", "failed", "cancelled"):
         raise ValueError("模型响应未完成，请检查输出上限或重试。")
+    if value.get("stop_reason") in ("max_tokens", "pause_turn"):
+        raise ValueError("模型响应未完成，请调整输出上限后重试。")
+    if value.get("type") == "message" and isinstance(value.get("content"), list):
+        return {"reply": "".join(part.get("text", "") for part in value["content"] if part.get("type") == "text"), "reasoning_summary": ""}
     reply = value.get("output_text")
     reply = reply if isinstance(reply, str) else ""
     summaries = []
@@ -73,7 +77,20 @@ def collect_events(events, on_event=None):
         kind = event.get("type")
         if kind in ("error", "response.failed", "response.incomplete"):
             raise ValueError("模型响应未完成，请检查接口配置、输出上限后重试。")
-        if kind == "response.output_text.delta":
+        if kind == "content_block_delta":
+            delta = event.get("delta") or {}
+            if delta.get("type") == "text_delta":
+                append("reply", delta.get("text"))
+        elif kind == "content_block_start":
+            block = event.get("content_block") or {}
+            if block.get("type") == "text":
+                append("reply", block.get("text"))
+        elif kind == "message_delta":
+            if (event.get("delta") or {}).get("stop_reason") in ("max_tokens", "pause_turn"):
+                raise ValueError("模型响应未完成，请调整输出上限后重试。")
+        elif kind == "message_stop":
+            complete = True
+        elif kind == "response.output_text.delta":
             append("reply", event.get("delta"))
         elif kind == "response.reasoning_summary_text.delta":
             append("reasoning_summary", event.get("delta"))

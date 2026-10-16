@@ -31,8 +31,8 @@ public sealed partial class AiSettingsView : UserControl
             uri.Scheme is not ("http" or "https") || string.IsNullOrEmpty(uri.Host) ||
             uri.UserInfo.Length > 0 || uri.Query.Length > 0 || uri.Fragment.Length > 0)
             throw new ArgumentException("请填写有效的 HTTP/HTTPS API Base URL。");
-        if (uri.AbsolutePath.TrimEnd('/').EndsWith("/responses") || uri.AbsolutePath.TrimEnd('/').EndsWith("/chat/completions"))
-            throw new ArgumentException("请填写 Base URL，不要包含 /responses 或 /chat/completions。");
+        if (uri.AbsolutePath.TrimEnd('/').EndsWith("/messages") || uri.AbsolutePath.TrimEnd('/').EndsWith("/responses") || uri.AbsolutePath.TrimEnd('/').EndsWith("/chat/completions"))
+            throw new ArgumentException("请填写 Base URL，不要包含 /messages、/responses 或 /chat/completions。");
         if (Value(ApiMode) == "chat_completions" && (Value(ReasoningMode) == "pro" || Value(ServiceTier) == "ultrafast"))
             throw new ArgumentException("Pro 模式和 Ultrafast 速度需要 Responses 接口。");
         if (!double.IsFinite(MaxOutputTokens.Value) || MaxOutputTokens.Value != Math.Truncate(MaxOutputTokens.Value) || MaxOutputTokens.Value < 0 || MaxOutputTokens.Value > int.MaxValue ||

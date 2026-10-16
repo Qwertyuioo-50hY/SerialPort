@@ -4,13 +4,13 @@
   <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
    <StackPanel Spacing="20" MaxWidth="640" HorizontalAlignment="Stretch" Margin="12,24">
     <TextBlock Text="设置" FontSize="24" FontWeight="SemiBold"/>
-    <TextBox x:Name="BaseUrl" Header="API 地址（Base URL，含 /v1 等路径）" CornerRadius="12" AutomationProperties.AutomationId="AiBaseUrl"/>
+    <TextBox x:Name="BaseUrl" Header="API 地址（Base URL，Anthropic 可填主机根地址）" CornerRadius="12" AutomationProperties.AutomationId="AiBaseUrl"/>
     <TextBox x:Name="KeyEnvironment" Header="API Key 环境变量（未填写密钥时使用）" CornerRadius="12" AutomationProperties.AutomationId="AiKeyEnvironment"/>
     <PasswordBox x:Name="ApiKey" Header="API Key" CornerRadius="12" AutomationProperties.AutomationId="AiApiKey"/>
     <ComboBox x:Name="Model" Header="模型选择（可输入中转站模型名）" IsEditable="True" HorizontalAlignment="Stretch" CornerRadius="12" AutomationProperties.AutomationId="AiModel"/>
     <TextBox x:Name="Models" Header="可选模型（每行一个）" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" CornerRadius="12" AutomationProperties.AutomationId="AiModels"/>
     <TextBox x:Name="PythonDll" Header="Python 运行时 DLL" CornerRadius="12" AutomationProperties.AutomationId="AiPythonDll"/>
-    <ComboBox x:Name="ApiMode" Header="接口协议" HorizontalAlignment="Stretch" CornerRadius="12" SelectedIndex="0" AutomationProperties.AutomationId="AiApiMode"><ComboBoxItem Content="Responses" Tag="responses"/><ComboBoxItem Content="Chat Completions（中转兼容）" Tag="chat_completions"/></ComboBox>
+    <ComboBox x:Name="ApiMode" Header="接口协议" HorizontalAlignment="Stretch" CornerRadius="12" SelectedIndex="0" AutomationProperties.AutomationId="AiApiMode"><ComboBoxItem Content="Anthropic Messages（Claude）" Tag="anthropic_messages"/><ComboBoxItem Content="Responses" Tag="responses"/><ComboBoxItem Content="Chat Completions（中转兼容）" Tag="chat_completions"/></ComboBox>
     <ComboBox x:Name="ReasoningMode" Header="模型模式" HorizontalAlignment="Stretch" CornerRadius="12" SelectedIndex="0" AutomationProperties.AutomationId="AiReasoningMode"><ComboBoxItem Content="Standard" Tag="standard"/><ComboBoxItem Content="Pro" Tag="pro"/></ComboBox>
     <ComboBox x:Name="ReasoningEffort" Header="思考强度" HorizontalAlignment="Stretch" CornerRadius="12" SelectedIndex="0" AutomationProperties.AutomationId="AiReasoningEffort"><ComboBoxItem Content="模型默认" Tag="default"/><ComboBoxItem Content="轻度 (low)" Tag="low"/><ComboBoxItem Content="中等 (medium)" Tag="medium"/><ComboBoxItem Content="高 (high)" Tag="high"/><ComboBoxItem Content="极高 (xhigh)" Tag="xhigh"/><ComboBoxItem Content="最高 (max)" Tag="max"/></ComboBox>
     <ComboBox x:Name="ServiceTier" Header="模型速度" HorizontalAlignment="Stretch" CornerRadius="12" SelectedIndex="0" AutomationProperties.AutomationId="AiServiceTier"><ComboBoxItem Content="标准 (default)" Tag="default"/><ComboBoxItem Content="快速 (Fast)" Tag="priority"/><ComboBoxItem Content="极速 (Ultrafast)" Tag="ultrafast"/><ComboBoxItem Content="自动 (auto)" Tag="auto"/></ComboBox>

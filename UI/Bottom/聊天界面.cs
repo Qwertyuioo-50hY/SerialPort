@@ -82,7 +82,7 @@ public sealed partial class AiChatPanelView : UserControl
     private void NewConversationClicked(object sender, RoutedEventArgs e) => NewConversationRequested?.Invoke(this, EventArgs.Empty);
     public void SetBusy(bool busy)
     {
-        _busy = busy; ModelButton.IsEnabled = !busy; UpdateSendState();
+        _busy = busy; SendArrow.Visibility = busy ? Visibility.Collapsed : Visibility.Visible; ThinkingSquare.Visibility = busy ? Visibility.Visible : Visibility.Collapsed; ModelButton.IsEnabled = !busy; UpdateSendState();
         if (!busy) { _pulse.Stop(); if (_pendingDot is not null) _pendingDot.Visibility = Visibility.Collapsed; }
     }
     public void SetStatus(string text) { ChatStatus.Text = text; ChatStatus.Visibility = string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible; }

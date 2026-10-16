@@ -18,9 +18,9 @@
     <TextBlock x:Name="EmptyMessage" Text="开始新的对话" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
    </Grid>
    <TextBlock x:Name="ChatStatus" Grid.Row="2" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" AutomationProperties.AutomationId="ChatStatus"/>
-   <Border Grid.Row="3" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="28" Padding="10,8">
+   <Border Grid.Row="3" MaxWidth="920" HorizontalAlignment="Stretch" Margin="16,0" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="24" Padding="8,6">
     <Grid ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-     <Button Click="NewConversationClicked" Width="32" Height="32" CornerRadius="16" Background="Transparent" BorderThickness="0" Padding="0" VerticalAlignment="Bottom" AutomationProperties.Name="新建对话" AutomationProperties.AutomationId="ComposerNewChat"><FontIcon Glyph="&#xE710;" FontSize="18"/></Button>
+     <Button Click="NewConversationClicked" Width="32" Height="32" CornerRadius="16" Background="Transparent" BorderThickness="0" Padding="0" VerticalAlignment="Center" AutomationProperties.Name="新建对话" AutomationProperties.AutomationId="ComposerNewChat"><FontIcon Glyph="&#xE710;" FontSize="18"/></Button>
      <TextBox x:Name="MessageInput" Grid.Column="1" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="32" MaxHeight="160" Background="Transparent" BorderThickness="0" BorderBrush="Transparent" CornerRadius="16" VerticalAlignment="Center" TextChanged="MessageInputChanged" KeyDown="MessageInputKeyDown" AutomationProperties.Name="聊天消息" AutomationProperties.AutomationId="ChatInput">
       <TextBox.Resources>
        <SolidColorBrush x:Key="TextControlBorderBrush" Color="Transparent"/>
@@ -35,7 +35,7 @@
        <Thickness x:Key="TextControlBorderThemeThicknessFocused">0</Thickness>
       </TextBox.Resources>
      </TextBox>
-     <Button Grid.Column="2" x:Name="ModelButton" Background="Transparent" BorderThickness="0" CornerRadius="16" Padding="10,6" VerticalAlignment="Bottom" AutomationProperties.Name="模型和思考设置" AutomationProperties.AutomationId="ChatModelSettings">
+     <Button Grid.Column="2" x:Name="ModelButton" Background="Transparent" BorderThickness="0" CornerRadius="16" Padding="10,6" VerticalAlignment="Center" AutomationProperties.Name="模型和思考设置" AutomationProperties.AutomationId="ChatModelSettings">
       <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock x:Name="ModelLabel" FontSize="12" FontWeight="SemiBold" Text="选择强度" VerticalAlignment="Center"/><FontIcon Glyph="&#xE70D;" FontSize="10"/></StackPanel>
       <Button.Flyout>
        <Flyout x:Name="ModeFlyout" Opened="ModeFlyoutOpened" Placement="Top">
@@ -74,7 +74,15 @@
        </Flyout>
       </Button.Flyout>
      </Button>
-     <Button x:Name="SendButton" Grid.Column="3" Click="SendClicked" Width="36" Height="36" CornerRadius="18" Padding="0" VerticalAlignment="Bottom" Background="{ThemeResource TextFillColorPrimaryBrush}" Foreground="{ThemeResource LayerFillColorDefaultBrush}" AutomationProperties.Name="发送消息" AutomationProperties.AutomationId="SendChatMessage"><FontIcon Glyph="&#xE74A;" FontSize="18"/></Button>
+     <Button x:Name="SendButton" Grid.Column="3" Click="SendClicked" Width="30" Height="30" MinWidth="0" MinHeight="0" CornerRadius="15" Padding="0" VerticalAlignment="Center" Background="{ThemeResource ComposerSendBackground}" Foreground="{ThemeResource ComposerSendForeground}" BorderThickness="0" AutomationProperties.Name="发送消息" AutomationProperties.AutomationId="SendChatMessage"><Button.Resources>
+      <ResourceDictionary>
+       <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark"><SolidColorBrush x:Key="ComposerSendBackground" Color="#E6E6E6"/><SolidColorBrush x:Key="ComposerSendForeground" Color="#202020"/><SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#E6E6E6"/><SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#E6E6E6"/><SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#E6E6E6"/><SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#202020"/><SolidColorBrush x:Key="ButtonForegroundPressed" Color="#202020"/><SolidColorBrush x:Key="ButtonForegroundDisabled" Color="#202020"/></ResourceDictionary>
+        <ResourceDictionary x:Key="Light"><SolidColorBrush x:Key="ComposerSendBackground" Color="#202020"/><SolidColorBrush x:Key="ComposerSendForeground" Color="#FFFFFF"/><SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#202020"/><SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#202020"/><SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#202020"/><SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#FFFFFF"/><SolidColorBrush x:Key="ButtonForegroundPressed" Color="#FFFFFF"/><SolidColorBrush x:Key="ButtonForegroundDisabled" Color="#FFFFFF"/></ResourceDictionary>
+        <ResourceDictionary x:Key="HighContrast"><SolidColorBrush x:Key="ComposerSendBackground" Color="{ThemeResource SystemColorButtonFaceColor}"/><SolidColorBrush x:Key="ComposerSendForeground" Color="{ThemeResource SystemColorButtonTextColor}"/><SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource SystemColorButtonFaceColor}"/><SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource SystemColorButtonFaceColor}"/><SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource SystemColorButtonFaceColor}"/><SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource SystemColorButtonTextColor}"/><SolidColorBrush x:Key="ButtonForegroundPressed" Color="{ThemeResource SystemColorButtonTextColor}"/><SolidColorBrush x:Key="ButtonForegroundDisabled" Color="{ThemeResource SystemColorButtonTextColor}"/></ResourceDictionary>
+       </ResourceDictionary.ThemeDictionaries>
+      </ResourceDictionary>
+     </Button.Resources><Grid><FontIcon x:Name="SendArrow" Glyph="&#xE74A;" FontSize="16"/><Rectangle x:Name="ThinkingSquare" Width="10" Height="10" RadiusX="1" RadiusY="1" Fill="{ThemeResource ComposerSendForeground}" Visibility="Collapsed"/></Grid></Button>
     </Grid>
    </Border>
   </Grid>

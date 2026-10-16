@@ -25,3 +25,6 @@ API Key 由 Windows 凭据管理器保存并在调用时注入；也可使用 JS
 界面请求流式返回，Python 将服务实际返回的 `response.reasoning_summary_text.delta` 和 `response.output_text.delta` 分别传给 C#。等待时显示闪烁圆点；没有摘要时不显示摘要区域。摘要随对话存入项目文件，但不作为后续用户消息重新发送。解析兼容 SDK 对象、JSON、字符串和 SSE；未收到流完成标记时报错，不将截断内容当成完整答案。
 
 流式事件依据：[OpenAI 官方流式文档](https://developers.openai.com/api/docs/guides/streaming-responses)。本地端到端测试：`dotnet run --project Tests/DeviceTests/DeviceTests.csproj -- --python-chat`（使用本机 CPython 与回环模拟接口）。
+
+
+Anthropic 中转配置：Base URL 填 `https://api.mxwell.ai`（也兼容末尾 `/v1`），接口协议选 `Anthropic Messages（Claude）`，模型填 `claude-sonnet-5` 或 `claude-opus-5`，密钥在设置页填写。请求固定使用所选模型，不进行自动路由。协议使用 `/v1/messages`，不附加 OpenAI 专有参数；输出上限为 0 时使用 4096。该模式目前使用模型默认思考设置，不应用 OpenAI 思考强度、速度或详细程度参数。

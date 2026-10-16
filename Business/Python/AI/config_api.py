@@ -13,13 +13,13 @@ def read_config(path):
     url = urlsplit(base)
     if url.scheme not in ("http", "https") or not url.hostname or url.username or url.password or url.query or url.fragment:
         raise ValueError("API Base URL 无效。")
-    if base.endswith(("/responses", "/chat/completions")):
+    if base.endswith(("/responses", "/chat/completions", "/messages")):
         raise ValueError("请填写 Base URL（例如以 /v1 结尾），不要包含接口路径。")
     config["BaseUrl"] = base
     if not isinstance(config.get("Model"), str) or not config["Model"].strip():
         raise ValueError("请配置模型名称。")
     for key, choices, default in (
-        ("ApiMode", ("responses", "chat_completions"), "responses"),
+        ("ApiMode", ("responses", "chat_completions", "anthropic_messages"), "responses"),
         ("ReasoningMode", ("standard", "pro"), "standard"),
         ("ReasoningEffort", ("default", "low", "medium", "high", "xhigh", "max"), "medium"),
         ("ServiceTier", ("auto", "default", "priority", "ultrafast"), "default"),
@@ -54,6 +54,12 @@ def build_request(config, messages):
         instructions.append("使用 Markdown 格式输出。")
     elif config["OutputFormat"] == "json_object":
         instructions.append("输出有效的 JSON 对象（JSON），不要添加格式之外的文字。")
+    if config["ApiMode"] == "anthropic_messages":
+        options = {"model": config["Model"], "messages": [dict(item) for item in messages],
+                   "max_tokens": config["MaxOutputTokens"] or 4096}
+        if instructions:
+            options["system"] = "\n".join(instructions)
+        return options
     options = {"model": config["Model"], "store": False, "service_tier": config["ServiceTier"]}
     effort = config["ReasoningEffort"]
     if config["ApiMode"] == "responses":
@@ -97,6 +103,9 @@ def run_from_file(config_path, request_json, api_key="", on_event=None):
     if not isinstance(messages, list) or any(not isinstance(item, dict) or item.get("role") not in ("user", "assistant") or not isinstance(item.get("content"), str) for item in messages):
         raise ValueError("聊天记录格式无效。")
     options = build_request(config, messages)
+    if config["ApiMode"] == "anthropic_messages":
+        from .anthropic_api import send_request
+        return json.dumps(send_request(config, key, options, on_event), ensure_ascii=False)
     try:
         with OpenAI(api_key=key, base_url=config["BaseUrl"], timeout=config["TimeoutSeconds"], max_retries=0) as client:
             if config["ApiMode"] == "responses":
