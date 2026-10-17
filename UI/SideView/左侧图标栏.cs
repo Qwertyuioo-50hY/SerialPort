@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 
@@ -32,7 +32,9 @@ public sealed partial class IconRailView : UserControl
             var selected = button.Tag as string == section;
             button.Background = selected ? _selectedBackground : new SolidColorBrush(Microsoft.UI.Colors.Transparent);
             var color = selected ? _selectedForeground : _defaultForeground;
-            button.Foreground = ((FontIcon)button.Content).Foreground = color;
+            button.Foreground = color;
+            if (button.Content is FontIcon font) font.Foreground = color;
+            else if (button.Content is Microsoft.UI.Xaml.Shapes.Path path) path.Fill = color;
         }
     }
 }

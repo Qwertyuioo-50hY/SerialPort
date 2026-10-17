@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -7,15 +7,22 @@ namespace Tomography.UI.Home;
 public sealed partial class HomeView : UserControl
 {
     public event EventHandler? NewProjectRequested;
+    public event EventHandler? BrowseProjectRequested;
     public event EventHandler<string>? OpenProjectRequested;
     public HomeView() => InitializeComponent();
     public void SetRecentProjects(IEnumerable<string>? paths)
     {
         var projects = (paths ?? Array.Empty<string>()).Select(path => new RecentProjectItem(path)).ToArray();
         RecentProjects.ItemsSource = projects;
-        EmptyRecentProjects.Visibility = projects.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+        RecentHeading.Visibility = projects.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
-    public void SetStatus(string message) => HomeStatus.Text = message;
+    public void SetStatus(string message)
+    {
+        HomeStatus.Text = message;
+        HomeStatus.Visibility = string.IsNullOrWhiteSpace(message) ? Visibility.Collapsed : Visibility.Visible;
+    }
+    private void OpenProjectClicked(object sender, RoutedEventArgs e) => BrowseProjectRequested?.Invoke(this, EventArgs.Empty);
+    private void CreateProjectSplitClicked(SplitButton sender, SplitButtonClickEventArgs args) => NewProjectRequested?.Invoke(this, EventArgs.Empty);
     private void NewProjectClicked(object sender, RoutedEventArgs e) => NewProjectRequested?.Invoke(this, EventArgs.Empty);
     private void RecentProjectClicked(object sender, ItemClickEventArgs e)
     {

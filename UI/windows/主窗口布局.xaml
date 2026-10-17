@@ -1,4 +1,4 @@
-<Window x:Class="Tomography.UI.windows.AppWindow"
+﻿<Window x:Class="Tomography.UI.windows.AppWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Tomography.UI.windows"
@@ -7,7 +7,7 @@
     xmlns:bottom="using:Tomography.UI.Bottom"
     xmlns:home="using:Tomography.UI.Home"
     xmlns:workspace="using:Tomography.UI.workspace" Title="FieldSync">
-    <Grid x:Name="Root" Background="#080808" RequestedTheme="Light" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
+    <Grid x:Name="Root" Background="{ThemeResource DeviceCanvasBrush}" RequestedTheme="Light" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
         <Grid.Resources>
             <Style x:Key="DividerStyle" TargetType="Thumb">
                 <Setter Property="UseSystemFocusVisuals" Value="False" />
@@ -29,7 +29,7 @@
                 </Setter>
             </Style>
         </Grid.Resources>
-        <Border x:Name="ShellFrame" Margin="0" BorderBrush="#080808" BorderThickness="8" CornerRadius="8" Background="{ThemeResource DeviceCanvasBrush}">
+        <Border x:Name="ShellFrame" Margin="0" BorderThickness="0" CornerRadius="12" Background="{ThemeResource DeviceCanvasBrush}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="68" /><ColumnDefinition x:Name="DirectoryColumn" Width="260"/><ColumnDefinition x:Name="DirectoryDividerColumn" Width="8"/><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                 <side:IconRailView x:Name="SideRail" CornerRadius="8" RequestedTheme="Dark" Margin="8,8,0,8" />

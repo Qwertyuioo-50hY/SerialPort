@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.UI;
 using Microsoft.UI.Input;
@@ -39,6 +39,8 @@ public sealed partial class AppWindow : Window
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
             const int DWMWA_BORDER_COLOR = 34;
+            var cornerPreference = 2u;
+            DwmSetWindowAttribute(hwnd, 33, ref cornerPreference, sizeof(uint));
             var borderColor = 0xFFFFFFFEu; // DWMWA_COLOR_NONE
             DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, ref borderColor, sizeof(uint));
         }
@@ -89,8 +91,8 @@ public sealed partial class AppWindow : Window
         AiChatView.Visibility = ViewModel.Section == "AI" ? Visibility.Visible : Visibility.Collapsed;
         HomePanel.Visibility = ViewModel.Section == "主页" ? Visibility.Visible : Visibility.Collapsed;
         ContentGrid.Visibility = device || ViewModel.Section is "主页" or "AI" or "设置" ? Visibility.Collapsed : Visibility.Visible;
-        ShellFrame.BorderThickness = new Thickness(8);
-        ShellFrame.CornerRadius = new CornerRadius(8);
+        ShellFrame.BorderThickness = new Thickness(0);
+        ShellFrame.CornerRadius = new CornerRadius(12);
         SideRail.CornerRadius = ShellFrame.CornerRadius;
         if (ContentGrid.ActualWidth > 0)
             _parameterWidth = Math.Clamp(_parameterWidth, 240, Math.Max(240, Math.Min(430, ContentGrid.ActualWidth - 760)));

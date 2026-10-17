@@ -13,9 +13,9 @@ def emit(event, **values):
 
 
 def main():
-    from PySide6.QtCore import Qt, QObject, Signal, QTimer
-    from PySide6.QtGui import QIcon, QWindow, QCursor
-    from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSystemTrayIcon, QMenu
+    from PySide6.QtCore import Qt, QObject, Signal, QTimer, QRectF
+    from PySide6.QtGui import QIcon, QWindow, QCursor, QPainterPath, QRegion
+    from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QSystemTrayIcon, QMenu
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--window", required=True, type=int)
@@ -37,6 +37,7 @@ def main():
     if not user32.IsWindow(args.window):
         raise RuntimeError("WinUI 页面窗口已失效。")
     app = QApplication(sys.argv[:1] + ["-platform", "windows:dpiawareness=2"])
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("FieldSync.Desktop")
     app.setApplicationName("FieldSync")
     app.setQuitOnLastWindowClosed(False)
     icon = QIcon(str(Path(__file__).resolve().parent.parent / "Assets" / "AppIcon.ico"))
@@ -45,35 +46,13 @@ def main():
     class Commands(QObject):
         received = Signal(dict)
 
-    class TitleBar(QWidget):
-        def __init__(self, shell):
-            super().__init__(shell)
-            self.shell = shell
-            self.setFixedHeight(32)
-            layout = QHBoxLayout(self)
-            layout.setContentsMargins(10, 0, 0, 0)
-            label = QLabel("FieldSync")
-            layout.addWidget(label)
-            layout.addStretch()
-            for text, name, action in (("−", "最小化", shell.showMinimized), ("□", "最大化或还原", shell.toggle_maximized), ("×", "关闭", shell.close)):
-                button = QPushButton(text)
-                button.setAccessibleName(name)
-                button.setFixedSize(42, 30)
-                button.clicked.connect(action)
-                layout.addWidget(button)
-
-        def mousePressEvent(self, event):
-            if event.button() == Qt.LeftButton:
-                self.shell.windowHandle().startSystemMove()
-
-        def mouseDoubleClickEvent(self, event):
-            if event.button() == Qt.LeftButton:
-                self.shell.toggle_maximized()
-
     class Shell(QWidget):
         def __init__(self):
             super().__init__(None, Qt.Window | Qt.FramelessWindowHint)
             self.quitting = False
+            # Round the top-level window, including its hosted WinUI child.
+            corner = ctypes.c_int(2)
+            ctypes.windll.dwmapi.DwmSetWindowAttribute(wintypes.HWND(int(self.winId())), 33, ctypes.byref(corner), ctypes.sizeof(corner))
             self.setWindowTitle("FieldSync")
             self.setWindowIcon(icon)
             self.setMinimumSize(800, 560)
@@ -82,9 +61,8 @@ def main():
             self.resize(min(self.width(), screen.width()), min(self.height(), screen.height()))
             self.move(screen.center() - self.rect().center())
             layout = QVBoxLayout(self)
-            layout.setContentsMargins(6, 6, 6, 6)
+            layout.setContentsMargins(4, 4, 4, 4)
             layout.setSpacing(0)
-            layout.addWidget(TitleBar(self))
             self.foreign = QWindow.fromWinId(args.window)
             if self.foreign is None:
                 raise RuntimeError("Qt 无法承载现有页面。")
@@ -100,6 +78,8 @@ def main():
             self.tray.setToolTip("FieldSync")
             menu = QMenu()
             menu.addAction("打开 FieldSync", self.restore)
+            menu.addAction("最小化", self.showMinimized)
+            menu.addAction("最大化或还原", self.toggle_maximized)
             menu.addSeparator()
             menu.addAction("退出", self.quit)
             self.tray_menu = menu
@@ -111,6 +91,15 @@ def main():
             self.monitor = QTimer(self)
             self.monitor.timeout.connect(self.check_backend)
             self.monitor.start(1000)
+
+        def resizeEvent(self, event):
+            super().resizeEvent(event)
+            if self.isMaximized():
+                self.clearMask()
+            else:
+                outline = QPainterPath()
+                outline.addRoundedRect(QRectF(self.rect()), 12, 12)
+                self.setMask(QRegion(outline.toFillPolygon().toPolygon()))
 
         def apply_theme(self, theme):
             dark = theme == "Dark"
@@ -157,6 +146,8 @@ def main():
             name = message.get("command")
             if name == "show": self.restore()
             elif name == "hide": self.close()
+            elif name == "move": self.windowHandle().startSystemMove()
+            elif name == "maximize": self.toggle_maximized()
             elif name == "theme": self.apply_theme(message.get("theme", "Light"))
             elif name == "quit": self.quit()
 

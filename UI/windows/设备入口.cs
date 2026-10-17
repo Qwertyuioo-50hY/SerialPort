@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Windows.Storage.Pickers;
 using Tomography.Business.Models;
@@ -28,16 +28,21 @@ public sealed partial class AppWindow
         DeviceView.ActionRequested += DeviceActionRequested;
         SideRail.NavigationRequested += (_, section) => { ViewModel.Section = section; ViewModel.ParametersVisible = false; ToolsPanel.Visibility = Visibility.Visible; };
         SideRail.DirectoryToggleRequested += ToggleProjectNavigation;
-        DirectoryPanel.ChooseDirectoryRequested += async (_, _) =>
-        {
-            if (!CanChangeProject()) return;
-            var folder = await new FolderPicker(PickerWindowId).PickSingleFolderAsync();
-            if (folder is not null) await SwitchProjectAsync(folder.Path);
-        };
+        DirectoryPanel.ChooseDirectoryRequested += async (_, _) => await BrowseProjectAsync();
         DirectoryPanel.CreateProjectRequested += async (_, _) => await CreateProjectAsync();
         _saveDeviceTimer.Tick += async (_, _) => { _saveDeviceTimer.Stop(); await SaveDeviceSettingsAsync(); };
         DeviceView.Loaded += async (_, _) => { if (!_devicePageLoaded) { _devicePageLoaded = true; await RestoreDeviceSettingsAsync(); } };
         _tcpConnection.Disconnected += (_, reason) => DispatcherQueue.TryEnqueue(() => { if (!_connectionLifetime.IsCancellationRequested) { CloseDevice(); ShowDeviceError(reason); } });
+    }
+    private async Task BrowseProjectAsync()
+    {
+        if (!CanChangeProject()) return;
+        try
+        {
+            var folder = await new FolderPicker(PickerWindowId).PickSingleFolderAsync();
+            if (folder is not null) await SwitchProjectAsync(folder.Path);
+        }
+        catch (Exception) { HomePanel.SetStatus("项目打开失败，请检查文件夹权限和配置。"); }
     }
     private bool _devicePageLoaded;
     private async Task RestoreDeviceSettingsAsync()

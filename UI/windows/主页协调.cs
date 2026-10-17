@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Tomography.Business.Services;
 
 namespace Tomography.UI.windows;
@@ -8,6 +8,7 @@ public sealed partial class AppWindow
     private void InitializeHome()
     {
         HomePanel.SetRecentProjects(_globalSettings.RecentProjects);
+        HomePanel.BrowseProjectRequested += async (_, _) => await BrowseProjectAsync();
         HomePanel.NewProjectRequested += async (_, _) => await CreateProjectAsync();
         HomePanel.OpenProjectRequested += async (_, path) =>
         {

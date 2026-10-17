@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -21,7 +21,13 @@ public sealed partial class AppWindow
         try
         {
             if (!File.Exists(python)) throw new FileNotFoundException("Qt 主窗口需要已安装 PySide6 的 Python 运行时。");
-            WindowControls.Visibility = WindowDragRegion.Visibility = Visibility.Collapsed;
+            WindowControls.Visibility = Visibility.Collapsed;
+            WindowDragRegion.Visibility = Visibility.Visible;
+            WindowDragRegion.PointerPressed += (_, e) =>
+            {
+                if (e.GetCurrentPoint(WindowDragRegion).Properties.IsLeftButtonPressed) _qtHost?.Send("move");
+            };
+            WindowDragRegion.DoubleTapped += (_, _) => _qtHost?.Send("maximize");
             _titleBarInput?.SetRegionRects(Microsoft.UI.Input.NonClientRegionKind.Caption, Array.Empty<RectInt32>());
             _qtHost = new QtWindowHost();
             _qtHost.ExitRequested += () => DispatcherQueue.TryEnqueue(() => { _exitFromQt = true; Close(); });
