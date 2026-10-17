@@ -21,6 +21,7 @@ public sealed partial class AppWindow : Window
     private readonly FontIconSource ConnectionIcon = new();
     private TextBlock ConnectionStatus = new();
     private bool _loaded;
+    private WindowId PickerWindowId => AppWindow.Id;
 
     public AppWindow(AuthenticationService authentication)
     {
@@ -75,13 +76,6 @@ public sealed partial class AppWindow : Window
     {
         ViewModel.Section = "主页"; SideRail.SetSection("主页"); HomePanel.SetStatus(message);
     }
-    public void CloseForSignOut()
-    {
-        _exitFromQt = true;
-        AppWindow.Closing -= QtContentClosing;
-        _qtHost?.Send("hide");
-        Close();
-    }
 
     public static ImageSource? AvatarSource(string? uri) => string.IsNullOrWhiteSpace(uri)
         ? null : new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(uri));
@@ -125,14 +119,12 @@ public sealed partial class AppWindow : Window
 
     private void RootThemeChanged(FrameworkElement sender, object args)
     {
-        _qtHost?.Send("theme", Root.ActualTheme.ToString());
         UpdateTitleBar();
     }
     private void AppWindowChanged(Microsoft.UI.Windowing.AppWindow sender, AppWindowChangedEventArgs args) => UpdateTitleBar();
 
     private void UpdateTitleBar()
     {
-        if (_qtHost is not null) return;
         if (_titleBarInput is null || Root.XamlRoot is null) return;
         var scale = Root.XamlRoot.RasterizationScale;
         _titleBarInput.SetRegionRects(NonClientRegionKind.Caption, new[]
@@ -143,8 +135,6 @@ public sealed partial class AppWindow : Window
 
     private void WindowClosed(object sender, WindowEventArgs args)
     {
-        AppWindow.Closing -= QtContentClosing;
-        _qtHost?.Dispose();
         _acquisitionStop?.Cancel();
         Workspace.ReconstructionRequested -= WorkspaceReconstructionRequested;
         _connectionLifetime.Cancel();
@@ -160,7 +150,7 @@ public sealed partial class AppWindow : Window
 
     private void WindowCommandRequested(object? sender, string command)
     {
-        if (command == "Close") { HideToBackground(); return; }
+        if (command == "Close") { Close(); return; }
         if (AppWindow.Presenter is not OverlappedPresenter presenter) return;
         if (command == "Minimize") presenter.Minimize();
         else if (presenter.State == OverlappedPresenterState.Maximized) presenter.Restore();

@@ -59,7 +59,7 @@ public partial class App : Application
             }
             catch
             {
-                _window = login; login.Activate(); main?.CloseForSignOut();
+                _window = login; login.Activate(); main?.Close();
                 login.ViewModel.Message = "主窗口打开失败，请重试。";
             }
             finally { _transitioning = false; }
@@ -75,13 +75,13 @@ public partial class App : Application
         {
             await _services.GetRequiredService<AuthenticationService>().LogoutAsync();
             ShowLogin(false, switchAccount);
-            main.CloseForSignOut();
+            main.Close();
         }
         catch
         {
             if (_services.GetRequiredService<AuthenticationService>().CurrentUser is null)
             {
-                main.CloseForSignOut(); Exit();
+                main.Close(); Exit();
             }
             else main.ShowAccountError("退出登录失败，请检查本地数据库和安全凭据权限后重试。");
         }
