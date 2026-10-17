@@ -5,3 +5,5 @@
 *.suo
 **/Logs/
 **/appsettings.json
+/artifacts/
+/dist/

@@ -29,7 +29,8 @@ public sealed partial class AppWindow
             _aiSettings = _globalSettings.AI;
             Root.RequestedTheme = Enum.Parse<Microsoft.UI.Xaml.ElementTheme>(_globalSettings.Theme);
             SideRail.RestoreTheme(Root.RequestedTheme);
-            if (string.IsNullOrWhiteSpace(_aiSettings.PythonDll)) _aiSettings.PythonDll = PythonRuntimeHost.FindPythonDll();
+            if (string.IsNullOrWhiteSpace(_aiSettings.PythonDll) || !File.Exists(_aiSettings.PythonDll))
+                _aiSettings.PythonDll = PythonRuntimeHost.FindPythonDll();
             try
             {
                 if (!string.IsNullOrWhiteSpace(_aiSettings.BaseUrl))

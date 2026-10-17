@@ -9,6 +9,8 @@ public static class PythonRuntimeHost
     private static string? _dll;
     public static string FindPythonDll()
     {
+        var bundled = Path.Combine(AppContext.BaseDirectory, "Runtime", "Python", "python313.dll");
+        if (File.Exists(bundled)) return bundled;
         var configured = Environment.GetEnvironmentVariable("PYTHONNET_PYDLL");
         if (!string.IsNullOrWhiteSpace(configured)) return configured;
         var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Python");
@@ -29,6 +31,8 @@ public static class PythonRuntimeHost
             Runtime.PythonDLL = path;
             PythonEngine.PythonHome = Path.GetDirectoryName(path)!;
             PythonEngine.Initialize();
+            // Installation directories may be read-only; importing modules must not write bytecode there.
+            PythonEngine.Exec("import sys; sys.dont_write_bytecode = True");
             PythonEngine.BeginAllowThreads();
             _dll = path;
         }

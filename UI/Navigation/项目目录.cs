@@ -28,6 +28,8 @@ public sealed partial class ProjectDirectoryView : UserControl
         foreach (var start in new[] { Environment.CurrentDirectory, AppContext.BaseDirectory })
             for (var folder = new DirectoryInfo(start); folder is not null; folder = folder.Parent)
                 if (File.Exists(Path.Combine(folder.FullName, "Tomography.sln"))) return folder.FullName;
-        return Environment.CurrentDirectory;
+        var workspace = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tomography", "Workspace");
+        Directory.CreateDirectory(workspace);
+        return workspace;
     }
 }
