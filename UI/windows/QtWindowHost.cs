@@ -16,13 +16,15 @@ internal sealed class QtWindowHost : IDisposable
 
     public async Task StartAsync(string python, nint child, string theme)
     {
+        var script = Path.Combine(AppContext.BaseDirectory, "QtShell", "main.py");
+        if (!File.Exists(script)) throw new FileNotFoundException("安装目录缺少 QtShell/main.py，请重新部署最新构建。", script);
         var start = new ProcessStartInfo(python)
         {
             UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden,
             RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true,
             StandardOutputEncoding = Encoding.UTF8, StandardErrorEncoding = Encoding.UTF8
         };
-        start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "QtShell", "main.py"));
+        start.ArgumentList.Add(script);
         start.ArgumentList.Add("--window"); start.ArgumentList.Add(child.ToString());
         start.ArgumentList.Add("--theme"); start.ArgumentList.Add(theme);
         start.Environment["PYTHONUTF8"] = "1";
