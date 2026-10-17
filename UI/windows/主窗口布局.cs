@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Tomography.UI.TittleBar;
 using Windows.Graphics;
+using Tomography.Business.Services.Authentication;
 
 namespace Tomography.UI.windows;
 
@@ -21,9 +22,16 @@ public sealed partial class AppWindow : Window
     private TextBlock ConnectionStatus = new();
     private bool _loaded;
 
-    public AppWindow()
+    public AppWindow(AuthenticationService authentication)
     {
+        var user = authentication.CurrentUser ?? throw new InvalidOperationException("请先登录。");
         InitializeComponent();
+        ViewModel.AccountName = user.Username;
+        SideRail.SetAccount(user.Username);
+        SideRail.AccountActionRequested += (_, switchAccount) =>
+        {
+            if (CanChangeProject()) SignOutRequested?.Invoke(this, switchAccount);
+        };
         SystemBackdrop = null;
         var hwnd = Win32Interop.GetWindowFromWindowId(AppWindow.Id);
         var scale = GetDpiForWindow(hwnd) / 96.0;
@@ -34,8 +42,9 @@ public sealed partial class AppWindow : Window
         AppWindow.MoveAndResize(new RectInt32(work.X + (work.Width - width) / 2,
             work.Y + (work.Height - height) / 2, width, height), display);
         AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
-        if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
         ExtendsContentIntoTitleBar = true;
+        AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Collapsed;
+        if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
             const int DWMWA_BORDER_COLOR = 34;
@@ -58,6 +67,20 @@ public sealed partial class AppWindow : Window
         AddReconstructionSettings(Workspace.AlgorithmPanel);
         _reconstructionSettings!.CustomAlgorithmRequested += async (_, _) => await ImportFileAsync("自定义算法");
         BuildParameterContents();
+    }
+
+    public event EventHandler<bool>? SignOutRequested;
+    public void SetAccountBusy(bool busy) => Root.IsHitTestVisible = !busy;
+    public void ShowAccountError(string message)
+    {
+        ViewModel.Section = "主页"; SideRail.SetSection("主页"); HomePanel.SetStatus(message);
+    }
+    public void CloseForSignOut()
+    {
+        _exitFromQt = true;
+        AppWindow.Closing -= QtContentClosing;
+        _qtHost?.Send("hide");
+        Close();
     }
 
     public static ImageSource? AvatarSource(string? uri) => string.IsNullOrWhiteSpace(uri)

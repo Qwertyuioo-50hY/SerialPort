@@ -1,0 +1,40 @@
+<Window x:Class="Tomography.UI.Account.LoginWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:local="using:Tomography.UI.Account" Title="EMT · FieldSync">
+ <Grid x:Name="Root" RequestedTheme="Light" Background="White" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
+  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+  <Grid Background="#EFF8F2" Padding="40,64,40,40">
+   <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="24">
+    <Image Source="ms-appx:///Assets/BrandAppIcon.png" Width="180" Height="180" Stretch="Uniform" AutomationProperties.Name="EMT 软件品牌图标"/>
+    <TextBlock Text="EMT" FontSize="48" FontWeight="SemiBold" Foreground="#13783E" HorizontalAlignment="Center"/>
+    <TextBlock Text="FieldSync" FontSize="28" FontWeight="SemiBold" Foreground="#173F2B" HorizontalAlignment="Center"/>
+    <TextBlock Text="电磁层析成像" FontSize="16" Foreground="#52675C" HorizontalAlignment="Center"/>
+   </StackPanel>
+  </Grid>
+  <ScrollViewer Grid.Column="1" Margin="32,64,32,24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+   <ContentControl MaxWidth="360" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" IsEnabled="{x:Bind ViewModel.IsIdle, Mode=OneWay}">
+   <StackPanel Spacing="20">
+    <TextBlock Text="{x:Bind ViewModel.FormTitle, Mode=OneWay}" FontSize="28" FontWeight="SemiBold"/>
+    <TextBox Header="用户名" PlaceholderText="输入本地用户名" MaxLength="64" Text="{x:Bind ViewModel.Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.AutomationId="LoginUsername"/>
+    <PasswordBox Header="密码" PlaceholderText="输入密码" MaxLength="128" Password="{x:Bind ViewModel.Password, Mode=TwoWay}" AutomationProperties.AutomationId="LoginPassword"/>
+    <PasswordBox Header="确认密码" PlaceholderText="再次输入密码" MaxLength="128" Password="{x:Bind ViewModel.Confirmation, Mode=TwoWay}" Visibility="{x:Bind local:LoginWindow.ToVisibility(ViewModel.IsRegistering), Mode=OneWay}" AutomationProperties.AutomationId="RegisterConfirmation"/>
+    <TextBlock Text="密码须为 8–128 位，并同时包含字母和数字。" TextWrapping="Wrap" Foreground="#52675C" Visibility="{x:Bind local:LoginWindow.ToVisibility(ViewModel.IsRegistering), Mode=OneWay}"/>
+    <StackPanel Orientation="Horizontal" Spacing="16" Visibility="{x:Bind local:LoginWindow.ToVisibility(ViewModel.IsLogin), Mode=OneWay}">
+     <CheckBox Content="记住账号" IsChecked="{x:Bind ViewModel.RememberAccount, Mode=TwoWay}" AutomationProperties.AutomationId="RememberAccount"/>
+     <CheckBox Content="自动登录" IsChecked="{x:Bind ViewModel.AutoLogin, Mode=TwoWay}" ToolTipService.ToolTip="30 天内使用安全令牌登录，不保存密码" AutomationProperties.AutomationId="AutoLogin"/>
+    </StackPanel>
+    <TextBlock Text="{x:Bind ViewModel.Message, Mode=OneWay}" Foreground="#B42318" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="LoginMessage"/>
+    <Button Content="{x:Bind ViewModel.SubmitText, Mode=OneWay}" Command="{x:Bind ViewModel.SubmitCommand}" HorizontalAlignment="Stretch" Padding="16,12" Background="#19B657" Foreground="White" CornerRadius="8" AutomationProperties.AutomationId="LoginSubmit"/>
+    <Button Content="{x:Bind ViewModel.SwitchText, Mode=OneWay}" Command="{x:Bind ViewModel.SwitchModeCommand}" HorizontalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="#13783E" AutomationProperties.AutomationId="LoginSwitchMode"/>
+   </StackPanel>
+   </ContentControl>
+  </ScrollViewer>
+  <ProgressRing Grid.Column="1" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="16" IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}"/>
+  <Grid x:Name="DragRegion" Grid.ColumnSpan="2" Height="40" Margin="0,0,96,0" VerticalAlignment="Top" Background="Transparent"/>
+  <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
+   <Button Content="&#xE921;" FontFamily="{ThemeResource SymbolThemeFontFamily}" Width="46" Height="40" Background="Transparent" BorderThickness="0" Click="MinimizeClicked" AutomationProperties.Name="最小化"/>
+   <Button Content="&#xE8BB;" FontFamily="{ThemeResource SymbolThemeFontFamily}" Width="46" Height="40" Background="Transparent" BorderThickness="0" Click="CloseClicked" AutomationProperties.Name="关闭"/>
+  </StackPanel>
+ </Grid>
+</Window>

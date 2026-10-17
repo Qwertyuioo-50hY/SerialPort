@@ -6,6 +6,14 @@ namespace Tomography.UI.SideView;
 
 public sealed partial class IconRailView : UserControl
 {
+    public event EventHandler<bool>? AccountActionRequested;
+    public void SetAccount(string username)
+    {
+        AccountPicture.DisplayName = username;
+        ToolTipService.SetToolTip(AccountButton, username);
+    }
+    private void AccountMenuClicked(object sender, RoutedEventArgs e) =>
+        AccountActionRequested?.Invoke(this, ((MenuFlyoutItem)sender).Tag as string == "Switch");
     public event EventHandler<string>? NavigationRequested;
     public event EventHandler? DirectoryToggleRequested;
     private void CollapseDirectory(object sender, RoutedEventArgs e) => DirectoryToggleRequested?.Invoke(this, EventArgs.Empty);

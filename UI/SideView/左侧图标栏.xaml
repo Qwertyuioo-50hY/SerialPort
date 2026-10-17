@@ -45,7 +45,13 @@
             <ToggleSwitch x:Name="ThemeSwitch" Width="40" MinWidth="0" Padding="0" HorizontalAlignment="Center" Margin="0,2,0,12" OffContent="{x:Null}" OnContent="{x:Null}" Toggled="ThemeToggled" AutomationProperties.AutomationId="ThemeSwitch" AutomationProperties.Name="深色模式" />
             <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />
             <Grid Margin="0,14,0,0">
-                <Border Width="38" Height="38" CornerRadius="10" Background="{ThemeResource RailSelectedBackgroundBrush}" HorizontalAlignment="Center"><PersonPicture DisplayName="EMT" Width="32" Height="32" /></Border>
+                <Button x:Name="AccountButton" Style="{StaticResource RailButtonStyle}" AutomationProperties.Name="账号" AutomationProperties.AutomationId="AccountMenu">
+                    <PersonPicture x:Name="AccountPicture" Width="32" Height="32"/>
+                    <Button.Flyout><MenuFlyout>
+                        <MenuFlyoutItem Text="切换账号" Tag="Switch" Click="AccountMenuClicked" AutomationProperties.AutomationId="SwitchAccount"/>
+                        <MenuFlyoutItem Text="退出登录" Click="AccountMenuClicked" AutomationProperties.AutomationId="SignOut"/>
+                    </MenuFlyout></Button.Flyout>
+                </Button>
             </Grid>
         </StackPanel>
     </Grid>

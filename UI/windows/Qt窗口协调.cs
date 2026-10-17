@@ -52,6 +52,6 @@ public sealed partial class AppWindow
     private void HideToBackground()
     {
         if (_qtHost?.IsRunning == true) _qtHost.Send("hide");
-        else if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.Minimize();
+        else Close();
     }
 }
