@@ -48,14 +48,12 @@ public sealed partial class AppWindow : Window
         if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
-            const int DWMWA_BORDER_COLOR = 34;
             var cornerPreference = 2u;
             DwmSetWindowAttribute(hwnd, 33, ref cornerPreference, sizeof(uint));
-            var borderColor = 0xFFFFFFFEu; // DWMWA_COLOR_NONE
-            DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, ref borderColor, sizeof(uint));
         }
         _titleBarInput = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
         Root.ActualThemeChanged += RootThemeChanged;
+        Activated += WindowActivated;
         AppWindow.Changed += AppWindowChanged;
         ViewModel.PropertyChanged += ViewModelPropertyChanged;
         Closed += WindowClosed;
@@ -86,6 +84,7 @@ public sealed partial class AppWindow : Window
     {
         _loaded = true;
         UpdatePresentation();
+        UpdateWindowFrame();
         UpdateTitleBar();
     }
 
@@ -119,9 +118,15 @@ public sealed partial class AppWindow : Window
 
     private void RootThemeChanged(FrameworkElement sender, object args)
     {
+        UpdateWindowFrame();
         UpdateTitleBar();
     }
-    private void AppWindowChanged(Microsoft.UI.Windowing.AppWindow sender, AppWindowChangedEventArgs args) => UpdateTitleBar();
+    private void WindowActivated(object sender, WindowActivatedEventArgs args) => UpdateWindowFrame();
+    private void AppWindowChanged(Microsoft.UI.Windowing.AppWindow sender, AppWindowChangedEventArgs args)
+    {
+        if (args.DidPresenterChange) UpdateWindowFrame();
+        UpdateTitleBar();
+    }
 
     private void UpdateTitleBar()
     {
@@ -144,6 +149,7 @@ public sealed partial class AppWindow : Window
         ViewModel.PropertyChanged -= ViewModelPropertyChanged;
         SideRail.ThemeRequested -= SideRailThemeRequested;
         Root.ActualThemeChanged -= RootThemeChanged;
+        Activated -= WindowActivated;
         AppWindow.Changed -= AppWindowChanged;
         Closed -= WindowClosed;
     }
