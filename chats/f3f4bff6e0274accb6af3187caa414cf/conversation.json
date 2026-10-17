@@ -6,11 +6,6 @@
       "Role": "user",
       "Content": "hello",
       "ReasoningSummary": ""
-    },
-    {
-      "Role": "user",
-      "Content": "Hello",
-      "ReasoningSummary": ""
     }
   ]
 }

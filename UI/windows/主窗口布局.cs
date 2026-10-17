@@ -84,13 +84,13 @@ public sealed partial class AppWindow : Window
     {
         _loaded = true;
         UpdatePresentation();
-        UpdateWindowFrame();
+        QueueWindowFrameUpdate();
         UpdateTitleBar();
     }
 
     private void RootSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (_loaded) { UpdatePresentation(); UpdateTitleBar(); }
+        if (_loaded) { UpdatePresentation(); UpdateTitleBar(); QueueWindowFrameUpdate(); }
     }
 
     private void ViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -118,13 +118,13 @@ public sealed partial class AppWindow : Window
 
     private void RootThemeChanged(FrameworkElement sender, object args)
     {
-        UpdateWindowFrame();
+        QueueWindowFrameUpdate();
         UpdateTitleBar();
     }
-    private void WindowActivated(object sender, WindowActivatedEventArgs args) => UpdateWindowFrame();
+    private void WindowActivated(object sender, WindowActivatedEventArgs args) => QueueWindowFrameUpdate();
     private void AppWindowChanged(Microsoft.UI.Windowing.AppWindow sender, AppWindowChangedEventArgs args)
     {
-        if (args.DidPresenterChange) UpdateWindowFrame();
+        if (args.DidPresenterChange || args.DidSizeChange) QueueWindowFrameUpdate();
         UpdateTitleBar();
     }
 
@@ -140,6 +140,7 @@ public sealed partial class AppWindow : Window
 
     private void WindowClosed(object sender, WindowEventArgs args)
     {
+        _loaded = false;
         _acquisitionStop?.Cancel();
         Workspace.ReconstructionRequested -= WorkspaceReconstructionRequested;
         _connectionLifetime.Cancel();

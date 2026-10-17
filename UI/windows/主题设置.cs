@@ -1,11 +1,24 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Dispatching;
+using System.Runtime.InteropServices;
 
 namespace Tomography.UI.windows;
 
 public sealed partial class AppWindow
 {
+    private bool _windowFrameUpdatePending;
+    private void QueueWindowFrameUpdate()
+    {
+        if (_windowFrameUpdatePending) return;
+        _windowFrameUpdatePending = DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        {
+            _windowFrameUpdatePending = false;
+            if (_loaded) UpdateWindowFrame();
+        });
+    }
+
     private void UpdateWindowFrame()
     {
         var hwnd = Win32Interop.GetWindowFromWindowId(AppWindow.Id);
@@ -20,7 +33,14 @@ public sealed partial class AppWindow
         }
         var borderColor = 0xFFFFFFFEu; // DWMWA_COLOR_NONE
         DwmSetWindowAttribute(hwnd, 34, ref borderColor, sizeof(uint)); // DWMWA_BORDER_COLOR
+        // Repaint the cached non-client pixels without requiring a window move.
+        const uint RDW_INVALIDATE = 0x0001, RDW_UPDATENOW = 0x0100, RDW_FRAME = 0x0400;
+        RedrawWindow(hwnd, 0, 0, RDW_INVALIDATE | RDW_UPDATENOW | RDW_FRAME);
     }
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool RedrawWindow(nint hwnd, nint updateRect, nint updateRegion, uint flags);
 
     private void SideRailThemeRequested(object? sender, ElementTheme theme)
     {
