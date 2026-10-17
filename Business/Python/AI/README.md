@@ -13,7 +13,9 @@ API Key 由 Windows 凭据管理器保存并在调用时注入；也可使用 JS
 - `OutputFormat`：`text`、`markdown`、`json_object`。Markdown、`Tone`、`Language`、`Instructions`、`OutputInstructions` 合并为模型指令；语气和语言不是独立 SDK 参数。
 - `TimeoutSeconds`：请求超时秒数。界面配置的参数会真实传入 Python；服务端不支持时返回错误，不静默降级。请求使用 `store=false`，本地保存全部文本历史。
 
-全局配置统一保存在 `%LOCALAPPDATA%/Tomography/setting.json`，其中 `AI` 为 AI 配置、`Theme` 为现有主题选择。C# 负责读写，Python 读取同一文件中的 `AI`（兼容原平铺 JSON）。API Key 继续由 Windows 凭据管理器保存。首次读取自动迁移旧 `ai-settings.json`，原文件保留。
+全局配置统一保存在 `%LOCALAPPDATA%/Tomography/setting.json`，其中 `AI` 为 AI 配置、`Theme` 为现有主题选择。C# 负责读写，Python 读取同一文件中的 `AI`（兼容原平铺 JSON）。手动配置的 API Key 继续由 Windows 凭据管理器保存。首次读取自动迁移旧 `ai-settings.json`，原文件保留。
+
+CC Switch：AI 设置默认启用“由 CC Switch 管理模型配置”，默认读取 `%USERPROFILE%/.codex/config.toml`，可在设置中更改路径并保存。每次发送重新读取文件，识别 `model_provider`、`model`、`model_reasoning_effort`、`disable_response_storage` 和对应服务商的 `base_url`、`wire_api`、`experimental_bearer_token` 或 `env_key`。TOML 中的密钥只在请求期间使用，不复制进 setting.json；`mcp_servers` 等其他内容不会执行。`requires_openai_auth = false` 不会阻止使用服务商提供的 Bearer Token。无密钥示例见 `config.example.toml`。
 
 新建项目：输入项目名并选择父目录，生成 `project.json`、`data/` 和 `chats/`。设备及实验输入配置保存至项目根目录的 `project.json`；聊天以 `chats/<对话ID>/conversation.json` 保存。旧 AppData 项目配置和聊天、项目内旧中文聊天目录均兼容迁移，原文件保留。项目导航仅显示新建项目、打开文件夹和新建对话入口。设置分类顺序为通用、外观、AI、快捷键、语言和地区；新增分类仅提供页面占位。
 

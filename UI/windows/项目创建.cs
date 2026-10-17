@@ -33,7 +33,7 @@ public sealed partial class AppWindow
         var name = nameField.Text.Trim();
         if (name.Length == 0 || name is "." or ".." || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name.EndsWith('.'))
         { ShowProjectError("项目名称无效。"); return; }
-        var parent = await new FolderPicker(AppWindow.Id).PickSingleFolderAsync();
+        var parent = await new FolderPicker(PickerWindowId).PickSingleFolderAsync();
         if (parent is null || !CanChangeProject()) return;
         try
         {

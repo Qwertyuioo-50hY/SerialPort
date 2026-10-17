@@ -9,8 +9,13 @@ def read_config(path):
     config = json.loads(Path(path).read_text(encoding="utf-8-sig"))
     if isinstance(config, dict) and "AI" in config:
         config = config["AI"]
+        if isinstance(config, dict):
+            config.setdefault("UseCcSwitchConfig", True)
     if not isinstance(config, dict):
         raise ValueError("AI 配置必须是 JSON 对象。")
+    if config.get("UseCcSwitchConfig"):
+        from .ccswitch_config import apply_provider
+        config = apply_provider(config)
     base = config.get("BaseUrl", "").strip().rstrip("/")
     url = urlsplit(base)
     if url.scheme not in ("http", "https") or not url.hostname or url.username or url.password or url.query or url.fragment:
@@ -62,13 +67,15 @@ def build_request(config, messages):
         if instructions:
             options["system"] = "\n".join(instructions)
         return options
-    options = {"model": config["Model"], "store": False, "service_tier": config["ServiceTier"]}
+    options = {"model": config["Model"], "store": config.get("StoreResponses", False)}
+    if not config.get("UseCcSwitchConfig"):
+        options["service_tier"] = config["ServiceTier"]
     effort = config["ReasoningEffort"]
     if config["ApiMode"] == "responses":
         options["input"] = [dict(item) for item in messages]
         if instructions:
             options["instructions"] = "\n".join(instructions)
-        options["reasoning"] = {"mode": config["ReasoningMode"]}
+        options["reasoning"] = {} if config.get("UseCcSwitchConfig") else {"mode": config["ReasoningMode"]}
         if effort != "default":
             options["reasoning"]["effort"] = effort
         text = {}
@@ -97,7 +104,7 @@ def run_from_file(config_path, request_json, api_key="", on_event=None):
     from openai import OpenAI, APIError
     from .response_reader import read_response
     config = read_config(config_path)
-    key = api_key or os.environ.get(config.get("ApiKeyEnvironmentVariable", "OPENAI_API_KEY"), "")
+    key = (config.get("_ProviderApiKey", "") if config.get("UseCcSwitchConfig") else api_key) or os.environ.get(config.get("ApiKeyEnvironmentVariable", "OPENAI_API_KEY"), "")
     if not key or not key.isascii() or any(character.isspace() for character in key):
         raise ValueError("API Key 为空或格式无效。")
     request = json.loads(request_json)

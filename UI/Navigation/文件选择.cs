@@ -6,7 +6,7 @@ public sealed partial class AppWindow
 {
     private async Task<string?> PickImportPathAsync(string role)
     {
-        var picker = new FileOpenPicker(AppWindow.Id);
+        var picker = new FileOpenPicker(PickerWindowId);
         var extensions = role switch
         {
             "自定义算法" => new[] { ".py" },
@@ -19,7 +19,7 @@ public sealed partial class AppWindow
     }
     private async Task<string?> PickExportPathAsync(string name, string extension)
     {
-        var picker = new FileSavePicker(AppWindow.Id) { SuggestedFileName = System.IO.Path.GetFileNameWithoutExtension(name) };
+        var picker = new FileSavePicker(PickerWindowId) { SuggestedFileName = System.IO.Path.GetFileNameWithoutExtension(name) };
         picker.FileTypeChoices.Add(extension, new List<string> { extension });
         return (await picker.PickSaveFileAsync())?.Path;
     }

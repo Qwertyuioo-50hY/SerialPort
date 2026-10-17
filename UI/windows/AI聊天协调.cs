@@ -54,6 +54,7 @@ public sealed partial class AppWindow
     }
     private void ChangeComposerConfiguration(string model, string effort)
     {
+        if (_aiSettings.UseCcSwitchConfig) { AiChatView.SetStatus("模型与思考强度由 CC Switch 的 config.toml 管理。"); return; }
         if (_aiBusy) { AiChatView.SetStatus("请等待当前回复完成后切换模型配置。"); return; }
         var oldModel = _aiSettings.Model; var oldEffort = _aiSettings.ReasoningEffort;
         try
@@ -106,8 +107,8 @@ public sealed partial class AppWindow
         try
         {
             var settings = AiSettingsPanel.ReadSettings();
-            if (!string.IsNullOrWhiteSpace(AiSettingsPanel.Key)) new PasswordVault().Add(new PasswordCredential("Tomography.AI", settings.BaseUrl, AiSettingsPanel.Key));
-            if (string.IsNullOrWhiteSpace(AiSettingsPanel.Key))
+            if (!settings.UseCcSwitchConfig && !string.IsNullOrWhiteSpace(AiSettingsPanel.Key)) new PasswordVault().Add(new PasswordCredential("Tomography.AI", settings.BaseUrl, AiSettingsPanel.Key));
+            if (!settings.UseCcSwitchConfig && string.IsNullOrWhiteSpace(AiSettingsPanel.Key))
             {
                 var vault = new PasswordVault();
                 try { vault.Remove(vault.Retrieve("Tomography.AI", settings.BaseUrl)); }
@@ -130,7 +131,7 @@ public sealed partial class AppWindow
     {
         if (_aiBusy) return;
         if (!_historyReadable) { AiChatView.SetStatus("项目对话记录读取失败，暂不能保存新消息。"); return; }
-        if (string.IsNullOrWhiteSpace(_aiSettings.Model) || string.IsNullOrWhiteSpace(_aiSettings.BaseUrl))
+        if (!_aiSettings.UseCcSwitchConfig && (string.IsNullOrWhiteSpace(_aiSettings.Model) || string.IsNullOrWhiteSpace(_aiSettings.BaseUrl)))
         { AiChatView.SetStatus("请先在设置中配置 API 地址、密钥和模型。"); return; }
         var conversation = _conversation;
         if (conversation is null)

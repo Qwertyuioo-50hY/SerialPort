@@ -23,7 +23,7 @@ public sealed partial class AppWindow
             }
             else
             {
-                var folder = await new FolderPicker(AppWindow.Id).PickSingleFolderAsync();
+                var folder = await new FolderPicker(PickerWindowId).PickSingleFolderAsync();
                 if (folder is null) return;
                 await Task.Run(() => AcquisitionExportService.ExportCsv(snapshot, folder.Path));
             }

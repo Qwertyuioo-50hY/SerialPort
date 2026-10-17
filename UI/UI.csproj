@@ -22,6 +22,7 @@
     <ProjectReference Include="..\Business\Business.csproj" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
     <Content Include="Assets\*" />
+    <Content Include="QtShell\*.py;QtShell\requirements.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Manifest Include="$(ApplicationManifest)" />
     <Page Remove="windows\App启动.xaml" />
     <ApplicationDefinition Include="windows\App启动.xaml" />

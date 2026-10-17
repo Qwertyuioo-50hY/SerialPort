@@ -52,7 +52,6 @@ public sealed partial class AppWindow : Window
         InitializeDevicePage();
         InitializeAi();
         InitializeHome();
-        InitializeBackgroundWindow();
         SideRail.SetSection(ViewModel.Section);
         AddReconstructionSettings(Workspace.AlgorithmPanel);
         _reconstructionSettings!.CustomAlgorithmRequested += async (_, _) => await ImportFileAsync("自定义算法");
@@ -99,11 +98,16 @@ public sealed partial class AppWindow : Window
         DividerColumn.Width = new GridLength(ViewModel.ParametersVisible ? 8 : 0);
     }
 
-    private void RootThemeChanged(FrameworkElement sender, object args) => UpdateTitleBar();
+    private void RootThemeChanged(FrameworkElement sender, object args)
+    {
+        _qtHost?.Send("theme", Root.ActualTheme.ToString());
+        UpdateTitleBar();
+    }
     private void AppWindowChanged(Microsoft.UI.Windowing.AppWindow sender, AppWindowChangedEventArgs args) => UpdateTitleBar();
 
     private void UpdateTitleBar()
     {
+        if (_qtHost is not null) return;
         if (_titleBarInput is null || Root.XamlRoot is null) return;
         var scale = Root.XamlRoot.RasterizationScale;
         _titleBarInput.SetRegionRects(NonClientRegionKind.Caption, new[]
@@ -114,8 +118,8 @@ public sealed partial class AppWindow : Window
 
     private void WindowClosed(object sender, WindowEventArgs args)
     {
-        AppWindow.Closing -= BackgroundWindowClosing;
-        _trayIcon?.Dispose();
+        AppWindow.Closing -= QtContentClosing;
+        _qtHost?.Dispose();
         _acquisitionStop?.Cancel();
         Workspace.ReconstructionRequested -= WorkspaceReconstructionRequested;
         _connectionLifetime.Cancel();

@@ -48,7 +48,7 @@ public sealed partial class AiChatPanelView : UserControl
     {
         _configuration = settings;
         var index = Array.IndexOf(Efforts, settings.ReasoningEffort);
-        ModelLabel.Text = index < 0 ? "默认" : EffortNames[index];
+        ModelLabel.Text = settings.UseCcSwitchConfig ? "CC Switch" : index < 0 ? "默认" : EffortNames[index];
         UpdateModeControls();
     }
     private void UpdateModeControls()

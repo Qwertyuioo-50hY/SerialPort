@@ -88,7 +88,7 @@
                 </Grid>
             </Grid>
         </Border>
-        <StackPanel Margin="8,8,8,0" VerticalAlignment="Top" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
+        <StackPanel x:Name="WindowControls" Margin="8,8,8,0" VerticalAlignment="Top" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
             <Button Content="&#xE921;" Tag="Minimize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最小化" AutomationProperties.AutomationId="DeviceMinimize"/>
             <Button Content="&#xE922;" Tag="Maximize" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="最大化或还原" AutomationProperties.AutomationId="DeviceMaximize"/>
             <Button Content="&#xE8BB;" Tag="Close" Click="DeviceWindowCommand" FontFamily="{ThemeResource SymbolThemeFontFamily}" Background="Transparent" BorderThickness="0" Padding="8" AutomationProperties.Name="关闭" AutomationProperties.AutomationId="DeviceClose"/>

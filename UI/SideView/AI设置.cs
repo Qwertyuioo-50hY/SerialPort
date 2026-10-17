@@ -6,6 +6,7 @@ namespace Tomography.UI.SideView;
 
 public sealed partial class AiSettingsView : UserControl
 {
+    private AiApiSettings _loadedSettings = new();
     public event EventHandler? SaveRequested;
     public AiSettingsView()
     {
@@ -35,6 +36,10 @@ public sealed partial class AiSettingsView : UserControl
     public string Key => ApiKey.Password.Trim();
     public void LoadSettings(AiApiSettings settings, string key)
     {
+        _loadedSettings = settings;
+        CcSwitchPath.Text = settings.CcSwitchConfigPath;
+        UseCcSwitch.IsOn = settings.UseCcSwitchConfig;
+        UpdateProviderControls();
         BaseUrl.Text = settings.BaseUrl ?? ""; PythonDll.Text = settings.PythonDll ?? "";
         settings.Models ??= new(); KeyEnvironment.Text = settings.ApiKeyEnvironmentVariable ?? ""; ApiKey.Password = key;
         Model.ItemsSource = settings.Models; Model.SelectedItem = settings.Model; Model.Text = settings.Model ?? "";
@@ -51,6 +56,27 @@ public sealed partial class AiSettingsView : UserControl
     { control.SelectedItem = control.Items.OfType<ComboBoxItem>().FirstOrDefault(item => (string)item.Tag == value) ?? control.Items[0]; }
     public AiApiSettings ReadSettings()
     {
+        if (!double.IsFinite(MaxOutputTokens.Value) || MaxOutputTokens.Value != Math.Truncate(MaxOutputTokens.Value) || MaxOutputTokens.Value < 0 || MaxOutputTokens.Value > int.MaxValue ||
+            !double.IsFinite(TimeoutSeconds.Value) || TimeoutSeconds.Value != Math.Truncate(TimeoutSeconds.Value) || TimeoutSeconds.Value is < 1 or > 3600)
+            throw new ArgumentException("Token 上限和超时必须为允许范围内的整数。");
+        if (UseCcSwitch.IsOn)
+        {
+            if (!System.IO.File.Exists(CcSwitchPath.Text.Trim()) || !CcSwitchPath.Text.Trim().EndsWith(".toml", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("请选择存在的 config.toml 文件。");
+            if (!System.IO.File.Exists(PythonDll.Text.Trim())) throw new ArgumentException("Python 运行时 DLL 不存在。");
+            var settings = System.Text.Json.JsonSerializer.Deserialize<AiApiSettings>(System.Text.Json.JsonSerializer.Serialize(_loadedSettings))!;
+            settings.UseCcSwitchConfig = true;
+            settings.CcSwitchConfigPath = System.IO.Path.GetFullPath(CcSwitchPath.Text.Trim());
+            settings.PythonDll = PythonDll.Text.Trim();
+            settings.Instructions = Instructions.Text;
+            settings.OutputInstructions = OutputInstructions.Text;
+            settings.OutputFormat = Value(OutputFormat);
+            settings.Tone = Tone.Text.Trim();
+            settings.Language = ResponseLanguage.Text.Trim();
+            settings.MaxOutputTokens = (int)MaxOutputTokens.Value;
+            settings.TimeoutSeconds = (int)TimeoutSeconds.Value;
+            return settings;
+        }
         if (!Uri.TryCreate(BaseUrl.Text.Trim(), UriKind.Absolute, out var uri) ||
             uri.Scheme is not ("http" or "https") || string.IsNullOrEmpty(uri.Host) ||
             uri.UserInfo.Length > 0 || uri.Query.Length > 0 || uri.Fragment.Length > 0)
@@ -59,13 +85,11 @@ public sealed partial class AiSettingsView : UserControl
             throw new ArgumentException("请填写 Base URL，不要包含 /messages、/responses 或 /chat/completions。");
         if (Value(ApiMode) == "chat_completions" && (Value(ReasoningMode) == "pro" || Value(ServiceTier) == "ultrafast"))
             throw new ArgumentException("Pro 模式和 Ultrafast 速度需要 Responses 接口。");
-        if (!double.IsFinite(MaxOutputTokens.Value) || MaxOutputTokens.Value != Math.Truncate(MaxOutputTokens.Value) || MaxOutputTokens.Value < 0 || MaxOutputTokens.Value > int.MaxValue ||
-            !double.IsFinite(TimeoutSeconds.Value) || TimeoutSeconds.Value != Math.Truncate(TimeoutSeconds.Value) || TimeoutSeconds.Value is < 1 or > 3600)
-            throw new ArgumentException("Token 上限和超时必须为允许范围内的整数。");
         if (string.IsNullOrWhiteSpace(Model.Text) || (string.IsNullOrWhiteSpace(Key) && string.IsNullOrWhiteSpace(KeyEnvironment.Text)))
             throw new ArgumentException("请填写模型名称，以及 API Key 或密钥环境变量。");
         if (!System.IO.File.Exists(PythonDll.Text.Trim())) throw new ArgumentException("Python 运行时 DLL 不存在。");
         return new AiApiSettings {
+            UseCcSwitchConfig = false, CcSwitchConfigPath = CcSwitchPath.Text.Trim(),
             BaseUrl = BaseUrl.Text.Trim().TrimEnd('/'), Model = Model.Text.Trim(), PythonDll = PythonDll.Text.Trim(),
             Models = Models.Text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(value => value.Trim()).Where(value => value.Length > 0).Append(Model.Text.Trim()).Distinct().ToList(),
             ApiMode = Value(ApiMode), ReasoningMode = Value(ReasoningMode), ReasoningEffort = Value(ReasoningEffort),
@@ -75,5 +99,12 @@ public sealed partial class AiSettingsView : UserControl
         };
     }
     public void SetStatus(string text) => SaveStatus.Text = text;
+    private void CcSwitchToggled(object sender, RoutedEventArgs e) => UpdateProviderControls();
+    private void UpdateProviderControls()
+    {
+        if (BaseUrl is null || UseCcSwitch is null) return;
+        foreach (var control in new Control[] { BaseUrl, ApiKey, KeyEnvironment, Model, Models, ApiMode, ReasoningMode, ReasoningEffort, ServiceTier, Verbosity })
+            if (control is not null) control.IsEnabled = !UseCcSwitch.IsOn;
+    }
     private void SaveClicked(object sender, RoutedEventArgs e) => SaveRequested?.Invoke(this, EventArgs.Empty);
 }

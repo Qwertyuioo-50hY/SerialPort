@@ -10,10 +10,12 @@ public partial class App : Application
 
     public App() => InitializeComponent();
 
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         LiveCharts.Configure(settings => settings.AddSkiaSharp().AddDefaultMappers().AddDefaultTheme());
-        _window = new AppWindow();
+        var window = new AppWindow();
+        _window = window;
         _window.Activate();
+        await window.StartQtWindowAsync();
     }
 }

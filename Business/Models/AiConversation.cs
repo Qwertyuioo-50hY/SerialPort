@@ -14,6 +14,8 @@ public sealed record AiChatReply(string Reply, string ReasoningSummary);
 
 public sealed class AiApiSettings
 {
+    public bool UseCcSwitchConfig { get; set; } = true;
+    public string CcSwitchConfigPath { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".codex", "config.toml");
     public string BaseUrl { get; set; } = "";
     public string Model { get; set; } = "";
     public string PythonDll { get; set; } = "";

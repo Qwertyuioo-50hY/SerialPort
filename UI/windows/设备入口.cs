@@ -31,7 +31,7 @@ public sealed partial class AppWindow
         DirectoryPanel.ChooseDirectoryRequested += async (_, _) =>
         {
             if (!CanChangeProject()) return;
-            var folder = await new FolderPicker(AppWindow.Id).PickSingleFolderAsync();
+            var folder = await new FolderPicker(PickerWindowId).PickSingleFolderAsync();
             if (folder is not null) await SwitchProjectAsync(folder.Path);
         };
         DirectoryPanel.CreateProjectRequested += async (_, _) => await CreateProjectAsync();
