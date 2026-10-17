@@ -24,9 +24,15 @@ public static class SettingsAndProjectTests
             var settings = GlobalSettingsStore.Load(global, legacy);
             if (settings.AI.Model != "claude-sonnet-5" || !File.Exists(legacy)) throw new Exception("AI migration");
             settings.Theme = "Dark";
+            for (var index = 0; index < 10; index++) RecentProjectStore.Remember(settings, Path.Combine(root, "project-" + index));
+            var latest = Path.Combine(root, "project-9");
+            RecentProjectStore.Remember(settings, latest.ToUpperInvariant());
+            if (settings.RecentProjects.Count != 8 || !string.Equals(settings.RecentProjects[0], latest, StringComparison.OrdinalIgnoreCase))
+                throw new Exception("recent project order, limit or deduplication");
             GlobalSettingsStore.Save(global, settings);
             if (GlobalSettingsStore.Load(global).Theme != "Dark" || GlobalSettingsStore.Load(global).AI.ApiMode != "anthropic_messages")
                 throw new Exception("global settings roundtrip");
+            if (GlobalSettingsStore.Load(global).RecentProjects.Count != 8) throw new Exception("recent project persistence");
             File.WriteAllText(global, "{broken");
             try { GlobalSettingsStore.Load(global, legacy); throw new Exception("broken settings accepted"); } catch (JsonException) { }
             if (File.ReadAllText(global) != "{broken") throw new Exception("broken settings overwritten");

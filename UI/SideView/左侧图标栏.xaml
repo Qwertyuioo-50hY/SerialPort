@@ -13,8 +13,8 @@
     <Grid Padding="0,12,0,8" CornerRadius="{Binding CornerRadius, ElementName=RailRoot}" Background="{ThemeResource ShellBackgroundBrush}">
         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
         <StackPanel Spacing="10">
-            <Border Width="38" Height="38" CornerRadius="11" Background="{ThemeResource LogoPlateBrush}" Padding="5" HorizontalAlignment="Center">
-                <Image Source="ms-appx:///Assets/BrandLogo.png" AutomationProperties.Name="软件 Logo" />
+            <Border Width="40" Height="40" CornerRadius="11" Background="{ThemeResource LogoPlateBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" Padding="3" HorizontalAlignment="Center">
+                <Image Source="ms-appx:///Assets/FieldSyncMark.svg" Stretch="Uniform" AutomationProperties.Name="FieldSync Logo" />
             </Border>
             <Button Style="{StaticResource RailButtonStyle}" Click="CollapseDirectory" AutomationProperties.AutomationId="CollapseDirectory" AutomationProperties.Name="折叠资源栏" ToolTipService.ToolTip="折叠资源栏"><Path Width="18" Height="15" Stretch="Uniform" Stroke="{ThemeResource RailForegroundBrush}" StrokeThickness="2" Data="M 0,3 L 13,3 M 0,10 L 13,10 M 0,17 L 13,17 M 16,3 L 23,10 L 16,17" /></Button>
             <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />
@@ -30,7 +30,7 @@
         </StackPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
             <StackPanel x:Name="RailItems" Spacing="4" Margin="0,14,0,0" HorizontalAlignment="Center">
-                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Tag="采集" AutomationProperties.AutomationId="AcquisitionNavigation" AutomationProperties.Name="采集" ToolTipService.ToolTip="概览"><FontIcon Glyph="&#xE80A;" FontSize="19" /></Button>
+                <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Tag="主页" AutomationProperties.AutomationId="HomeNavigation" AutomationProperties.Name="主页" ToolTipService.ToolTip="主页"><FontIcon Glyph="&#xE80F;" FontSize="19" /></Button>
                 <Button x:Name="SelectedRailItem" Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Background="{ThemeResource RailSelectedBackgroundBrush}" Foreground="{ThemeResource RailAccentBrush}" Tag="设备" AutomationProperties.AutomationId="DeviceNavigation" AutomationProperties.Name="设备" ToolTipService.ToolTip="设备"><FontIcon Foreground="{ThemeResource RailAccentBrush}" Glyph="&#xE8A5;" FontSize="19" /></Button>
                 <Button Click="SelectRailItem" Style="{StaticResource RailButtonStyle}" Tag="算法" AutomationProperties.AutomationId="AlgorithmNavigation" AutomationProperties.Name="数据分析" ToolTipService.ToolTip="数据分析"><FontIcon Glyph="&#xE9F9;" FontSize="19" /></Button>
             </StackPanel>

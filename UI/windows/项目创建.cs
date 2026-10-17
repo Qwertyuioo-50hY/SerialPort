@@ -11,7 +11,7 @@ public sealed partial class AppWindow
     {
         if (!_aiBusy && !_connecting && !ActiveChannel.IsOpen && !_sampling && !_fileOperation && !_reconstructing) return true;
         const string message = "请先结束当前操作并断开设备，再切换项目。";
-        ShowDeviceError(message); AiChatView.SetStatus(message); return false;
+        ShowDeviceError(message); AiChatView.SetStatus(message); HomePanel.SetStatus(message); return false;
     }
     private async Task SwitchProjectAsync(string path)
     {
@@ -20,6 +20,7 @@ public sealed partial class AppWindow
         foreach (var role in _projectSettings.ExperimentInputs.Keys) DirectoryPanel.SetAsset(role, null);
         _reconstruction.ClearInputs(); _projectSettings = new();
         await DirectoryPanel.LoadAsync(path); await RestoreDeviceSettingsAsync();
+        RememberProject(path);
     }
     private async Task CreateProjectAsync()
     {
@@ -41,5 +42,5 @@ public sealed partial class AppWindow
         }
         catch (Exception ex) { ShowProjectError("创建项目失败：" + ex.Message); }
     }
-    private void ShowProjectError(string text) { ShowDeviceError(text); AiChatView.SetStatus(text); }
+    private void ShowProjectError(string text) { ShowDeviceError(text); AiChatView.SetStatus(text); HomePanel.SetStatus(text); }
 }

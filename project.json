@@ -1,0 +1,31 @@
+{
+  "CustomFrame": null,
+  "Device": {
+    "Source": 0,
+    "Connection": 0,
+    "Protocol": 1,
+    "Host": "127.0.0.1",
+    "Port": 1346,
+    "TimeoutSeconds": 3,
+    "FrequencyKhz": 100,
+    "CoilCount": 8
+  },
+  "ExperimentInputs": {},
+  "DefaultSerialPortConfig": {
+    "PortName": "",
+    "BaudRate": 115200,
+    "Parity": 0,
+    "DataBits": 8,
+    "StopBits": 1,
+    "Handshake": 0,
+    "ReadTimeout": 1000,
+    "WriteTimeout": 1000,
+    "DtrEnable": false,
+    "RtsEnable": false,
+    "EncodingName": "UTF-8"
+  },
+  "LogDirectoryPath": "C:\\Users\\qwq_5\\OneDrive\\Desktop\\EMT\\Seial_Port_C#\\SerialPort\\UI\\bin\\Debug\\net10.0-windows10.0.26100.0\\win-x64\\AppX\\Logs",
+  "LogFilePath": "C:\\Users\\qwq_5\\OneDrive\\Desktop\\EMT\\Seial_Port_C#\\SerialPort\\UI\\bin\\Debug\\net10.0-windows10.0.26100.0\\win-x64\\AppX\\Logs\\serial.log",
+  "DefaultEncodingName": "UTF-8",
+  "RefreshIntervalMs": 500
+}

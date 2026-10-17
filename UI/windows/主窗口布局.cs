@@ -51,6 +51,9 @@ public sealed partial class AppWindow : Window
         SideRail.ThemeRequested += SideRailThemeRequested;
         InitializeDevicePage();
         InitializeAi();
+        InitializeHome();
+        InitializeBackgroundWindow();
+        SideRail.SetSection(ViewModel.Section);
         AddReconstructionSettings(Workspace.AlgorithmPanel);
         _reconstructionSettings!.CustomAlgorithmRequested += async (_, _) => await ImportFileAsync("自定义算法");
         BuildParameterContents();
@@ -85,7 +88,8 @@ public sealed partial class AppWindow : Window
         DeviceShell.Visibility = device ? Visibility.Visible : Visibility.Collapsed;
         AiSettingsPanel.Visibility = ViewModel.Section == "设置" ? Visibility.Visible : Visibility.Collapsed;
         AiChatView.Visibility = ViewModel.Section == "AI" ? Visibility.Visible : Visibility.Collapsed;
-        ContentGrid.Visibility = device || ViewModel.Section is "采集" or "AI" or "设置" ? Visibility.Collapsed : Visibility.Visible;
+        HomePanel.Visibility = ViewModel.Section == "主页" ? Visibility.Visible : Visibility.Collapsed;
+        ContentGrid.Visibility = device || ViewModel.Section is "主页" or "AI" or "设置" ? Visibility.Collapsed : Visibility.Visible;
         ShellFrame.BorderThickness = new Thickness(8);
         ShellFrame.CornerRadius = new CornerRadius(8);
         SideRail.CornerRadius = ShellFrame.CornerRadius;
@@ -110,6 +114,8 @@ public sealed partial class AppWindow : Window
 
     private void WindowClosed(object sender, WindowEventArgs args)
     {
+        AppWindow.Closing -= BackgroundWindowClosing;
+        _trayIcon?.Dispose();
         _acquisitionStop?.Cancel();
         Workspace.ReconstructionRequested -= WorkspaceReconstructionRequested;
         _connectionLifetime.Cancel();
@@ -125,7 +131,7 @@ public sealed partial class AppWindow : Window
 
     private void WindowCommandRequested(object? sender, string command)
     {
-        if (command == "Close") { Close(); return; }
+        if (command == "Close") { HideToBackground(); return; }
         if (AppWindow.Presenter is not OverlappedPresenter presenter) return;
         if (command == "Minimize") presenter.Minimize();
         else if (presenter.State == OverlappedPresenterState.Maximized) presenter.Restore();

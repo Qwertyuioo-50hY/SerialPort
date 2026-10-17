@@ -5,7 +5,8 @@
     xmlns:side="using:Tomography.UI.SideView"
     xmlns:navigation="using:Tomography.UI.Navigation"
     xmlns:bottom="using:Tomography.UI.Bottom"
-    xmlns:workspace="using:Tomography.UI.workspace" Title="Tomography">
+    xmlns:home="using:Tomography.UI.Home"
+    xmlns:workspace="using:Tomography.UI.workspace" Title="FieldSync">
     <Grid x:Name="Root" Background="#080808" RequestedTheme="Light" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
         <Grid.Resources>
             <Style x:Key="DividerStyle" TargetType="Thumb">
@@ -41,6 +42,7 @@
 
                     <side:DevicePage x:Name="DeviceView"/>
                 </Grid>
+                <home:HomeView x:Name="HomePanel" Grid.Column="3" Margin="0,8,8,8" Visibility="Collapsed"/>
                 <side:AiSettingsView x:Name="AiSettingsPanel" Grid.Column="3" Margin="0,8,8,8" Visibility="Collapsed"/>
                 <bottom:AiChatPanelView x:Name="AiChatView" Grid.Column="3" Margin="0,8,8,8" Visibility="Collapsed"/>
                 <Grid x:Name="ContentGrid" Grid.Column="3" Margin="0,8,8,8">
