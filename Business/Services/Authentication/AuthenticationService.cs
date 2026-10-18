@@ -28,8 +28,8 @@ public sealed class AuthenticationService(AccountStore accounts, IAccountStorage
         username = Normalize(username);
         if (username.Length is < 1 or > 64 || username.Any(char.IsControl))
             throw new ArgumentException("用户名须为 1–64 个字符，不能包含控制字符。");
-        if (password.Length is < 8 or > 128 || !password.Any(char.IsLetter) || !password.Any(char.IsDigit))
-            throw new ArgumentException("密码须为 8–128 位，并同时包含字母和数字。");
+        if (password.Length is < 12 or > 128 || !password.Any(char.IsLetter) || !password.Any(char.IsDigit) || !password.Any(c => char.IsPunctuation(c) || char.IsSymbol(c)))
+            throw new ArgumentException("密码须为 12–128 位，并同时包含字母、数字和特殊符号。");
         if (password != confirmation) throw new ArgumentException("两次输入的密码不一致。");
         if (!accounts.Create(username, username.ToUpperInvariant(), PasswordHasher.Hash(password)))
             throw new ArgumentException("用户名已存在，请使用其他用户名。");
