@@ -1,14 +1,22 @@
 <UserControl x:Class="Tomography.UI.Navigation.ProjectDirectoryView"
- xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
- <StackPanel Padding="20" Spacing="16">
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:winui="using:Microsoft.UI.Xaml.Controls">
+ <Grid Padding="20" RowSpacing="16"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
   <StackPanel Orientation="Horizontal" Spacing="12">
    <FontIcon Glyph="&#xE8B7;" FontSize="20" Foreground="{ThemeResource RailAccentBrush}"/>
    <TextBlock Text="项目导航" FontSize="20" FontWeight="SemiBold"/>
   </StackPanel>
-  <StackPanel Spacing="8">
+  <StackPanel x:Name="ProjectActions" Grid.Row="1" Spacing="8">
    <Button Content="新建项目" Click="CreateProjectClicked" HorizontalAlignment="Stretch" CornerRadius="10" AutomationProperties.AutomationId="CreateProject"/>
    <Button x:Name="ChooseProjectDirectory" Content="打开文件夹" HorizontalAlignment="Stretch" CornerRadius="10" AutomationProperties.AutomationId="ChooseProjectDirectory"/>
-   <Button Content="＋ 新建对话" Click="NewChatClicked" HorizontalAlignment="Stretch" CornerRadius="12" AutomationProperties.AutomationId="NewAiConversation"/>
   </StackPanel>
- </StackPanel>
+ <AutoSuggestBox x:Name="ProjectSearch" Grid.Row="1" Visibility="Collapsed" PlaceholderText="搜索项目文件" QueryIcon="Find" TextChanged="ProjectSearchChanged" AutomationProperties.AutomationId="ProjectSearch"/>
+ <TreeView x:Name="ProjectTree" Visibility="Collapsed" ItemInvoked="ProjectItemInvoked" Grid.Row="2" Expanding="FolderExpanding" SelectionMode="Single" AutomationProperties.Name="项目结构" AutomationProperties.AutomationId="ProjectTree">
+  <TreeView.ItemTemplate><DataTemplate x:DataType="winui:TreeViewNode"><ContentPresenter Content="{x:Bind Content, Mode=OneWay}"/></DataTemplate></TreeView.ItemTemplate>
+  <TreeView.ItemContainerStyle><Style TargetType="TreeViewItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="MinHeight" Value="42"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TreeViewItem"><Border x:Name="Row" Padding="10,8" CornerRadius="12" Background="Transparent">
+   <VisualStateManager.VisualStateGroups><VisualStateGroup x:Name="CommonStates"><VisualState x:Name="Normal"/><VisualState x:Name="PointerOver"><VisualState.Setters><Setter Target="Row.Background" Value="{ThemeResource ControlFillColorSecondaryBrush}"/></VisualState.Setters></VisualState></VisualStateGroup><VisualStateGroup x:Name="SelectionStates"><VisualState x:Name="Unselected"/><VisualState x:Name="Selected"><VisualState.Setters><Setter Target="Row.Background" Value="{ThemeResource ControlFillColorSecondaryBrush}"/></VisualState.Setters></VisualState><VisualState x:Name="SelectedUnfocused"><VisualState.Setters><Setter Target="Row.Background" Value="{ThemeResource ControlFillColorSecondaryBrush}"/></VisualState.Setters></VisualState></VisualStateGroup></VisualStateManager.VisualStateGroups>
+   <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+  </Border></ControlTemplate></Setter.Value></Setter></Style></TreeView.ItemContainerStyle>
+ </TreeView>
+ <TextBlock x:Name="TreeStatus" Grid.Row="2" VerticalAlignment="Bottom" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+ </Grid>
 </UserControl>

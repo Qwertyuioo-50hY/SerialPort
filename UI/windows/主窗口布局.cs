@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.UI;
 using Microsoft.UI.Input;
@@ -21,6 +21,7 @@ public sealed partial class AppWindow : Window
     private readonly FontIconSource ConnectionIcon = new();
     private TextBlock ConnectionStatus = new();
     private bool _loaded;
+    private readonly Tomography.UI.Account.BorderlessLoginFrame _frame;
     private WindowId PickerWindowId => AppWindow.Id;
 
     public AppWindow(AuthenticationService authentication)
@@ -51,6 +52,7 @@ public sealed partial class AppWindow : Window
             var cornerPreference = 2u;
             DwmSetWindowAttribute(hwnd, 33, ref cornerPreference, sizeof(uint));
         }
+        _frame = new Tomography.UI.Account.BorderlessLoginFrame(hwnd);
         _titleBarInput = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
         Root.ActualThemeChanged += RootThemeChanged;
         Activated += WindowActivated;
@@ -62,6 +64,7 @@ public sealed partial class AppWindow : Window
         InitializeDevicePage();
         InitializeAi();
         InitializeHome();
+        HomePanel.SetGreeting(user.Username);
         SideRail.SetSection(ViewModel.Section);
         AddReconstructionSettings(Workspace.AlgorithmPanel);
         _reconstructionSettings!.CustomAlgorithmRequested += async (_, _) => await ImportFileAsync("自定义算法");
@@ -141,6 +144,7 @@ public sealed partial class AppWindow : Window
     private void WindowClosed(object sender, WindowEventArgs args)
     {
         _loaded = false;
+        _frame.Dispose();
         _acquisitionStop?.Cancel();
         Workspace.ReconstructionRequested -= WorkspaceReconstructionRequested;
         _connectionLifetime.Cancel();

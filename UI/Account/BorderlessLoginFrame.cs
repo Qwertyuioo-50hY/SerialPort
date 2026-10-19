@@ -17,10 +17,23 @@ internal sealed class BorderlessLoginFrame : IDisposable
     }
     private nint ProcessMessage(nint hwnd, uint message, nuint wParam, nint lParam, nuint id, nuint data)
     {
-        if (message == 0x0083 && wParam != 0) return 0; // WM_NCCALCSIZE: full client area
+        if (message == 0x0083 && wParam != 0)
+        {
+            if (IsZoomed(hwnd))
+            {
+                var info = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
+                if (GetMonitorInfo(MonitorFromWindow(hwnd, 2), ref info)) Marshal.StructureToPtr(info.Work, lParam, false);
+            }
+            return 0;
+        } // WM_NCCALCSIZE: full client area
         return DefSubclassProc(hwnd, message, wParam, lParam);
     }
     public void Dispose() => RemoveWindowSubclass(_hwnd, _procedure, 1);
+    [StructLayout(LayoutKind.Sequential)] private struct Rect { public int Left, Top, Right, Bottom; }
+    [StructLayout(LayoutKind.Sequential)] private struct MonitorInfo { public int Size; public Rect Monitor, Work; public uint Flags; }
+    [DllImport("user32.dll")] private static extern bool IsZoomed(nint hwnd);
+    [DllImport("user32.dll")] private static extern nint MonitorFromWindow(nint hwnd, uint flags);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern bool GetMonitorInfo(nint monitor, ref MonitorInfo info);
     private delegate nint SubclassProc(nint hwnd, uint message, nuint wParam, nint lParam, nuint id, nuint data);
     [DllImport("comctl32.dll")][return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetWindowSubclass(nint hwnd, SubclassProc procedure, nuint id, nuint data);

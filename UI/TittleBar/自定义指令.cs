@@ -37,7 +37,7 @@ public sealed partial class AppWindow
         }
         else
         {
-            var format = new ComboBox { Header = "波形显示", ItemsSource = new[] { "全场波形图", "物场波形图", "叠加波形图" }, SelectedIndex = 1 };
+            var format = new Tomography.UI.Controls.ClickComboBox { Header = "波形显示", ItemsSource = new[] { "全场波形图", "物场波形图", "叠加波形图" }, SelectedIndex = 1 };
             body.Children.Add(format);
             body.Children.Add(new TextBlock { Text = "可在工作台切换波形类型" });
         }

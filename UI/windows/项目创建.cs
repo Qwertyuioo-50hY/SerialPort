@@ -20,6 +20,8 @@ public sealed partial class AppWindow
         foreach (var role in _projectSettings.ExperimentInputs.Keys) DirectoryPanel.SetAsset(role, null);
         _reconstruction.ClearInputs(); _projectSettings = new();
         await DirectoryPanel.LoadAsync(path); await RestoreDeviceSettingsAsync();
+        DirectoryPanel.RefreshTree();
+        ShowProjectNavigation();
         RememberProject(path);
     }
     private async Task CreateProjectAsync()

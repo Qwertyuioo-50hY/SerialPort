@@ -46,7 +46,6 @@ public sealed partial class AppWindow
         AiChatView.SetConfiguration(_aiSettings);
         AiSettingsPanel.SaveRequested += (_, _) => SaveAiSettings();
         AiChatView.SendRequested += async (_, message) => await SendAiMessageAsync(message);
-        DirectoryPanel.NewChatRequested += (_, _) => NewAiConversation();
         AiChatView.NewConversationRequested += (_, _) => NewAiConversation();
         AiChatView.ConfigurationRequested += (_, selection) => ChangeComposerConfiguration(selection.Model, selection.Effort);
         DirectoryPanel.ProjectChanged += (_, _) => { if (!_aiBusy) LoadAiHistory(); };
@@ -90,6 +89,7 @@ public sealed partial class AppWindow
             _conversations = AiProjectStore.Load(DirectoryPanel.DirectoryPath, LegacyAiHistoryPath);
             _conversation = _conversations.FirstOrDefault();
             AiChatView.ShowConversation(_conversation); AiChatView.SetStatus("");
+            RefreshRecentChats();
         }
         catch (Exception)
         {
@@ -125,7 +125,7 @@ public sealed partial class AppWindow
     private void SaveAiHistory()
     {
         if (!_historyReadable) return;
-        try { AiProjectStore.Save(DirectoryPanel.DirectoryPath, _conversations); }
+        try { AiProjectStore.Save(DirectoryPanel.DirectoryPath, _conversations); RefreshRecentChats(); DirectoryPanel.RefreshTree(); }
         catch (Exception) { AiChatView.SetStatus("对话保存失败，请检查文件存储权限。"); }
     }
     private async Task SendAiMessageAsync(string message)

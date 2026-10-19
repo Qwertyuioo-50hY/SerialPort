@@ -22,7 +22,7 @@ public sealed partial class AppWindow
             if (extension is ".csv" or ".txt")
             {
                 var roles = role == "灵敏度矩阵" ? new[] { "灵敏度矩阵", "节点坐标" } : new[] { "物场/Demo数据", "空场参考", "仅保存文件" };
-                var choice = new ComboBox { Header = "文件用途", ItemsSource = roles, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+                var choice = new Tomography.UI.Controls.ClickComboBox { Header = "文件用途", ItemsSource = roles, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
                 var dialog = new ContentDialog { XamlRoot = Root.XamlRoot, RequestedTheme = Root.ActualTheme,
                     Title = "导入数值文件", Content = choice, PrimaryButtonText = "导入", CloseButtonText = "取消" };
                 if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;

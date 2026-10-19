@@ -5,6 +5,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <ResourceDictionary Source="ms-appx:///Controls/InputStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
@@ -54,7 +55,7 @@
             <x:Double x:Key="TextControlThemeFontSize">12</x:Double>
             <Style TargetType="TextBlock">
                 <Setter Property="FontSize" Value="12" />
-                <Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei UI" />
+                <Setter Property="FontFamily" Value="Segoe UI Variable Text, Microsoft YaHei UI" />
             </Style>
             <Style x:Key="WorkspaceHeadingStyle" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="14" />

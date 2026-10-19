@@ -31,7 +31,7 @@ public sealed partial class AppWindow
             var captionColor = (uint)(color.R | color.G << 8 | color.B << 16);
             DwmSetWindowAttribute(hwnd, 35, ref captionColor, sizeof(uint)); // DWMWA_CAPTION_COLOR
         }
-        var borderColor = 0xFFFFFFFEu; // DWMWA_COLOR_NONE
+        var borderColor = Root.Background is SolidColorBrush brush ? (uint)(brush.Color.R | brush.Color.G << 8 | brush.Color.B << 16) : 0u; // DWMWA_COLOR_NONE
         DwmSetWindowAttribute(hwnd, 34, ref borderColor, sizeof(uint)); // DWMWA_BORDER_COLOR
         // Repaint the cached non-client pixels without requiring a window move.
         const uint RDW_INVALIDATE = 0x0001, RDW_UPDATENOW = 0x0100, RDW_FRAME = 0x0400;

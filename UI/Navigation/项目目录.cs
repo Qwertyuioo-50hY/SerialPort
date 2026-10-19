@@ -13,12 +13,17 @@ public sealed partial class ProjectDirectoryView : UserControl
     public ProjectDirectoryView()
     {
         InitializeComponent();
+        Loaded += (_, _) => { if (ProjectTree.RootNodes.Count == 0) RefreshTree(); };
         ChooseProjectDirectory.Click += (_, _) => ChooseDirectoryRequested?.Invoke(this, EventArgs.Empty);
     }
     public Task LoadAsync(string path)
     {
         if (!Directory.Exists(path)) throw new DirectoryNotFoundException("项目文件夹不存在。");
         DirectoryPath = Path.GetFullPath(path);
+        _projectOpened = true;
+        ProjectActions.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+        ProjectSearch.Visibility = ProjectTree.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+        ProjectSearch.Text = "";
         ProjectChanged?.Invoke(this, EventArgs.Empty);
         return Task.CompletedTask;
     }

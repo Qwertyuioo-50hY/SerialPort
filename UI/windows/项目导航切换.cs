@@ -15,6 +15,12 @@ public sealed partial class AppWindow
         DirectoryDividerColumn.Width = new GridLength(visible ? 8 : 0);
     }
 
+    private void ShowProjectNavigation()
+    {
+        DirectoryFrame.Visibility = DirectoryDivider.Visibility = Visibility.Visible;
+        DirectoryColumn.Width = new GridLength(_directoryWidth);
+        DirectoryDividerColumn.Width = new GridLength(8);
+    }
     private void DirectoryDragDelta(object sender, DragDeltaEventArgs e)
     {
         var maximum = Math.Max(180, Math.Min(430, Root.ActualWidth - 68 - 8 - 650));

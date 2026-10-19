@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System.IO;
+using Tomography.Business.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -9,7 +10,31 @@ public sealed partial class HomeView : UserControl
     public event EventHandler? NewProjectRequested;
     public event EventHandler? BrowseProjectRequested;
     public event EventHandler<string>? OpenProjectRequested;
-    public HomeView() => InitializeComponent();
+    public event EventHandler<RecentChatEntry>? OpenChatRequested;
+    private string _username = "";
+    public HomeView()
+    {
+        InitializeComponent();
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
+        timer.Tick += (_, _) => UpdateGreeting();
+        Loaded += (_, _) => { UpdateGreeting(); timer.Start(); };
+        Unloaded += (_, _) => timer.Stop();
+    }
+    public void SetGreeting(string username) { _username = username; UpdateGreeting(); }
+    private void UpdateGreeting()
+    {
+        var hour = DateTime.Now.Hour;
+        Welcome.Text = $"Good {(hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening")}, {_username}";
+    }
+    public void SetRecentChats(IReadOnlyList<RecentChatEntry> chats)
+    {
+        RecentChats.ItemsSource = chats;
+        ChatHeading.Visibility = chats.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+    }
+    private void RecentChatClicked(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is RecentChatEntry chat) OpenChatRequested?.Invoke(this, chat);
+    }
     public void SetRecentProjects(IEnumerable<string>? paths)
     {
         var projects = (paths ?? Array.Empty<string>()).Select(path => new RecentProjectItem(path)).ToArray();

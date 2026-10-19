@@ -40,7 +40,7 @@ public sealed partial class AiSettingsView : UserControl
         CcSwitchPath.Text = settings.CcSwitchConfigPath;
         UseCcSwitch.IsOn = settings.UseCcSwitchConfig;
         UpdateProviderControls();
-        BaseUrl.Text = settings.BaseUrl ?? ""; PythonDll.Text = settings.PythonDll ?? "";
+        BaseUrl.Text = settings.BaseUrl ?? "";
         settings.Models ??= new(); KeyEnvironment.Text = settings.ApiKeyEnvironmentVariable ?? ""; ApiKey.Password = key;
         Model.ItemsSource = settings.Models; Model.SelectedItem = settings.Model; Model.Text = settings.Model ?? "";
         Models.Text = string.Join(Environment.NewLine, settings.Models);
@@ -63,11 +63,11 @@ public sealed partial class AiSettingsView : UserControl
         {
             if (!System.IO.File.Exists(CcSwitchPath.Text.Trim()) || !CcSwitchPath.Text.Trim().EndsWith(".toml", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("请选择存在的 config.toml 文件。");
-            if (!System.IO.File.Exists(PythonDll.Text.Trim())) throw new ArgumentException("Python 运行时 DLL 不存在。");
+            if (!System.IO.File.Exists(_loadedSettings.PythonDll)) throw new ArgumentException("Python 运行时 DLL 不存在。");
             var settings = System.Text.Json.JsonSerializer.Deserialize<AiApiSettings>(System.Text.Json.JsonSerializer.Serialize(_loadedSettings))!;
             settings.UseCcSwitchConfig = true;
             settings.CcSwitchConfigPath = System.IO.Path.GetFullPath(CcSwitchPath.Text.Trim());
-            settings.PythonDll = PythonDll.Text.Trim();
+            settings.PythonDll = _loadedSettings.PythonDll;
             settings.Instructions = Instructions.Text;
             settings.OutputInstructions = OutputInstructions.Text;
             settings.OutputFormat = Value(OutputFormat);
@@ -87,10 +87,10 @@ public sealed partial class AiSettingsView : UserControl
             throw new ArgumentException("Pro 模式和 Ultrafast 速度需要 Responses 接口。");
         if (string.IsNullOrWhiteSpace(Model.Text) || (string.IsNullOrWhiteSpace(Key) && string.IsNullOrWhiteSpace(KeyEnvironment.Text)))
             throw new ArgumentException("请填写模型名称，以及 API Key 或密钥环境变量。");
-        if (!System.IO.File.Exists(PythonDll.Text.Trim())) throw new ArgumentException("Python 运行时 DLL 不存在。");
+        if (!System.IO.File.Exists(_loadedSettings.PythonDll)) throw new ArgumentException("Python 运行时 DLL 不存在。");
         return new AiApiSettings {
             UseCcSwitchConfig = false, CcSwitchConfigPath = CcSwitchPath.Text.Trim(),
-            BaseUrl = BaseUrl.Text.Trim().TrimEnd('/'), Model = Model.Text.Trim(), PythonDll = PythonDll.Text.Trim(),
+            BaseUrl = BaseUrl.Text.Trim().TrimEnd('/'), Model = Model.Text.Trim(), PythonDll = _loadedSettings.PythonDll,
             Models = Models.Text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(value => value.Trim()).Where(value => value.Length > 0).Append(Model.Text.Trim()).Distinct().ToList(),
             ApiMode = Value(ApiMode), ReasoningMode = Value(ReasoningMode), ReasoningEffort = Value(ReasoningEffort),
             ServiceTier = Value(ServiceTier), Verbosity = Value(Verbosity), OutputFormat = Value(OutputFormat),

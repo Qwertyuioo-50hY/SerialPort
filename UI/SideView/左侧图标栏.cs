@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 
@@ -9,11 +9,23 @@ public sealed partial class IconRailView : UserControl
     public event EventHandler<bool>? AccountActionRequested;
     public void SetAccount(string username)
     {
-        AccountPicture.DisplayName = username;
+        AccountPicture.DisplayName = MenuAccountPicture.DisplayName = username;
+        MenuAccountName.Text = username;
         ToolTipService.SetToolTip(AccountButton, username);
     }
-    private void AccountMenuClicked(object sender, RoutedEventArgs e) =>
-        AccountActionRequested?.Invoke(this, ((MenuFlyoutItem)sender).Tag as string == "Switch");
+    private void AccountProfileClicked(object sender, RoutedEventArgs e) { AccountFlyout.Hide(); AccountActionRequested?.Invoke(this, true); }
+    private void AccountSignOutClicked(object sender, RoutedEventArgs e) { AccountFlyout.Hide(); AccountActionRequested?.Invoke(this, false); }
+    private void AccountThemeClicked(object sender, RoutedEventArgs e) => ToggleTheme(sender, e);
+    private void AccountSettingsClicked(object sender, RoutedEventArgs e)
+    {
+        AccountFlyout.Hide(); NavigationRequested?.Invoke(this, "设置"); SetSection("设置");
+    }
+    private async void AccountHelpClicked(object sender, RoutedEventArgs e)
+    {
+        AccountFlyout.Hide();
+        await new ContentDialog { XamlRoot = XamlRoot, RequestedTheme = ActualTheme, Title = "FieldSync 帮助",
+            Content = "新建或打开项目后，可在左侧搜索和浏览文件。主页可恢复最近项目和聊天；设备连接与成像参数可在对应页面设置。", CloseButtonText = "知道了" }.ShowAsync();
+    }
     public event EventHandler<string>? NavigationRequested;
     public event EventHandler? DirectoryToggleRequested;
     private void CollapseDirectory(object sender, RoutedEventArgs e) => DirectoryToggleRequested?.Invoke(this, EventArgs.Empty);

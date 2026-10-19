@@ -21,9 +21,9 @@ public sealed partial class AppWindow
         var header = Field("帧头（十六进制，必填）", old.HeaderHex, "FrameHeader");
         var length = Field("整帧字节数（含帧头、校验）", old.Length.ToString(), "FrameLength");
         var offset = Field("数值区起始字节偏移", old.DataOffset.ToString(), "FrameOffset");
-        var type = new ComboBox { Header = "字段类型", ItemsSource = new[] { "UInt16", "Int16", "UInt32", "Int32", "Float32", "Float64" }, SelectedItem = old.FieldType, HorizontalAlignment = HorizontalAlignment.Stretch };
-        var endian = new ComboBox { Header = "字节序", ItemsSource = new[] { "小端", "大端" }, SelectedIndex = old.BigEndian ? 1 : 0, HorizontalAlignment = HorizontalAlignment.Stretch };
-        var checksum = new ComboBox { Header = "末尾单字节校验（覆盖此前全部字节）", ItemsSource = new[] { "None", "XOR8", "SUM8" }, SelectedItem = old.Checksum, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var type = new Tomography.UI.Controls.ClickComboBox { Header = "字段类型", ItemsSource = new[] { "UInt16", "Int16", "UInt32", "Int32", "Float32", "Float64" }, SelectedItem = old.FieldType, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var endian = new Tomography.UI.Controls.ClickComboBox { Header = "字节序", ItemsSource = new[] { "小端", "大端" }, SelectedIndex = old.BigEndian ? 1 : 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var checksum = new Tomography.UI.Controls.ClickComboBox { Header = "末尾单字节校验（覆盖此前全部字节）", ItemsSource = new[] { "None", "XOR8", "SUM8" }, SelectedItem = old.Checksum, HorizontalAlignment = HorizontalAlignment.Stretch };
         AutomationProperties.SetAutomationId(type, "FrameType"); AutomationProperties.SetAutomationId(endian, "FrameEndian"); AutomationProperties.SetAutomationId(checksum, "FrameChecksum");
         panel.Children.Add(type); panel.Children.Add(endian); panel.Children.Add(checksum);
         var map = Field("64 通道的数值字段索引（从 0 开始，逗号分隔）", string.Join(",", old.ChannelMap), "FrameMap");
