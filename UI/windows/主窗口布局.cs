@@ -65,7 +65,7 @@ public sealed partial class AppWindow : Window
         InitializeAi();
         InitializeHome();
         InitializeInterfacePreferences();
-        HomePanel.SetGreeting(user.Username);
+        InitializeProfile(user);
         SideRail.SetSection(ViewModel.Section);
         AddReconstructionSettings(Workspace.AlgorithmPanel);
         _reconstructionSettings!.CustomAlgorithmRequested += async (_, _) => await ImportFileAsync("自定义算法");

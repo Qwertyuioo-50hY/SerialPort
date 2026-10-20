@@ -40,7 +40,7 @@ public sealed partial class LoginWindow : Window
             presenter.IsMaximizable = false;
         }
         _frame = new BorderlessLoginFrame(hwnd);
-        Root.RequestedTheme = LoadTheme();
+        Root.RequestedTheme = ElementTheme.Dark;
         Root.ActualThemeChanged += (_, _) => UpdateFrameColors();
         Activated += (_, _) => UpdateFrameColors();
         UpdateFrameColors();
@@ -56,9 +56,7 @@ public sealed partial class LoginWindow : Window
     private async void RootLoaded(object sender, RoutedEventArgs e)
     {
         Root.Language = ViewModel.English ? "en-US" : "zh-CN";
-        ChineseLanguage.IsChecked = !ViewModel.English;
-        EnglishLanguage.IsChecked = ViewModel.English;
-        SetThemeChecks();
+        LanguageMenu.SetLanguage(ViewModel.English ? "en" : "zh");
         UpdateFrameColors();
         RootSizeChanged(sender, null!);
         await ViewModel.InitializeAsync(_allowAutoLogin);
@@ -69,17 +67,15 @@ public sealed partial class LoginWindow : Window
         if (Root.XamlRoot is null) return;
         var scale = Root.XamlRoot.RasterizationScale;
         InputNonClientPointerSource.GetForWindowId(AppWindow.Id).SetRegionRects(NonClientRegionKind.Caption,
-            [new RectInt32(0, 0, (int)(Math.Max(0, Root.ActualWidth - 192) * scale), (int)(48 * scale))]);
+            [new RectInt32(0, 0, (int)(Math.Max(0, Root.ActualWidth - 152) * scale), (int)(48 * scale))]);
     }
     public static Visibility MessageVisibility(string message) => ToVisibility(!string.IsNullOrWhiteSpace(message));
-    private void ChineseClicked(object sender, RoutedEventArgs e) => ChangeLanguage(false);
-    private void EnglishClicked(object sender, RoutedEventArgs e) => ChangeLanguage(true);
+    private void LanguageSelected(object? sender, string language) => ChangeLanguage(language == "en");
     private void ChangeLanguage(bool english)
     {
         ViewModel.SetLanguage(english);
         Root.Language = english ? "en-US" : "zh-CN";
-        ChineseLanguage.IsChecked = !english;
-        EnglishLanguage.IsChecked = english;
+        LanguageMenu.SetLanguage(english ? "en" : "zh");
         UpdatePasswordAppearance();
     }
     private void PasswordChanged(object sender, RoutedEventArgs e) => UpdatePasswordAppearance();
@@ -117,33 +113,6 @@ public sealed partial class LoginWindow : Window
         ConfirmationEyeIcon.Glyph = ConfirmationInput.PasswordRevealMode == PasswordRevealMode.Visible ? "\uED1A" : "\uE890";
         AutomationProperties.SetName(PasswordEye, PasswordInput.PasswordRevealMode == PasswordRevealMode.Visible ? ViewModel.HidePasswordText : ViewModel.ShowPasswordText);
         AutomationProperties.SetName(ConfirmationEye, ConfirmationInput.PasswordRevealMode == PasswordRevealMode.Visible ? ViewModel.HidePasswordText : ViewModel.ShowPasswordText);
-    }
-    private static string ThemePath => System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tomography", "login-theme.txt");
-    private static ElementTheme LoadTheme()
-    {
-        try { return System.IO.File.Exists(ThemePath) && System.IO.File.ReadAllText(ThemePath).Trim() == "Light" ? ElementTheme.Light : ElementTheme.Dark; }
-        catch (System.IO.IOException) { return ElementTheme.Dark; }
-        catch (UnauthorizedAccessException) { return ElementTheme.Dark; }
-    }
-    private void DarkClicked(object sender, RoutedEventArgs e) => ChangeTheme(ElementTheme.Dark);
-    private void LightClicked(object sender, RoutedEventArgs e) => ChangeTheme(ElementTheme.Light);
-    private void SetThemeChecks()
-    {
-        DarkTheme.IsChecked = Root.RequestedTheme == ElementTheme.Dark;
-        LightTheme.IsChecked = !DarkTheme.IsChecked;
-    }
-    private void ChangeTheme(ElementTheme theme)
-    {
-        Root.RequestedTheme = theme;
-        SetThemeChecks();
-        UpdateFrameColors();
-        try
-        {
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(ThemePath)!);
-            System.IO.File.WriteAllText(ThemePath, theme.ToString());
-        }
-        catch (System.IO.IOException) { }
-        catch (UnauthorizedAccessException) { }
     }
     private void UpdateFrameColors()
     {

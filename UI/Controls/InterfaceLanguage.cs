@@ -9,6 +9,16 @@ public static class InterfaceLanguage
 {
     private static readonly (string Zh, string En)[] Labels =
     [
+        ("个人资料", "Profile"), ("姓名", "Full name"), ("显示名称", "Display name"), ("生日", "Birthday"),
+        ("国家", "Country"), ("地区／省份", "Region / Province"), ("城市", "City"), ("机构／公司", "Organization"),
+        ("职业／职位", "Job title"), ("网站", "Website"), ("个人简介", "About me"), ("更换头像", "Change photo"),
+        ("移除头像", "Remove photo"), ("保存资料", "Save profile"),
+        ("资料均为可选，保存在本机；显示名称不会改变登录账号。", "Optional details, stored on this device. Your display name does not change your login."),
+        ("资料字段最多 100 个字符，不能包含控制字符。", "Use up to 100 characters per field, without control characters."),
+        ("个人简介最多 500 个字符。", "Use up to 500 characters for your bio."),
+        ("生日不能晚于今天。", "Your birthday cannot be in the future."),
+        ("网站须为有效的 HTTP 或 HTTPS 地址。", "Enter a valid HTTP or HTTPS website URL."),
+        ("请选择 10 MB 以下的 PNG 或 JPEG 图片。", "Choose a PNG or JPEG image smaller than 10 MB."),
         ("主页", "Home"), ("设备", "Device"), ("数据分析", "Analysis"), ("项目导航", "Project navigation"),
         ("新建项目", "New project"), ("打开项目", "Open project"), ("打开文件夹", "Open folder"),
         ("最近项目", "Recent projects"), ("最近聊天", "Recent chats"), ("搜索项目文件", "Search project files"),

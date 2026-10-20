@@ -9,6 +9,7 @@ public sealed partial class ProjectDirectoryView
     private bool _projectOpened;
     private int _searchVersion, _treeVersion;
     private ProjectEntry? _root;
+    private readonly System.Collections.ObjectModel.ObservableCollection<ProjectEntry> _visible = new();
     private readonly HashSet<ProjectEntry> _loading = new();
     public async void RefreshTree()
     {
@@ -38,7 +39,18 @@ public sealed partial class ProjectDirectoryView
             visible.Add(node);
             if (node.Expanded && node.Children is not null) foreach (var child in node.Children) Append(child);
         }
-        Append(_root); ProjectTree.ItemsSource = visible;
+        Append(_root); UpdateVisible(visible);
+    }
+    private void UpdateVisible(IReadOnlyList<ProjectEntry> entries)
+    {
+        if (!ReferenceEquals(ProjectTree.ItemsSource, _visible)) ProjectTree.ItemsSource = _visible;
+        for (var i = 0; i < entries.Count; i++)
+        {
+            if (i < _visible.Count && ReferenceEquals(_visible[i], entries[i])) continue;
+            var existing = _visible.IndexOf(entries[i]);
+            if (existing >= 0) _visible.Move(existing, i); else _visible.Insert(i, entries[i]);
+        }
+        while (_visible.Count > entries.Count) _visible.RemoveAt(_visible.Count - 1);
     }
     private async void ProjectItemClicked(object sender, ItemClickEventArgs args)
     {
@@ -66,7 +78,7 @@ public sealed partial class ProjectDirectoryView
                 .Where(p => System.IO.Path.GetFileName(p).Contains(query, StringComparison.OrdinalIgnoreCase)).Take(100).ToArray());
             if (version != _searchVersion || root != DirectoryPath) return;
             TreeStatus.Text = "";
-            ProjectTree.ItemsSource = paths.Select(p => new ProjectEntry(p, Directory.Exists(p), false, 0, System.IO.Path.GetRelativePath(root, p))).ToArray();
+            UpdateVisible(paths.Select(p => new ProjectEntry(p, Directory.Exists(p), false, 0, System.IO.Path.GetRelativePath(root, p))).ToArray());
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { if (version == _searchVersion) TreeStatus.Text = "搜索失败，请检查目录访问权限。"; }
     }

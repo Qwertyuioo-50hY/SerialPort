@@ -27,12 +27,9 @@ public sealed partial class AppWindow
     private async Task CreateProjectAsync()
     {
         if (!CanChangeProject()) return;
-        var nameField = new TextBox { Header = "项目名称", PlaceholderText = "输入项目名称" };
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(nameField, "ProjectName");
-        var dialog = new ContentDialog { XamlRoot = Root.XamlRoot, RequestedTheme = Root.ActualTheme,
-            Title = "新建项目", Content = nameField, PrimaryButtonText = "选择保存位置", CloseButtonText = "取消" };
-        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
-        var name = nameField.Text.Trim();
+        var entered = await Tomography.UI.Controls.RoundedProjectPrompt.ShowAsync(Root, _globalSettings.Language == "en");
+        if (entered is null) return;
+        var name = entered.Trim();
         if (name.Length == 0 || name is "." or ".." || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name.EndsWith('.'))
         { ShowProjectError("项目名称无效。"); return; }
         var parent = await new FolderPicker(PickerWindowId).PickSingleFolderAsync();

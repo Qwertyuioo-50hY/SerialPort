@@ -11,17 +11,19 @@ public sealed partial class AiSettingsView : UserControl
     public AiSettingsView()
     {
         InitializeComponent();
-        SettingsCategories.SelectedIndex = 2;
+        SettingsCategories.SelectedIndex = 3;
     }
     private void SettingsCategoryChanged(object sender, SelectionChangedEventArgs e)
     {
         if (AiSettingsContent is null || CategoryPlaceholder is null) return;
         var item = SettingsCategories.SelectedItem as ListViewItem;
         var ai = item?.Tag as string == "AI";
+        var profile = item?.Tag as string == "Profile";
+        ProfileSettings.Visibility = profile ? Visibility.Visible : Visibility.Collapsed;
         var shortcuts = item?.Tag as string == "Shortcuts";
         ShortcutSettings.Visibility = shortcuts ? Visibility.Visible : Visibility.Collapsed;
         AiSettingsContent.Visibility = ai ? Visibility.Visible : Visibility.Collapsed;
-        CategoryPlaceholder.Visibility = item is not null && !ai && !shortcuts ? Visibility.Visible : Visibility.Collapsed;
+        CategoryPlaceholder.Visibility = item is not null && !ai && !shortcuts && !profile ? Visibility.Visible : Visibility.Collapsed;
         CategoryTitle.Text = item?.Content?.ToString() ?? "";
         DispatcherQueue.TryEnqueue(() => SetLanguage(_english));
     }
@@ -37,6 +39,13 @@ public sealed partial class AiSettingsView : UserControl
         SettingsSearchEmpty.Visibility = visible.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
     private bool _english;
+    public ProfileSettingsView Profile => ProfileSettings;
+    public void ShowProfile()
+    {
+        SettingsSearch.Text = "";
+        ProfileCategory.Visibility = Visibility.Visible;
+        SettingsCategories.SelectedItem = ProfileCategory;
+    }
     public ShortcutSettingsView Shortcuts => ShortcutSettings;
     public void SetLanguage(bool english)
     {
@@ -45,6 +54,7 @@ public sealed partial class AiSettingsView : UserControl
         foreach (var item in SettingsCategories.Items.OfType<ListViewItem>())
             if (item.Content is string text) item.Content = Tomography.UI.Controls.InterfaceLanguage.Text(text, english);
         ShortcutSettings.SetLanguage(english);
+        ProfileSettings.SetLanguage(english);
     }
     public string Key => ApiKey.Password.Trim();
     public void LoadSettings(AiApiSettings settings, string key)

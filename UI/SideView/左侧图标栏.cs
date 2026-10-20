@@ -13,7 +13,12 @@ public sealed partial class IconRailView : UserControl
         MenuAccountName.Text = username;
         ToolTipService.SetToolTip(AccountButton, username);
     }
-    private void AccountProfileClicked(object sender, RoutedEventArgs e) { AccountFlyout.Hide(); AccountActionRequested?.Invoke(this, true); }
+    public void SetProfile(string name, ImageSource? picture)
+    {
+        SetAccount(name);
+        AccountPicture.ProfilePicture = MenuAccountPicture.ProfilePicture = picture;
+    }
+    private void AccountProfileClicked(object sender, RoutedEventArgs e) { AccountFlyout.Hide(); ProfileRequested?.Invoke(this, EventArgs.Empty); }
     private void AccountSignOutClicked(object sender, RoutedEventArgs e) { AccountFlyout.Hide(); AccountActionRequested?.Invoke(this, false); }
     private void AccountThemeClicked(object sender, RoutedEventArgs e) => ToggleTheme(sender, e);
     private void AccountSettingsClicked(object sender, RoutedEventArgs e)
@@ -27,12 +32,12 @@ public sealed partial class IconRailView : UserControl
             Content = "新建或打开项目后，可在左侧搜索和浏览文件。主页可恢复最近项目和聊天；设备连接与成像参数可在对应页面设置。", CloseButtonText = "知道了" }.ShowAsync();
     }
     public void SwitchTheme() => ToggleTheme(this, new RoutedEventArgs());
+    public event EventHandler? ProfileRequested;
     public event EventHandler<string>? LanguageRequested;
-    private void ChineseClicked(object sender, RoutedEventArgs e) => LanguageRequested?.Invoke(this, "zh");
-    private void EnglishClicked(object sender, RoutedEventArgs e) => LanguageRequested?.Invoke(this, "en");
+    private void LanguageSelected(object? sender, string language) => LanguageRequested?.Invoke(this, language);
     public void SetLanguage(string language)
     {
-        ChineseOption.IsChecked = language != "en"; EnglishOption.IsChecked = language == "en";
+        MainLanguageMenu.SetLanguage(language);
         Tomography.UI.Controls.InterfaceLanguage.Apply(this, language == "en");
     }
     public event EventHandler<string>? NavigationRequested;
