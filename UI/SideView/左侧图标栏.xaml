@@ -13,7 +13,7 @@
     <Grid Padding="0,12,0,8" CornerRadius="{Binding CornerRadius, ElementName=RailRoot}" Background="{ThemeResource ShellBackgroundBrush}">
         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
         <StackPanel Spacing="10">
-            <Image Source="ms-appx:///Assets/FieldSyncMark.svg" Width="32" Height="46" Stretch="Uniform" HorizontalAlignment="Center" AutomationProperties.Name="FieldSync Logo" />
+            <Image Source="ms-appx:///Assets/BrandAppIcon.png" Width="32" Height="46" Stretch="Uniform" HorizontalAlignment="Center" AutomationProperties.Name="FieldSync Logo" />
             <Button Style="{StaticResource RailButtonStyle}" Click="CollapseDirectory" AutomationProperties.AutomationId="CollapseDirectory" AutomationProperties.Name="折叠资源栏" ToolTipService.ToolTip="折叠资源栏"><Path Width="18" Height="15" Stretch="Uniform" Stroke="{ThemeResource RailForegroundBrush}" StrokeThickness="2" Data="M 0,3 L 13,3 M 0,10 L 13,10 M 0,17 L 13,17 M 16,3 L 23,10 L 16,17" /></Button>
             <Border Height="1" Background="{ThemeResource WorkspaceStrokeBrush}" />
             <Grid Height="64">

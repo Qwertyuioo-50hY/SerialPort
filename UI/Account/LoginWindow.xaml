@@ -35,7 +35,7 @@
   </Grid.Resources>
   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
   <Grid x:Name="BrandPanel" Background="{ThemeResource LoginBackground}">
-   <Image Source="ms-appx:///Assets/FieldSyncMark.svg" Stretch="Uniform" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False"/>
+   <Image Source="ms-appx:///Assets/LoginArtwork.png" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False"/>
   </Grid>
   <ScrollViewer Grid.Column="1" Margin="40,76,40,32" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center">
    <ContentControl HorizontalContentAlignment="Stretch" IsEnabled="{x:Bind ViewModel.IsIdle, Mode=OneWay}">
