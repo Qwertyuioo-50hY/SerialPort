@@ -26,6 +26,15 @@ public sealed partial class IconRailView : UserControl
         await new ContentDialog { XamlRoot = XamlRoot, RequestedTheme = ActualTheme, Title = "FieldSync 帮助",
             Content = "新建或打开项目后，可在左侧搜索和浏览文件。主页可恢复最近项目和聊天；设备连接与成像参数可在对应页面设置。", CloseButtonText = "知道了" }.ShowAsync();
     }
+    public void SwitchTheme() => ToggleTheme(this, new RoutedEventArgs());
+    public event EventHandler<string>? LanguageRequested;
+    private void ChineseClicked(object sender, RoutedEventArgs e) => LanguageRequested?.Invoke(this, "zh");
+    private void EnglishClicked(object sender, RoutedEventArgs e) => LanguageRequested?.Invoke(this, "en");
+    public void SetLanguage(string language)
+    {
+        ChineseOption.IsChecked = language != "en"; EnglishOption.IsChecked = language == "en";
+        Tomography.UI.Controls.InterfaceLanguage.Apply(this, language == "en");
+    }
     public event EventHandler<string>? NavigationRequested;
     public event EventHandler? DirectoryToggleRequested;
     private void CollapseDirectory(object sender, RoutedEventArgs e) => DirectoryToggleRequested?.Invoke(this, EventArgs.Empty);

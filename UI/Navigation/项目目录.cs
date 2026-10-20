@@ -13,7 +13,7 @@ public sealed partial class ProjectDirectoryView : UserControl
     public ProjectDirectoryView()
     {
         InitializeComponent();
-        Loaded += (_, _) => { if (ProjectTree.RootNodes.Count == 0) RefreshTree(); };
+        Loaded += (_, _) => { if (ProjectTree.Items.Count == 0) RefreshTree(); };
         ChooseProjectDirectory.Click += (_, _) => ChooseDirectoryRequested?.Invoke(this, EventArgs.Empty);
     }
     public Task LoadAsync(string path)

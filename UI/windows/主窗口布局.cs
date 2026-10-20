@@ -64,6 +64,7 @@ public sealed partial class AppWindow : Window
         InitializeDevicePage();
         InitializeAi();
         InitializeHome();
+        InitializeInterfacePreferences();
         HomePanel.SetGreeting(user.Username);
         SideRail.SetSection(ViewModel.Section);
         AddReconstructionSettings(Workspace.AlgorithmPanel);
@@ -89,6 +90,7 @@ public sealed partial class AppWindow : Window
         UpdatePresentation();
         QueueWindowFrameUpdate();
         UpdateTitleBar();
+        ApplyInterfaceLanguage();
     }
 
     private void RootSizeChanged(object sender, SizeChangedEventArgs e)
@@ -100,6 +102,7 @@ public sealed partial class AppWindow : Window
     {
         if (e.PropertyName == nameof(WindowStateViewModel.Section)) BuildParameterContents();
         UpdatePresentation();
+        DispatcherQueue.TryEnqueue(ApplyInterfaceLanguage);
     }
 
     private void UpdatePresentation()

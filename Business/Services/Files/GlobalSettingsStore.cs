@@ -19,7 +19,6 @@ public static class GlobalSettingsStore
         if (legacyAiPath is not null && File.Exists(legacyAiPath))
             initial.AI = JsonSerializer.Deserialize<AiApiSettings>(File.ReadAllText(legacyAiPath))
                 ?? throw new InvalidDataException("原 AI 配置为空。");
-        Save(path, initial);
         return initial;
     }
 

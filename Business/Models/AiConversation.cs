@@ -14,23 +14,23 @@ public sealed record AiChatReply(string Reply, string ReasoningSummary);
 
 public sealed class AiApiSettings
 {
-    public bool UseCcSwitchConfig { get; set; } = true;
-    public string CcSwitchConfigPath { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".codex", "config.toml");
+    public bool UseCcSwitchConfig { get; set; }
+    public string CcSwitchConfigPath { get; set; } = "";
     public string BaseUrl { get; set; } = "";
     public string Model { get; set; } = "";
     public string PythonDll { get; set; } = "";
-    public List<string> Models { get; set; } = new() { "gpt-6.1-sol" };
-    public string ApiMode { get; set; } = "responses";
-    public string ReasoningMode { get; set; } = "standard";
-    public string ReasoningEffort { get; set; } = "medium";
-    public string ServiceTier { get; set; } = "default";
-    public string Verbosity { get; set; } = "default";
-    public string Tone { get; set; } = "默认";
-    public string Language { get; set; } = "跟随用户";
-    public string OutputFormat { get; set; } = "text";
+    public List<string> Models { get; set; } = new();
+    public string ApiMode { get; set; } = "";
+    public string ReasoningMode { get; set; } = "";
+    public string ReasoningEffort { get; set; } = "";
+    public string ServiceTier { get; set; } = "";
+    public string Verbosity { get; set; } = "";
+    public string Tone { get; set; } = "";
+    public string Language { get; set; } = "";
+    public string OutputFormat { get; set; } = "";
     public string OutputInstructions { get; set; } = "";
     public string Instructions { get; set; } = "";
     public int MaxOutputTokens { get; set; }
-    public int TimeoutSeconds { get; set; } = 120;
-    public string ApiKeyEnvironmentVariable { get; set; } = "OPENAI_API_KEY";
+    public int TimeoutSeconds { get; set; }
+    public string ApiKeyEnvironmentVariable { get; set; } = "";
 }

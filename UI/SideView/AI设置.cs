@@ -18,9 +18,12 @@ public sealed partial class AiSettingsView : UserControl
         if (AiSettingsContent is null || CategoryPlaceholder is null) return;
         var item = SettingsCategories.SelectedItem as ListViewItem;
         var ai = item?.Tag as string == "AI";
+        var shortcuts = item?.Tag as string == "Shortcuts";
+        ShortcutSettings.Visibility = shortcuts ? Visibility.Visible : Visibility.Collapsed;
         AiSettingsContent.Visibility = ai ? Visibility.Visible : Visibility.Collapsed;
-        CategoryPlaceholder.Visibility = item is not null && !ai ? Visibility.Visible : Visibility.Collapsed;
+        CategoryPlaceholder.Visibility = item is not null && !ai && !shortcuts ? Visibility.Visible : Visibility.Collapsed;
         CategoryTitle.Text = item?.Content?.ToString() ?? "";
+        DispatcherQueue.TryEnqueue(() => SetLanguage(_english));
     }
     private void SettingsSearchChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
@@ -32,6 +35,16 @@ public sealed partial class AiSettingsView : UserControl
             item.Visibility = visible.Contains(item) ? Visibility.Visible : Visibility.Collapsed;
         if (!visible.Contains(SettingsCategories.SelectedItem)) SettingsCategories.SelectedItem = visible.FirstOrDefault();
         SettingsSearchEmpty.Visibility = visible.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
+    private bool _english;
+    public ShortcutSettingsView Shortcuts => ShortcutSettings;
+    public void SetLanguage(bool english)
+    {
+        _english = english;
+        Tomography.UI.Controls.InterfaceLanguage.Apply(this, english);
+        foreach (var item in SettingsCategories.Items.OfType<ListViewItem>())
+            if (item.Content is string text) item.Content = Tomography.UI.Controls.InterfaceLanguage.Text(text, english);
+        ShortcutSettings.SetLanguage(english);
     }
     public string Key => ApiKey.Password.Trim();
     public void LoadSettings(AiApiSettings settings, string key)
@@ -49,15 +62,17 @@ public sealed partial class AiSettingsView : UserControl
         SelectValue(Verbosity, settings.Verbosity); SelectValue(OutputFormat, settings.OutputFormat);
         Tone.Text = settings.Tone ?? "默认"; ResponseLanguage.Text = settings.Language ?? "跟随用户";
         Instructions.Text = settings.Instructions ?? ""; OutputInstructions.Text = settings.OutputInstructions ?? "";
-        MaxOutputTokens.Value = settings.MaxOutputTokens; TimeoutSeconds.Value = settings.TimeoutSeconds;
+        MaxOutputTokens.Value = settings.MaxOutputTokens == 0 ? double.NaN : settings.MaxOutputTokens; TimeoutSeconds.Value = settings.TimeoutSeconds == 0 ? double.NaN : settings.TimeoutSeconds;
     }
-    private static string Value(ComboBox control) => (string)((ComboBoxItem)control.SelectedItem).Tag;
+    private static string Value(ComboBox control) => (control.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
     private static void SelectValue(ComboBox control, string value)
-    { control.SelectedItem = control.Items.OfType<ComboBoxItem>().FirstOrDefault(item => (string)item.Tag == value) ?? control.Items[0]; }
+    { control.SelectedItem = control.Items.OfType<ComboBoxItem>().FirstOrDefault(item => (string)item.Tag == value) ; }
     public AiApiSettings ReadSettings()
     {
-        if (!double.IsFinite(MaxOutputTokens.Value) || MaxOutputTokens.Value != Math.Truncate(MaxOutputTokens.Value) || MaxOutputTokens.Value < 0 || MaxOutputTokens.Value > int.MaxValue ||
-            !double.IsFinite(TimeoutSeconds.Value) || TimeoutSeconds.Value != Math.Truncate(TimeoutSeconds.Value) || TimeoutSeconds.Value is < 1 or > 3600)
+        var tokens = double.IsNaN(MaxOutputTokens.Value) ? 0 : MaxOutputTokens.Value;
+        var timeout = double.IsNaN(TimeoutSeconds.Value) ? 120 : TimeoutSeconds.Value;
+        if (!double.IsFinite(tokens) || tokens != Math.Truncate(tokens) || tokens < 0 || tokens > int.MaxValue ||
+            !double.IsFinite(timeout) || timeout != Math.Truncate(timeout) || timeout is < 1 or > 3600)
             throw new ArgumentException("Token 上限和超时必须为允许范围内的整数。");
         if (UseCcSwitch.IsOn)
         {
@@ -70,11 +85,11 @@ public sealed partial class AiSettingsView : UserControl
             settings.PythonDll = _loadedSettings.PythonDll;
             settings.Instructions = Instructions.Text;
             settings.OutputInstructions = OutputInstructions.Text;
-            settings.OutputFormat = Value(OutputFormat);
+            settings.OutputFormat = string.IsNullOrEmpty(Value(OutputFormat)) ? "text" : Value(OutputFormat);
             settings.Tone = Tone.Text.Trim();
             settings.Language = ResponseLanguage.Text.Trim();
-            settings.MaxOutputTokens = (int)MaxOutputTokens.Value;
-            settings.TimeoutSeconds = (int)TimeoutSeconds.Value;
+            settings.MaxOutputTokens = (int)tokens;
+            settings.TimeoutSeconds = (int)timeout;
             return settings;
         }
         if (!Uri.TryCreate(BaseUrl.Text.Trim(), UriKind.Absolute, out var uri) ||
@@ -92,10 +107,10 @@ public sealed partial class AiSettingsView : UserControl
             UseCcSwitchConfig = false, CcSwitchConfigPath = CcSwitchPath.Text.Trim(),
             BaseUrl = BaseUrl.Text.Trim().TrimEnd('/'), Model = Model.Text.Trim(), PythonDll = _loadedSettings.PythonDll,
             Models = Models.Text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(value => value.Trim()).Where(value => value.Length > 0).Append(Model.Text.Trim()).Distinct().ToList(),
-            ApiMode = Value(ApiMode), ReasoningMode = Value(ReasoningMode), ReasoningEffort = Value(ReasoningEffort),
-            ServiceTier = Value(ServiceTier), Verbosity = Value(Verbosity), OutputFormat = Value(OutputFormat),
+            ApiMode = string.IsNullOrEmpty(Value(ApiMode)) ? "responses" : Value(ApiMode), ReasoningMode = string.IsNullOrEmpty(Value(ReasoningMode)) ? "standard" : Value(ReasoningMode), ReasoningEffort = string.IsNullOrEmpty(Value(ReasoningEffort)) ? "default" : Value(ReasoningEffort),
+            ServiceTier = string.IsNullOrEmpty(Value(ServiceTier)) ? "default" : Value(ServiceTier), Verbosity = string.IsNullOrEmpty(Value(Verbosity)) ? "default" : Value(Verbosity), OutputFormat = string.IsNullOrEmpty(Value(OutputFormat)) ? "text" : Value(OutputFormat),
             Tone = Tone.Text.Trim(), Language = ResponseLanguage.Text.Trim(), ApiKeyEnvironmentVariable = KeyEnvironment.Text.Trim(), Instructions = Instructions.Text,
-            OutputInstructions = OutputInstructions.Text, MaxOutputTokens = (int)MaxOutputTokens.Value, TimeoutSeconds = (int)TimeoutSeconds.Value
+            OutputInstructions = OutputInstructions.Text, MaxOutputTokens = (int)tokens, TimeoutSeconds = (int)timeout
         };
     }
     public void SetStatus(string text) => SaveStatus.Text = text;

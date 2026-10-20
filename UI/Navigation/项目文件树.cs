@@ -1,56 +1,57 @@
 using System.IO;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Tomography.UI.Navigation;
 
 public sealed partial class ProjectDirectoryView
 {
     private bool _projectOpened;
-    private int _searchVersion;
-    private readonly Dictionary<TreeViewNode, string> _folders = new();
-    public void RefreshTree()
+    private int _searchVersion, _treeVersion;
+    private ProjectEntry? _root;
+    private readonly HashSet<ProjectEntry> _loading = new();
+    public async void RefreshTree()
     {
         if (!_projectOpened) return;
-        ProjectTree.RootNodes.Clear(); _folders.Clear(); TreeStatus.Text = "";
-        var root = new TreeViewNode { Content = Row(DirectoryPath, true, 0), IsExpanded = true };
-        _folders[root] = DirectoryPath;
-        Populate(root);
-        ProjectTree.RootNodes.Add(root);
-    }
-    private void FolderExpanding(TreeView sender, TreeViewExpandingEventArgs args)
-    {
-        if (args.Node.HasUnrealizedChildren) Populate(args.Node);
-    }
-    private void Populate(TreeViewNode node)
-    {
-        node.Children.Clear(); node.HasUnrealizedChildren = false;
-        if (!_folders.TryGetValue(node, out var path)) return;
+        var version = ++_treeVersion;
+        var path = DirectoryPath;
+        TreeStatus.Text = "";
         try
         {
-            foreach (var entry in new DirectoryInfo(path).EnumerateFileSystemInfos().OrderByDescending(e => e is DirectoryInfo).ThenBy(e => e.Name, StringComparer.OrdinalIgnoreCase))
-            {
-                var folder = entry is DirectoryInfo;
-                var child = new TreeViewNode { Content = Row(entry.FullName, folder, Depth(node) + 1), HasUnrealizedChildren = folder && (entry.Attributes & FileAttributes.ReparsePoint) == 0 };
-                if (folder) _folders[child] = entry.FullName;
-                node.Children.Add(child);
-            }
+            var root = new ProjectEntry(path, true, false, 0) { Expanded = true };
+            root.Children = await ReadChildrenAsync(root);
+            if (version != _treeVersion || path != DirectoryPath) return;
+            _root = root; RenderTree();
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { TreeStatus.Text = "部分目录无法读取，请检查访问权限。"; }
     }
-    private static int Depth(TreeViewNode node) => node.Parent is null ? 0 : Depth(node.Parent) + 1;
-    private static FrameworkElement Row(string path, bool folder, int depth, string? label = null)
+    private static Task<List<ProjectEntry>> ReadChildrenAsync(ProjectEntry folder) => Task.Run(() =>
+        new DirectoryInfo(folder.Path).EnumerateFileSystemInfos()
+            .Select(e => new ProjectEntry(e.FullName, e is DirectoryInfo, (e.Attributes & FileAttributes.ReparsePoint) != 0, folder.Depth + 1))
+            .OrderByDescending(e => e.Folder).ThenBy(e => e.Name, StringComparer.OrdinalIgnoreCase).ToList());
+    private void RenderTree()
     {
-        var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new Thickness(depth * 12, 0, 0, 0) };
-        row.Children.Add(new FontIcon { Glyph = folder ? "\uE8B7" : "\uE8A5", FontSize = 20, VerticalAlignment = VerticalAlignment.Center });
-        row.Children.Add(new TextBlock { Text = label ?? Path.GetFileName(path), FontSize = 16, VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis });
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(row, label ?? Path.GetFileName(path));
-        return row;
+        if (_root is null) return;
+        var visible = new List<ProjectEntry>();
+        void Append(ProjectEntry node)
+        {
+            visible.Add(node);
+            if (node.Expanded && node.Children is not null) foreach (var child in node.Children) Append(child);
+        }
+        Append(_root); ProjectTree.ItemsSource = visible;
     }
-    private void ProjectItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
+    private async void ProjectItemClicked(object sender, ItemClickEventArgs args)
     {
-        if (args.InvokedItem is TreeViewNode node && _folders.ContainsKey(node)) node.IsExpanded = !node.IsExpanded;
+        if (args.ClickedItem is not ProjectEntry entry || !entry.Folder || entry.Link || ProjectSearch.Text.Trim().Length > 0 || !_loading.Add(entry)) return;
+        var version = _treeVersion;
+        try
+        {
+            if (entry.Children is null) entry.Children = await ReadChildrenAsync(entry);
+            if (version != _treeVersion) return;
+            entry.Expanded = !entry.Expanded; RenderTree();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { TreeStatus.Text = "目录无法读取，请检查访问权限。"; }
+        finally { _loading.Remove(entry); }
     }
     private async void ProjectSearchChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
@@ -62,12 +63,25 @@ public sealed partial class ProjectDirectoryView
         try
         {
             var paths = await Task.Run(() => Directory.EnumerateFileSystemEntries(root, "*", new EnumerationOptions { RecurseSubdirectories = true, IgnoreInaccessible = true, AttributesToSkip = FileAttributes.ReparsePoint })
-                .Where(p => Path.GetFileName(p).Contains(query, StringComparison.OrdinalIgnoreCase)).Take(100).ToArray());
+                .Where(p => System.IO.Path.GetFileName(p).Contains(query, StringComparison.OrdinalIgnoreCase)).Take(100).ToArray());
             if (version != _searchVersion || root != DirectoryPath) return;
-            ProjectTree.RootNodes.Clear(); _folders.Clear(); TreeStatus.Text = "";
-            foreach (var path in paths) ProjectTree.RootNodes.Add(new TreeViewNode { Content = Row(path, Directory.Exists(path), 0, Path.GetRelativePath(root, path)) });
+            TreeStatus.Text = "";
+            ProjectTree.ItemsSource = paths.Select(p => new ProjectEntry(p, Directory.Exists(p), false, 0, System.IO.Path.GetRelativePath(root, p))).ToArray();
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { if (version == _searchVersion) TreeStatus.Text = "搜索失败，请检查目录访问权限。"; }
     }
+}
 
+public sealed class ProjectEntry(string path, bool folder, bool link, int depth, string? label = null)
+{
+    public string Path { get; } = path;
+    public string Name => label ?? System.IO.Path.GetFileName(Path.TrimEnd(System.IO.Path.DirectorySeparatorChar));
+    public string Glyph => Folder ? "\uE8B7" : "\uE8A5";
+    public Thickness Indent => new(Depth * 12, 0, 0, 0);
+    public bool Folder { get; } = folder;
+    public bool Link { get; } = link;
+    public int Depth { get; } = depth;
+    public bool Expanded { get; set; }
+    public List<ProjectEntry>? Children { get; set; }
+    public override string ToString() => Name;
 }
