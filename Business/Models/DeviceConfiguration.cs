@@ -2,6 +2,9 @@ namespace Tomography.Business.Models;
 
 public sealed class DeviceConfiguration
 {
+    public int ProtocolVersion { get; set; }
+    public string LocalHost { get; set; } = "0.0.0.0";
+    public int LocalPort { get; set; } = 1347;
     public int Source { get; set; }
     public int Connection { get; set; }
     public int Protocol { get; set; }

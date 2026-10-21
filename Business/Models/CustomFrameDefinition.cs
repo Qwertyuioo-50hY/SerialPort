@@ -3,6 +3,8 @@ namespace Tomography.Business.Models;
 public sealed class CustomFrameDefinition
 {
     public string HeaderHex { get; set; } = "";
+    public string FooterHex { get; set; } = "";
+    public int ChecksumStart { get; set; }
     public int Length { get; set; }
     public int DataOffset { get; set; }
     public string FieldType { get; set; } = "UInt32";

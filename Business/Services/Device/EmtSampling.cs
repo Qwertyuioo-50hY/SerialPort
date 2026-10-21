@@ -1,56 +1,71 @@
+using System.Globalization;
+using System.Text;
 using Tomography.Business.Interfaces;
 using Tomography.Business.Models;
 
 namespace Tomography.Business.Services;
 
-/// <summary>一次采样请求：积累完整帧后解码，不将串口回调视为帧边界。</summary>
+/// <summary>USART 文本采样：匹配 START，接收完整行，等待 END 后才允许下一次请求。</summary>
 public static class EmtSampling
 {
-    // 调用方必须串行采样；接收失败后应断开重连，避免迟到帧影响下一次请求。
-    public static async Task<OperationResult> ExecuteAsync(IDeviceChannel serial, int frequencyKhz, int coilCount,
+    public static async Task<OperationResult> ExecuteAsync(IDeviceChannel channel, int frequencyKhz, int coilCount,
         CancellationToken cancellationToken = default)
     {
         var command = EmtSampleCommand.Build(frequencyKhz, coilCount);
-        var frame = new byte[EmtSampleDecoder.FrameSize];
-        var count = 0;
+        var completion = new TaskCompletionSource<OperationResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var pending = new StringBuilder();
+        var values = new List<uint>();
+        var started = false;
+        var rows = 0;
         var sync = new object();
-        var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         void Receive(object? sender, LogEntry entry)
         {
             lock (sync)
             {
                 if (completion.Task.IsCompleted) return;
-                if (entry.RawData.Length > frame.Length - count)
+                foreach (var b in entry.RawData)
                 {
-                    completion.TrySetResult(false);
-                    return;
+                    if (b != 10)
+                    {
+                        if (pending.Length >= 65536) { completion.TrySetResult(new() { Message = "EMT 回复行过长。" }); return; }
+                        pending.Append((char)b); continue;
+                    }
+                    var line = pending.ToString().TrimEnd('\r'); pending.Clear();
+                    if (line.StartsWith("ERROR,", StringComparison.Ordinal)) { completion.TrySetResult(new() { Message = "下位机回复：" + line }); return; }
+                    if (!started)
+                    {
+                        if (line == "READY" || line.Length == 0) continue;
+                        if (line != $"START,{frequencyKhz},{coilCount}") { completion.TrySetResult(new() { Message = "EMT START 回复与发送参数不匹配。" }); return; }
+                        started = true; continue;
+                    }
+                    if (line == "END")
+                    {
+                        completion.TrySetResult(rows == coilCount
+                            ? new() { IsSuccess = true, Data = values.ToArray(), Message = "EMT 握手成功，采样结束。" }
+                            : new() { Message = "EMT 返回的数据行数不匹配。" });
+                        return;
+                    }
+                    var fields = line.Split(',');
+                    if (fields.Length != coilCount || rows >= coilCount) { completion.TrySetResult(new() { Message = "EMT 数据列数或行数不匹配。" }); return; }
+                    foreach (var field in fields)
+                    {
+                        if (!uint.TryParse(field, NumberStyles.None, CultureInfo.InvariantCulture, out var value))
+                        { completion.TrySetResult(new() { Message = "EMT 数据必须是无符号十进制整数。" }); return; }
+                        values.Add(value);
+                    }
+                    rows++;
                 }
-                entry.RawData.CopyTo(frame, count);
-                count += entry.RawData.Length;
-                if (count == frame.Length) completion.TrySetResult(true);
             }
         }
-        serial.DataReceived += Receive;
+        channel.DataReceived += Receive;
         try
         {
-            var sent = await Task.Run(() => serial.SendText(command, "ASCII"), cancellationToken).ConfigureAwait(false);
+            var sent = await Task.Run(() => channel.SendText(command, "ASCII"), cancellationToken).ConfigureAwait(false);
             if (!sent.IsSuccess) return sent;
-            var complete = await completion.Task.WaitAsync(TimeSpan.FromSeconds(3), cancellationToken).ConfigureAwait(false);
-            return complete
-                ? new OperationResult { IsSuccess = true, Message = "已采集 64 个通道。", Data = EmtSampleDecoder.Decode(frame) }
-                : new OperationResult { Message = "采样回复超过 256 字节。" };
+            return await completion.Task.WaitAsync(TimeSpan.FromSeconds(30), cancellationToken).ConfigureAwait(false);
         }
-        catch (TimeoutException ex)
-        {
-            return new OperationResult { Message = $"采样超时，已接收 {count}/256 字节。", Exception = ex };
-        }
-        catch (OperationCanceledException ex)
-        {
-            return new OperationResult { Message = "采样已取消。", Exception = ex };
-        }
-        finally
-        {
-            serial.DataReceived -= Receive;
-        }
+        catch (TimeoutException ex) { return new() { Message = "EMT 回复超时，未收到完整 START / 数据 / END。", Exception = ex }; }
+        catch (OperationCanceledException ex) { return new() { Message = "EMT 操作已取消。", Exception = ex }; }
+        finally { channel.DataReceived -= Receive; }
     }
 }

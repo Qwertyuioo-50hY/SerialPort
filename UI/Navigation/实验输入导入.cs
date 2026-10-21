@@ -34,19 +34,19 @@ public sealed partial class AppWindow
             }
             await ValidateAsync(path);
             var asset = existingPath is null ? await Task.Run(() => _assets.Import(path)) : new ImportedAsset(Path.GetFileName(path), path);
-            var description = await ValidateAsync(asset.Path);
+            await ValidateAsync(asset.Path);
             _reconstruction.UseAsset(asset, role);
             _projectSettings.ExperimentInputs[role] = asset.Path;
             DirectoryPanel.SetAsset(role, asset);
-            if (role == "灵敏度矩阵") DeviceView.SetMatrix($"{asset.Name} · {description}");
-            else if (role == "节点坐标") DeviceView.SetCoordinates($"{asset.Name} · {description}");
-            else if (role == "物场/Demo数据") { DeviceView.SetSimulation($"{asset.Name} · {description}"); Workspace.ShowMeasurements(_reconstruction.Measurements!); }
-            else { Workspace.ShowReference(_reconstruction.Reference!); DeviceView.SetParameterStatus("空场参考已校验；参数尚未由下位机采样应答确认。"); }
+            if (role == "灵敏度矩阵") { DeviceView.SetMatrix(asset.Name); if (existingPath is null) DeviceView.ShowImportResult(true); }
+            else if (role == "物场/Demo数据") { Workspace.ShowMeasurements(_reconstruction.Measurements!); }
+            else if (role == "空场参考") { Workspace.ShowReference(_reconstruction.Reference!); DeviceView.SetParameterStatus("空场参考已校验；参数尚未由下位机采样应答确认。"); }
             UpdateDeviceInputs();
             await SaveDeviceSettingsAsync();
         }
         catch (Exception ex)
         {
+            if (role == "灵敏度矩阵") DeviceView.ShowImportResult(false);
             if (!_connectionLifetime.IsCancellationRequested) ShowDeviceError($"导入失败，原有效输入保留：{ex.Message}");
         }
         finally { _fileOperation = false; }

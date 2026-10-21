@@ -5,8 +5,8 @@ namespace Tomography.UI.SideView;
 
 public sealed class DeviceParametersView : UserControl
 {
-    private readonly NumberBox _frequency = new() { Value = 100, Minimum = 1, Maximum = 999 };
-    private readonly NumberBox _coils = new() { Value = 8, Minimum = 1, Maximum = 99 };
+    private readonly NumberBox _frequency = new() { Value = 100, Minimum = 1, Maximum = 159 };
+    private readonly NumberBox _coils = new() { Value = 8, Minimum = 1, Maximum = 15 };
     public event EventHandler? Changed;
     public void Restore(double frequency, double coils) { _frequency.Value = frequency; _coils.Value = coils; }
     public double FrequencyKhz => _frequency.Value;
