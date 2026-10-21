@@ -14,8 +14,6 @@ public sealed record AiChatReply(string Reply, string ReasoningSummary);
 
 public sealed class AiApiSettings
 {
-    public bool UseCcSwitchConfig { get; set; }
-    public string CcSwitchConfigPath { get; set; } = "";
     public string BaseUrl { get; set; } = "";
     public string Model { get; set; } = "";
     public string PythonDll { get; set; } = "";

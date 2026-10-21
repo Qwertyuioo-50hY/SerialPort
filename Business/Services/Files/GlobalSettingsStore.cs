@@ -25,7 +25,9 @@ public static class GlobalSettingsStore
     public static void Save(string path, GlobalSettings settings)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
-        File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true }));
+        var document = JsonSerializer.SerializeToNode(settings)!.AsObject();
+        document.Remove("AI"); // AI settings are stored only in the project config.toml.
+        File.WriteAllText(path + ".tmp", document.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
         File.Move(path + ".tmp", path, true);
     }
 }

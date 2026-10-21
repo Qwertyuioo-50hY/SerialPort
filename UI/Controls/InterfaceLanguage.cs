@@ -27,8 +27,6 @@ public static class InterfaceLanguage
         ("账号", "Account"), ("语言", "Language"), ("深色模式", "Dark mode"),
         ("搜索设置", "Search settings"), ("通用", "General"), ("外观", "Appearance"),
         ("快捷键", "Keyboard shortcuts"), ("语言和地区", "Language and region"), ("暂无可配置项", "No settings available"),
-        ("未找到设置分类", "No settings found"), ("由 CC Switch 管理模型配置", "Use CC Switch configuration"),
-        ("CC Switch / Codex config.toml 路径", "CC Switch / Codex config.toml path"),
         ("启用后，每次发送读取 TOML 中的模型、地址、协议及认证参数；下方对应参数仅在手动配置时生效。", "When enabled, requests use the model, URL, protocol and credentials from TOML."),
         ("API 地址（Base URL，Anthropic 可填主机根地址）", "API base URL"),
         ("API Key 环境变量（未填写密钥时使用）", "API key environment variable"),

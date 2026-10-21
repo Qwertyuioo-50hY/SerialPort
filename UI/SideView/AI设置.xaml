@@ -3,16 +3,14 @@
  <UserControl.Resources><x:Double x:Key="ControlContentThemeFontSize">16</x:Double><x:Double x:Key="TextControlThemeFontSize">16</x:Double><Style TargetType="TextBlock"><Setter Property="FontSize" Value="16"/><Setter Property="FontFamily" Value="Segoe UI Variable Text"/></Style></UserControl.Resources>
  <Border Style="{StaticResource WorkspaceCardStyle}">
   <Grid ColumnSpacing="24" Padding="16">
-   <Grid.ColumnDefinitions><ColumnDefinition Width="176"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+   <Grid.ColumnDefinitions><ColumnDefinition Width="240"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
    <StackPanel Spacing="16">
     <AutoSuggestBox x:Name="SettingsSearch" PlaceholderText="搜索设置" QueryIcon="Find" CornerRadius="16" TextChanged="SettingsSearchChanged" AutomationProperties.Name="搜索设置" AutomationProperties.AutomationId="SettingsSearch"/>
     <ListView x:Name="SettingsCategories" SelectionMode="Single" SelectionChanged="SettingsCategoryChanged" AutomationProperties.Name="设置分类" AutomationProperties.AutomationId="SettingsCategories">
      <ListViewItem x:Name="ProfileCategory" Content="个人资料" Tag="Profile" AutomationProperties.AutomationId="SettingsProfile"/>
-     <ListViewItem Content="通用" Tag="General" AutomationProperties.AutomationId="SettingsGeneral"/>
      <ListViewItem Content="外观" Tag="Appearance" AutomationProperties.AutomationId="SettingsAppearance"/>
      <ListViewItem Content="AI" Tag="AI" AutomationProperties.AutomationId="SettingsAI"/>
      <ListViewItem Content="快捷键" Tag="Shortcuts" AutomationProperties.AutomationId="SettingsShortcuts"/>
-     <ListViewItem Content="语言和地区" Tag="LanguageRegion" AutomationProperties.AutomationId="SettingsLanguageRegion"/>
     </ListView>
     <TextBlock x:Name="SettingsSearchEmpty" Text="未找到设置分类" Visibility="Collapsed" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
    </StackPanel>
@@ -24,9 +22,6 @@
   <local:ShortcutSettingsView x:Name="ShortcutSettings" Grid.Column="1" Visibility="Collapsed"/>
   <ScrollViewer x:Name="AiSettingsContent" Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
    <StackPanel Spacing="20" MaxWidth="640" HorizontalAlignment="Stretch" Margin="12,24">
-    <ToggleSwitch x:Name="UseCcSwitch" Header="由 CC Switch 管理模型配置" Toggled="CcSwitchToggled" AutomationProperties.AutomationId="AiUseCcSwitch"/>
-    <TextBox x:Name="CcSwitchPath" Header="CC Switch / Codex config.toml 路径" CornerRadius="12" AutomationProperties.AutomationId="AiCcSwitchPath"/>
-    <TextBlock Text="启用后，每次发送读取 TOML 中的模型、地址、协议及认证参数；下方对应参数仅在手动配置时生效。" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
     <TextBox x:Name="BaseUrl" Header="API 地址（Base URL，Anthropic 可填主机根地址）" CornerRadius="12" AutomationProperties.AutomationId="AiBaseUrl"/>
     <TextBox x:Name="KeyEnvironment" Header="API Key 环境变量（未填写密钥时使用）" CornerRadius="12" AutomationProperties.AutomationId="AiKeyEnvironment"/>
     <PasswordBox x:Name="ApiKey" Header="API Key" CornerRadius="12" AutomationProperties.AutomationId="AiApiKey"/>

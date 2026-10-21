@@ -7,3 +7,6 @@
 **/appsettings.json
 /artifacts/
 /dist/
+
+/config.toml
+/config.toml.tmp

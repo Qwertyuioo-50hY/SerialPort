@@ -49,7 +49,7 @@ public sealed class ShortcutSettingsView : UserControl
         AutomationProperties.SetAutomationId(save, "SaveShortcuts"); AutomationProperties.SetAutomationId(_status, "ShortcutStatus");
         save.Click += (_, _) => Save(); _panel.Children.Add(save); _panel.Children.Add(_status);
         _search.TextChanged += (_, _) => Filter();
-        Content = new ScrollViewer { Content = _panel, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled };
+        Content = new ScrollViewer { Content = _panel, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, VerticalScrollBarVisibility = ScrollBarVisibility.Hidden };
     }
     public void LoadBindings(IReadOnlyDictionary<string, string> values)
     { foreach (var pair in _fields) pair.Value.Text = values.GetValueOrDefault(pair.Key, ""); }

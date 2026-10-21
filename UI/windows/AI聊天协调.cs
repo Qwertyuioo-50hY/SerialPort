@@ -27,19 +27,21 @@ public sealed partial class AppWindow
         {
             _globalSettings = GlobalSettingsStore.Load(AiSettingsPath, Path.Combine(Path.GetDirectoryName(AiSettingsPath)!, "ai-settings.json"));
             _aiSettings = _globalSettings.AI;
+            if (File.Exists(AiTomlStore.ConfigPath)) (_aiSettings, _aiKey) = AiTomlStore.Load(AiTomlStore.ConfigPath);
             Root.RequestedTheme = Enum.Parse<Microsoft.UI.Xaml.ElementTheme>(_globalSettings.Theme);
             SideRail.RestoreTheme(Root.RequestedTheme);
             if (string.IsNullOrWhiteSpace(_aiSettings.PythonDll) || !File.Exists(_aiSettings.PythonDll))
                 _aiSettings.PythonDll = PythonRuntimeHost.FindPythonDll();
             try
             {
-                if (!string.IsNullOrWhiteSpace(_aiSettings.BaseUrl))
+                if (!File.Exists(AiTomlStore.ConfigPath) && !string.IsNullOrWhiteSpace(_aiSettings.BaseUrl))
                 {
                     var credential = new PasswordVault().Retrieve("Tomography.AI", _aiSettings.BaseUrl);
                     credential.RetrievePassword(); _aiKey = credential.Password;
                 }
             }
             catch (System.Runtime.InteropServices.COMException ex) when (ex.HResult == unchecked((int)0x80070490)) { }
+            if (!File.Exists(AiTomlStore.ConfigPath)) AiTomlStore.Save(AiTomlStore.ConfigPath, _aiSettings, _aiKey);
         }
         catch (Exception) { AiSettingsPanel.SetStatus("配置读取失败，请重新填写并保存。"); }
         AiSettingsPanel.LoadSettings(_aiSettings, _aiKey);
@@ -54,13 +56,12 @@ public sealed partial class AppWindow
     }
     private void ChangeComposerConfiguration(string model, string effort)
     {
-        if (_aiSettings.UseCcSwitchConfig) { AiChatView.SetStatus("模型与思考强度由 CC Switch 的 config.toml 管理。"); return; }
         if (_aiBusy) { AiChatView.SetStatus("请等待当前回复完成后切换模型配置。"); return; }
         var oldModel = _aiSettings.Model; var oldEffort = _aiSettings.ReasoningEffort;
         try
         {
             _aiSettings.Model = model; _aiSettings.ReasoningEffort = effort;
-            SaveGlobalSettings();
+            AiTomlStore.Save(AiTomlStore.ConfigPath, _aiSettings, _aiKey);
             AiSettingsPanel.LoadSettings(_aiSettings, _aiKey); AiChatView.SetConfiguration(_aiSettings);
         }
         catch (Exception)
@@ -99,7 +100,6 @@ public sealed partial class AppWindow
     }
     private void SaveGlobalSettings()
     {
-        _globalSettings.AI = _aiSettings;
         GlobalSettingsStore.Save(AiSettingsPath, _globalSettings);
     }
     private void SaveAiSettings()
@@ -108,15 +108,7 @@ public sealed partial class AppWindow
         try
         {
             var settings = AiSettingsPanel.ReadSettings();
-            if (!settings.UseCcSwitchConfig && !string.IsNullOrWhiteSpace(AiSettingsPanel.Key)) new PasswordVault().Add(new PasswordCredential("Tomography.AI", settings.BaseUrl, AiSettingsPanel.Key));
-            if (!settings.UseCcSwitchConfig && string.IsNullOrWhiteSpace(AiSettingsPanel.Key))
-            {
-                var vault = new PasswordVault();
-                try { vault.Remove(vault.Retrieve("Tomography.AI", settings.BaseUrl)); }
-                catch (System.Runtime.InteropServices.COMException ex) when (ex.HResult == unchecked((int)0x80070490)) { }
-            }
-            _globalSettings.AI = settings;
-            GlobalSettingsStore.Save(AiSettingsPath, _globalSettings);
+            AiTomlStore.Save(AiTomlStore.ConfigPath, settings, AiSettingsPanel.Key);
             _aiSettings = settings; _aiKey = AiSettingsPanel.Key;
             AiChatView.SetConfiguration(settings); AiSettingsPanel.SetStatus("已保存");
         }
@@ -132,7 +124,13 @@ public sealed partial class AppWindow
     {
         if (_aiBusy) return;
         if (!_historyReadable) { AiChatView.SetStatus("项目对话记录读取失败，暂不能保存新消息。"); return; }
-        if (!_aiSettings.UseCcSwitchConfig && (string.IsNullOrWhiteSpace(_aiSettings.Model) || string.IsNullOrWhiteSpace(_aiSettings.BaseUrl)))
+        try
+        {
+            if (File.Exists(AiTomlStore.ConfigPath)) (_aiSettings, _aiKey) = AiTomlStore.Load(AiTomlStore.ConfigPath);
+            if (string.IsNullOrWhiteSpace(_aiSettings.PythonDll) || !File.Exists(_aiSettings.PythonDll)) _aiSettings.PythonDll = PythonRuntimeHost.FindPythonDll();
+        }
+        catch { AiChatView.SetStatus("config.toml 或 Python 运行时读取失败，请检查配置。"); return; }
+        if (string.IsNullOrWhiteSpace(_aiSettings.Model) || string.IsNullOrWhiteSpace(_aiSettings.BaseUrl))
         { AiChatView.SetStatus("请先在设置中配置 API 地址、密钥和模型。"); return; }
         var conversation = _conversation;
         if (conversation is null)
@@ -149,7 +147,7 @@ public sealed partial class AppWindow
         AiChatView.ShowConversation(conversation); AiChatView.ShowPending("", ""); SaveAiHistory();
         try
         {
-            var reply = await _chatService.SendAsync(AiSettingsPath, _aiSettings.PythonDll, _aiKey, conversation.Messages.ToArray(), (kind, delta) =>
+            var reply = await _chatService.SendAsync(AiTomlStore.ConfigPath, _aiSettings.PythonDll, _aiKey, conversation.Messages.ToArray(), (kind, delta) =>
                 DispatcherQueue.TryEnqueue(() =>
                 {
                     if (_aiClosed || _pendingConversation != conversation) return;

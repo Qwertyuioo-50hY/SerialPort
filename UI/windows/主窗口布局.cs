@@ -22,6 +22,9 @@ public sealed partial class AppWindow : Window
     private TextBlock ConnectionStatus = new();
     private bool _loaded;
     private readonly Tomography.UI.Account.BorderlessLoginFrame _frame;
+    private TrayIcon? _tray;
+    private bool _exiting;
+    public void CloseForAccountChange() { _exiting = true; Close(); }
     private WindowId PickerWindowId => AppWindow.Id;
 
     public AppWindow(AuthenticationService authentication)
@@ -46,13 +49,15 @@ public sealed partial class AppWindow : Window
         AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
         ExtendsContentIntoTitleBar = true;
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Collapsed;
-        if (AppWindow.Presenter is OverlappedPresenter presenter) presenter.SetBorderAndTitleBar(false, false);
+        if (AppWindow.Presenter is OverlappedPresenter presenter) { presenter.SetBorderAndTitleBar(false, false); presenter.IsResizable = true; }
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
             var cornerPreference = 2u;
             DwmSetWindowAttribute(hwnd, 33, ref cornerPreference, sizeof(uint));
         }
-        _frame = new Tomography.UI.Account.BorderlessLoginFrame(hwnd);
+        _frame = new Tomography.UI.Account.BorderlessLoginFrame(hwnd, true);
+        _tray = new TrayIcon(hwnd, () => { AppWindow.Show(); if (AppWindow.Presenter is OverlappedPresenter p && p.State == OverlappedPresenterState.Minimized) p.Restore(); Activate(); }, () => { _exiting = true; Close(); });
+        AppWindow.Closing += (_, e) => { if (!_exiting) { e.Cancel = true; AppWindow.Hide(); } };
         _titleBarInput = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
         Root.ActualThemeChanged += RootThemeChanged;
         Activated += WindowActivated;
@@ -147,6 +152,7 @@ public sealed partial class AppWindow : Window
     private void WindowClosed(object sender, WindowEventArgs args)
     {
         _loaded = false;
+        _tray?.Dispose();
         _frame.Dispose();
         _acquisitionStop?.Cancel();
         Workspace.ReconstructionRequested -= WorkspaceReconstructionRequested;

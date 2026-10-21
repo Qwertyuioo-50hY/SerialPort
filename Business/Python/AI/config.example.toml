@@ -1,13 +1,14 @@
-# Let CC Switch manage the real config.toml outside this repository.
-# API keys must not be committed; the sample uses an environment variable.
-model_provider = "custom"
-model = "gpt-6.1-sol"
-model_reasoning_effort = "high"
-disable_response_storage = true
-
-[model_providers.custom]
-name = "Software"
-base_url = "https://api.mxwell.ai/v1"
-wire_api = "responses"
-requires_openai_auth = false
-env_key = "SOFTWARE_API_KEY"
+# FieldSync project AI configuration (saved by the AI settings page).
+[AI]
+BaseUrl = ""
+Model = ""
+ApiKey = ""
+ApiKeyEnvironmentVariable = "OPENAI_API_KEY"
+ApiMode = "responses"
+ReasoningMode = "standard"
+ReasoningEffort = "default"
+ServiceTier = "default"
+Verbosity = "default"
+OutputFormat = "text"
+TimeoutSeconds = 120
+MaxOutputTokens = 0

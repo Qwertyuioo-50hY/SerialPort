@@ -6,12 +6,30 @@ namespace Tomography.UI.SideView;
 
 public sealed partial class AiSettingsView : UserControl
 {
+    private bool _loading;
+    private readonly DispatcherTimer _autoSave = new() { Interval = TimeSpan.FromMilliseconds(800) };
     private AiApiSettings _loadedSettings = new();
     public event EventHandler? SaveRequested;
     public AiSettingsView()
     {
         InitializeComponent();
-        SettingsCategories.SelectedIndex = 3;
+        SettingsCategories.SelectedIndex = 0;
+        _autoSave.Tick += (_, _) => { _autoSave.Stop(); try { ReadSettings(); } catch (ArgumentException) { return; } SaveRequested?.Invoke(this, EventArgs.Empty); };
+        foreach (var box in new[] { BaseUrl, KeyEnvironment, Models, Instructions, OutputInstructions }) box.TextChanged += (_, _) => QueueAutoSave();
+        ApiKey.PasswordChanged += (_, _) => QueueAutoSave();
+        foreach (var combo in new ComboBox[] { Model, ApiMode, ReasoningMode, ReasoningEffort, ServiceTier, Verbosity, OutputFormat, Tone, ResponseLanguage })
+        {
+            combo.SelectionChanged += (_, _) => QueueAutoSave();
+            combo.LostFocus += (_, _) => QueueAutoSave();
+        }
+        MaxOutputTokens.ValueChanged += (_, _) => QueueAutoSave();
+        TimeoutSeconds.ValueChanged += (_, _) => QueueAutoSave();
+        Unloaded += (_, _) => _autoSave.Stop();
+    }
+    private void QueueAutoSave()
+    {
+        if (_loading) return;
+        _autoSave.Stop(); _autoSave.Start();
     }
     private void SettingsCategoryChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -59,10 +77,8 @@ public sealed partial class AiSettingsView : UserControl
     public string Key => ApiKey.Password.Trim();
     public void LoadSettings(AiApiSettings settings, string key)
     {
+        _autoSave.Stop(); _loading = true;
         _loadedSettings = settings;
-        CcSwitchPath.Text = settings.CcSwitchConfigPath;
-        UseCcSwitch.IsOn = settings.UseCcSwitchConfig;
-        UpdateProviderControls();
         BaseUrl.Text = settings.BaseUrl ?? "";
         settings.Models ??= new(); KeyEnvironment.Text = settings.ApiKeyEnvironmentVariable ?? ""; ApiKey.Password = key;
         Model.ItemsSource = settings.Models; Model.SelectedItem = settings.Model; Model.Text = settings.Model ?? "";
@@ -73,6 +89,7 @@ public sealed partial class AiSettingsView : UserControl
         Tone.Text = settings.Tone ?? "默认"; ResponseLanguage.Text = settings.Language ?? "跟随用户";
         Instructions.Text = settings.Instructions ?? ""; OutputInstructions.Text = settings.OutputInstructions ?? "";
         MaxOutputTokens.Value = settings.MaxOutputTokens == 0 ? double.NaN : settings.MaxOutputTokens; TimeoutSeconds.Value = settings.TimeoutSeconds == 0 ? double.NaN : settings.TimeoutSeconds;
+        _loading = false;
     }
     private static string Value(ComboBox control) => (control.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
     private static void SelectValue(ComboBox control, string value)
@@ -84,24 +101,6 @@ public sealed partial class AiSettingsView : UserControl
         if (!double.IsFinite(tokens) || tokens != Math.Truncate(tokens) || tokens < 0 || tokens > int.MaxValue ||
             !double.IsFinite(timeout) || timeout != Math.Truncate(timeout) || timeout is < 1 or > 3600)
             throw new ArgumentException("Token 上限和超时必须为允许范围内的整数。");
-        if (UseCcSwitch.IsOn)
-        {
-            if (!System.IO.File.Exists(CcSwitchPath.Text.Trim()) || !CcSwitchPath.Text.Trim().EndsWith(".toml", StringComparison.OrdinalIgnoreCase))
-                throw new ArgumentException("请选择存在的 config.toml 文件。");
-            if (!System.IO.File.Exists(_loadedSettings.PythonDll)) throw new ArgumentException("Python 运行时 DLL 不存在。");
-            var settings = System.Text.Json.JsonSerializer.Deserialize<AiApiSettings>(System.Text.Json.JsonSerializer.Serialize(_loadedSettings))!;
-            settings.UseCcSwitchConfig = true;
-            settings.CcSwitchConfigPath = System.IO.Path.GetFullPath(CcSwitchPath.Text.Trim());
-            settings.PythonDll = _loadedSettings.PythonDll;
-            settings.Instructions = Instructions.Text;
-            settings.OutputInstructions = OutputInstructions.Text;
-            settings.OutputFormat = string.IsNullOrEmpty(Value(OutputFormat)) ? "text" : Value(OutputFormat);
-            settings.Tone = Tone.Text.Trim();
-            settings.Language = ResponseLanguage.Text.Trim();
-            settings.MaxOutputTokens = (int)tokens;
-            settings.TimeoutSeconds = (int)timeout;
-            return settings;
-        }
         if (!Uri.TryCreate(BaseUrl.Text.Trim(), UriKind.Absolute, out var uri) ||
             uri.Scheme is not ("http" or "https") || string.IsNullOrEmpty(uri.Host) ||
             uri.UserInfo.Length > 0 || uri.Query.Length > 0 || uri.Fragment.Length > 0)
@@ -114,7 +113,6 @@ public sealed partial class AiSettingsView : UserControl
             throw new ArgumentException("请填写模型名称，以及 API Key 或密钥环境变量。");
         if (!System.IO.File.Exists(_loadedSettings.PythonDll)) throw new ArgumentException("Python 运行时 DLL 不存在。");
         return new AiApiSettings {
-            UseCcSwitchConfig = false, CcSwitchConfigPath = CcSwitchPath.Text.Trim(),
             BaseUrl = BaseUrl.Text.Trim().TrimEnd('/'), Model = Model.Text.Trim(), PythonDll = _loadedSettings.PythonDll,
             Models = Models.Text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(value => value.Trim()).Where(value => value.Length > 0).Append(Model.Text.Trim()).Distinct().ToList(),
             ApiMode = string.IsNullOrEmpty(Value(ApiMode)) ? "responses" : Value(ApiMode), ReasoningMode = string.IsNullOrEmpty(Value(ReasoningMode)) ? "standard" : Value(ReasoningMode), ReasoningEffort = string.IsNullOrEmpty(Value(ReasoningEffort)) ? "default" : Value(ReasoningEffort),
@@ -124,12 +122,5 @@ public sealed partial class AiSettingsView : UserControl
         };
     }
     public void SetStatus(string text) => SaveStatus.Text = text;
-    private void CcSwitchToggled(object sender, RoutedEventArgs e) => UpdateProviderControls();
-    private void UpdateProviderControls()
-    {
-        if (BaseUrl is null || UseCcSwitch is null) return;
-        foreach (var control in new Control[] { BaseUrl, ApiKey, KeyEnvironment, Model, Models, ApiMode, ReasoningMode, ReasoningEffort, ServiceTier, Verbosity })
-            if (control is not null) control.IsEnabled = !UseCcSwitch.IsOn;
-    }
     private void SaveClicked(object sender, RoutedEventArgs e) => SaveRequested?.Invoke(this, EventArgs.Empty);
 }
