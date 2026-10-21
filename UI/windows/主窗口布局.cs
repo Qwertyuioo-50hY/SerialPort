@@ -154,6 +154,7 @@ public sealed partial class AppWindow : Window
         CloseDevice();
         _serialConnection.Dispose();
         _tcpConnection.Dispose();
+        _networkConnection.Dispose();
         ViewModel.PropertyChanged -= ViewModelPropertyChanged;
         SideRail.ThemeRequested -= SideRailThemeRequested;
         Root.ActualThemeChanged -= RootThemeChanged;

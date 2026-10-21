@@ -23,17 +23,14 @@ public sealed partial class AppWindow
             { ShowDeviceError("采集数量必须为正整数。"); return; }
             _batchFrameTarget = (int)BatchFrameCount.Value;
         }
-        if (_protocolSettings?.IsSimulation == true)
+        if (_protocolSettings?.Protocol == 0) { ShowDeviceError("默认协议仅显示原始接收数据。"); return; }
+        if (_protocolSettings?.Protocol == 2 && ActiveChannel.IsOpen)
         {
-            if (!_projectSettings.ExperimentInputs.TryGetValue("物场/Demo数据", out var input)) { ShowDeviceError("请先导入仿真数据。"); return; }
-            try { _reconstruction.SetMeasurements(ExperimentInputValidator.ReadChannels(input));
-                if (mode == AcquisitionMode.Reference) _reconstruction.CaptureReference();
-                if (mode == AcquisitionMode.Reference) Workspace.ShowReference(_reconstruction.Reference!); else Workspace.ShowMeasurements(_reconstruction.Measurements!); ConnectionStatus.Text = "仿真数据已载入；未操作实物设备"; }
-            catch (Exception ex) { ShowDeviceError(ex.Message); }
-            return;
+            if (_projectSettings.CustomFrame?.ChannelMap.Length != 64) { ShowDeviceError("当前自定义帧仅用于原始数据显示，未定义成像通道。"); return; }
+            BeginStreamAcquisition(mode); return;
         }
-        if (_protocolSettings?.Protocol is 1 or 2 && ActiveChannel.IsOpen) { BeginStreamAcquisition(mode); return; }
         if (!_deviceReady) { ConnectionStatus.Text = "请先连接设备并完成握手"; return; }
+        if (_deviceSettings.CoilCount != 8) { ShowDeviceError("当前成像算法需要 8 线圈、64 通道；其他线圈数量可握手并查看原始数据。"); return; }
         if (mode == AcquisitionMode.Reference) SetRealtimeReconstruction(false);
         _acquiringReference = mode == AcquisitionMode.Reference;
         _sampling = true; _deviceSettings.IsEnabled = false;
@@ -43,8 +40,8 @@ public sealed partial class AppWindow
         var count = 0;
         try
         {
-            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 99))
-                throw new ArgumentException("激励频率必须为 1–999 kHz 的整数，线圈数必须为 1–99 的整数。");
+            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 15))
+                throw new ArgumentException("激励频率必须为 1–999 kHz 的整数，线圈数必须为 1–15 的整数。");
             var result = await _acquisition.RunAsync(ActiveChannel, (int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount,
                 mode, _batchFrameTarget, frame =>
                 {

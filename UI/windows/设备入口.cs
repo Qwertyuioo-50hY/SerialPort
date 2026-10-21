@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Windows.Storage.Pickers;
 using Tomography.Business.Models;
@@ -26,6 +26,21 @@ public sealed partial class AppWindow
         _protocolSettings.RefreshRequested += (_, _) => RefreshDevicePorts();
         _protocolSettings.Changed += DeviceConfigurationChanged; _deviceSettings.Changed += DeviceConfigurationChanged;
         DeviceView.ActionRequested += DeviceActionRequested;
+        DeviceView.FrameEditor.SaveRequested += async (_, definition) =>
+        {
+            if (_connecting || ActiveChannel.IsOpen || _sampling) { DeviceView.FrameEditor.SetStatus("请先断开设备再修改帧配置。"); return; }
+            var previous = _projectSettings.CustomFrame;
+            try
+            {
+                _projectSettings.CustomFrame = definition;
+                var path = ProjectSettingsPath;
+                var saved = await Task.Run(() => _projectConfig.Save(_projectSettings, path));
+                if (!saved.IsSuccess) throw new InvalidOperationException(saved.Message);
+                _reconstruction.InvalidateReference(); DeviceView.FrameEditor.SetStatus("已保存");
+            }
+            catch (Exception ex) { _projectSettings.CustomFrame = previous; DeviceView.FrameEditor.SetStatus(ex.Message); }
+        };
+        _networkConnection.Disconnected += (_, reason) => DispatcherQueue.TryEnqueue(() => { if (!_connectionLifetime.IsCancellationRequested) { CloseDevice(); ShowDeviceError(reason); } });
         SideRail.NavigationRequested += (_, section) => { ViewModel.Section = section; ViewModel.ParametersVisible = false; ToolsPanel.Visibility = Visibility.Visible; };
         SideRail.DirectoryToggleRequested += ToggleProjectNavigation;
         DirectoryPanel.ChooseDirectoryRequested += async (_, _) => await BrowseProjectAsync();
@@ -61,16 +76,17 @@ public sealed partial class AppWindow
             }
             _projectSettings = result.IsSuccess && result.Data is AppSettings settings ? settings : new AppSettings();
             _protocolSettings!.Restore(_projectSettings);
+            DeviceView.FrameEditor.LoadDefinition(_projectSettings.CustomFrame);
             _deviceSettings.Restore(_projectSettings.Device.FrequencyKhz, _projectSettings.Device.CoilCount);
             _referenceConfiguration = ReferenceConfiguration();
             foreach (var input in _projectSettings.ExperimentInputs.ToArray())
-                await ImportExperimentalInputAsync(input.Key, input.Value);
+                if (input.Key is "灵敏度矩阵" or "空场参考") await ImportExperimentalInputAsync(input.Key, input.Value);
             UpdateDeviceInputs();
             if (System.IO.File.Exists(path) && !result.IsSuccess) ShowDeviceError(result.Message);
         }
         finally { _restoringDevice = false; }
     }
-    private string ReferenceConfiguration() => $"{_protocolSettings!.IsSimulation}:{_protocolSettings.Protocol}:{_deviceSettings.FrequencyKhz}:{_deviceSettings.CoilCount}";
+    private string ReferenceConfiguration() => $"{_protocolSettings!.Transport}:{_protocolSettings.Protocol}:{_deviceSettings.FrequencyKhz}:{_deviceSettings.CoilCount}";
     private void DeviceConfigurationChanged(object? sender, EventArgs e)
     {
         if (_restoringDevice) return;
@@ -81,18 +97,17 @@ public sealed partial class AppWindow
     }
     private void UpdateDeviceInputs()
     {
-        var simulation = _protocolSettings!.IsSimulation;
-        DeviceView.SetInputState(simulation, _connecting || ActiveChannel.IsOpen || _sampling);
-        if (!ActiveChannel.IsOpen && !_connecting)
-            DeviceView.SetState(simulation && _projectSettings.ExperimentInputs.ContainsKey("物场/Demo数据") ? "仿真就绪" : simulation ? "仿真数据未就绪：请导入 64 通道数据" : "未连接", false, false);
+        DeviceView.SetProtocol(_protocolSettings!.Protocol);
+        DeviceView.SetInputState(_connecting || ActiveChannel.IsOpen || _sampling);
+        if (!ActiveChannel.IsOpen && !_connecting) DeviceView.SetState("未连接", false, false);
     }
     private async Task SaveDeviceSettingsAsync()
     {
         if (_restoringDevice) return;
         try
         {
-            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 99))
-                throw new ArgumentException("频率需为 1–999 kHz、线圈需为 1–99 的整数。");
+            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 15))
+                throw new ArgumentException("频率需为 1–999 kHz、线圈需为 1–15 的整数。");
             _projectSettings.Device = _protocolSettings!.ReadSettings((int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount);
             _projectSettings.DefaultSerialPortConfig = _protocolSettings.GetSerialConfig();
             var path = ProjectSettingsPath; var result = await Task.Run(() => _projectConfig.Save(_projectSettings, path));
@@ -118,17 +133,6 @@ public sealed partial class AppWindow
             return;
         }
         if (action == "刷新") { RefreshDevicePorts(); return; }
-        if (action is "灵敏度矩阵" or "节点坐标" or "物场/Demo数据" or "空场参考") { await ImportExperimentalInputAsync(action); return; }
-        if (action == "移除矩阵")
-        {
-            if (_sampling || _reconstructing || _fileOperation) { ShowDeviceError("请先结束采集、重建或导入。"); return; }
-            _reconstruction.RemoveSensitivity(); _projectSettings.ExperimentInputs.Remove("灵敏度矩阵");
-            DirectoryPanel.SetAsset("灵敏度矩阵", null); DeviceView.SetMatrix("未导入灵敏度矩阵");
-            await SaveDeviceSettingsAsync(); return;
-        }
-        if (action == "自定义帧") { await EditFrameDefinitionAsync(); return; }
-        var text = action == "诊断" ? string.Join("\n", _deviceDiagnostics) : "自定义帧暂未启用：请提供真实帧样例、帧头、总长度、字段类型、字节序、校验和 64 通道映射。不会执行脚本或发送未知设备指令。";
-        await new ContentDialog { XamlRoot = Root.XamlRoot, RequestedTheme = Root.ActualTheme, Title = action,
-            Content = new ScrollViewer { Content = new TextBlock { Text = string.IsNullOrEmpty(text) ? "暂无原始收发记录" : text, TextWrapping = TextWrapping.Wrap }, MaxHeight = 420 }, CloseButtonText = "关闭" }.ShowAsync();
+        if (action == "灵敏度矩阵") await ImportExperimentalInputAsync(action);
     }
 }

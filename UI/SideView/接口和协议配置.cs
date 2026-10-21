@@ -9,9 +9,12 @@ public sealed partial class ConnectionProtocolView : UserControl
     private ContentControl? _transportParameters;
     public event EventHandler? Changed;
     public event EventHandler? RefreshRequested;
-    public bool IsSimulation => DataSource.SelectedIndex == 1;
-    public bool UsesSerialDevice => !IsSimulation && ConnectionType.SelectedIndex == 0;
-    public bool UsesTcpDevice => !IsSimulation && ConnectionType.SelectedIndex == 1;
+    public int Transport => ConnectionType.SelectedIndex;
+    public string LocalHost => LocalHostField.Text.Trim();
+    public int LocalPort => (int)LocalPortField.Value;
+    public string ReceiveEncoding => (string)EncodingField.SelectedItem;
+    public bool UsesSerialDevice => Transport == 0;
+    public bool UsesTcpDevice => Transport != 0;
     public int Protocol => DataProtocol.SelectedIndex;
     public string Host => TcpHost.Text.Trim();
     public double Port => TcpPort.Value;
@@ -29,7 +32,8 @@ public sealed partial class ConnectionProtocolView : UserControl
     private void RefreshClicked(object sender, RoutedEventArgs e) => RefreshRequested?.Invoke(this, EventArgs.Empty);
     private void UpdateConfiguration()
     {
-        ConnectionTypeOption.Visibility = Show(!IsSimulation);
+        UdpLocalParameters.Visibility = Show(Transport == 1);
+        TcpHost.Header = Transport == 3 ? "监听地址" : "远端地址";
         SerialParameters.Visibility = Show(UsesSerialDevice);
         TcpParameters.Visibility = Show(UsesTcpDevice);
     }
@@ -65,7 +69,9 @@ public sealed partial class ConnectionProtocolView : UserControl
         if (!double.IsFinite(Port) || Port != Math.Truncate(Port) || Port is < 1 or > 65535 ||
             !double.IsFinite(TimeoutSeconds) || TimeoutSeconds != Math.Truncate(TimeoutSeconds) || TimeoutSeconds is < 1 or > 60)
             throw new ArgumentException("TCP 端口需为 1–65535、超时需为 1–60 秒的整数。");
-        return new() { Source = DataSource.SelectedIndex, Connection = ConnectionType.SelectedIndex, Protocol = Protocol,
+        if (Transport == 1 && (!double.IsFinite(LocalPortField.Value) || LocalPortField.Value != Math.Truncate(LocalPortField.Value) || LocalPortField.Value is < 1 or > 65535))
+            throw new ArgumentException("本地端口需为 1–65535 的整数。");
+        return new() { Source = 0, Connection = Transport, Protocol = Protocol, ProtocolVersion = 1, LocalHost = LocalHost, LocalPort = LocalPort,
             Host = Host, Port = (int)Port, TimeoutSeconds = (int)TimeoutSeconds, FrequencyKhz = frequency, CoilCount = coils };
     }
     public void Restore(Tomography.Business.Models.AppSettings settings)
@@ -74,9 +80,9 @@ public sealed partial class ConnectionProtocolView : UserControl
         try
         {
             var d = settings.Device; var serial = settings.DefaultSerialPortConfig;
-            DataSource.SelectedIndex = d.Source is 0 or 1 ? d.Source : 0;
-            ConnectionType.SelectedIndex = d.Connection is 0 or 1 ? d.Connection : 0;
-            DataProtocol.SelectedIndex = d.Protocol is >= 0 and <= 2 ? d.Protocol : 0;
+            ConnectionType.SelectedIndex = d.ProtocolVersion == 0 ? (d.Connection == 1 ? 2 : 0) : Math.Clamp(d.Connection, 0, 3);
+            DataProtocol.SelectedIndex = d.ProtocolVersion == 0 ? (d.Protocol == 2 ? 2 : 0) : Math.Clamp(d.Protocol, 0, 2);
+            LocalHostField.Text = d.LocalHost; LocalPortField.Value = d.LocalPort;
             TcpHost.Text = d.Host; TcpPort.Value = d.Port; TcpTimeout.Value = d.TimeoutSeconds;
             DevicePortField.SelectedItem = serial.PortName;
             BaudRateField.SelectedItem = serial.BaudRate.ToString(); DataBitsField.SelectedItem = serial.DataBits.ToString();
