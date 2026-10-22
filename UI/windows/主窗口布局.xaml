@@ -7,7 +7,7 @@
     xmlns:bottom="using:Tomography.UI.Bottom"
     xmlns:home="using:Tomography.UI.Home"
     xmlns:workspace="using:Tomography.UI.workspace" Title="FieldSync">
-    <Grid x:Name="Root" Background="{ThemeResource DeviceCanvasBrush}" RequestedTheme="Light" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
+    <Grid KeyboardAcceleratorPlacementMode="Hidden" x:Name="Root" Background="{ThemeResource DeviceCanvasBrush}" RequestedTheme="Light" Loaded="RootLoaded" SizeChanged="RootSizeChanged">
         <Grid.Resources>
             <Style x:Key="DividerStyle" TargetType="Thumb">
                 <Setter Property="UseSystemFocusVisuals" Value="False" />

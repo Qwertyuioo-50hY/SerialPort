@@ -6,6 +6,12 @@ namespace Tomography.UI.SideView;
 
 public sealed partial class IconRailView : UserControl
 {
+    public event EventHandler<string>? WindowCommandRequested;
+    private void WindowMenuClicked(object sender, RoutedEventArgs e)
+    {
+        WindowMenuFlyout.Hide();
+        WindowCommandRequested?.Invoke(this, (string)((Button)sender).Tag);
+    }
     public event EventHandler<bool>? AccountActionRequested;
     public void SetAccount(string username)
     {

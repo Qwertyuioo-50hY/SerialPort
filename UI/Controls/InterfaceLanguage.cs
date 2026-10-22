@@ -9,6 +9,7 @@ public static class InterfaceLanguage
 {
     private static readonly (string Zh, string En)[] Labels =
     [
+        ("窗口操作", "Window controls"), ("最小化", "Minimize"), ("最大化", "Maximize"), ("关闭窗口", "Close window"),
         ("个人资料", "Profile"), ("姓名", "Full name"), ("显示名称", "Display name"), ("生日", "Birthday"),
         ("国家", "Country"), ("地区／省份", "Region / Province"), ("城市", "City"), ("机构／公司", "Organization"),
         ("职业／职位", "Job title"), ("网站", "Website"), ("个人简介", "About me"), ("更换头像", "Change photo"),

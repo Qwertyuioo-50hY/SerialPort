@@ -33,6 +33,7 @@ public sealed partial class AppWindow : Window
         InitializeComponent();
         ViewModel.AccountName = user.Username;
         SideRail.SetAccount(user.Username);
+        SideRail.WindowCommandRequested += WindowCommandRequested;
         SideRail.AccountActionRequested += (_, switchAccount) =>
         {
             if (CanChangeProject()) SignOutRequested?.Invoke(this, switchAccount);
@@ -167,6 +168,7 @@ public sealed partial class AppWindow : Window
         _networkConnection.Dispose();
         ViewModel.PropertyChanged -= ViewModelPropertyChanged;
         SideRail.ThemeRequested -= SideRailThemeRequested;
+        SideRail.WindowCommandRequested -= WindowCommandRequested;
         Root.ActualThemeChanged -= RootThemeChanged;
         Activated -= WindowActivated;
         AppWindow.Changed -= AppWindowChanged;

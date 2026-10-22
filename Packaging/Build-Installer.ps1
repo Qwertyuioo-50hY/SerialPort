@@ -35,7 +35,7 @@ $targets = if ($Architecture -eq 'all') { @('x64', 'arm64') } else { @($Architec
 foreach ($arch in $targets) {
     $rid = "win-$arch"
     $platform = if ($arch -eq 'arm64') { 'ARM64' } else { 'x64' }
-    $payload = Join-Path $root "artifacts/publish/$rid"
+    $payload = Join-Path $root "artifacts/publish/$Version/$rid"
     & dotnet publish (Join-Path $root 'UI/UI.csproj') -c Release -r $rid "-p:Platform=$platform" `
         -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true -p:SelfContained=true `
         -p:PublishTrimmed=false -p:DebugType=None "-p:Version=$Version" -o $payload -v:minimal

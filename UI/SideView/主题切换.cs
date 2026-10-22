@@ -19,6 +19,8 @@ public sealed partial class IconRailView
     {
         AccountSurface.RequestedTheme = theme;
         AccountSurface.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(theme == ElementTheme.Light ? Microsoft.UI.Colors.White : Microsoft.UI.ColorHelper.FromArgb(255,29,29,29));
+        WindowMenuSurface.RequestedTheme = theme;
+        WindowMenuSurface.Background = AccountSurface.Background;
         MainLanguageMenu.Theme = theme;
     }
 

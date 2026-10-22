@@ -15,6 +15,7 @@ public sealed partial class AiSettingsView : UserControl
     public AiSettingsView()
     {
         InitializeComponent();
+        AiSettingsContent.SizeChanged += (_, _) => AiSettingsForm.Width = Math.Max(0, Math.Min(640, AiSettingsContent.ActualWidth - 48));
         SettingsCategories.SelectedIndex = 0;
         _autoSave.Tick += (_, _) => { _autoSave.Stop(); try { ReadSettings(); } catch (ArgumentException) { return; } SaveRequested?.Invoke(this, EventArgs.Empty); };
         foreach (var box in new[] { BaseUrl, KeyEnvironment, Models, Instructions, OutputInstructions }) box.TextChanged += (_, _) => QueueAutoSave();
