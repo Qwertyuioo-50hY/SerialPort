@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Tomography.Business.Models;
@@ -20,13 +21,14 @@ internal sealed class AppearanceController
     public event EventHandler? MotionChanged;
     private AppearanceSettings _settings = new();
     private AppearancePalette _palette = new();
-    private bool _applying;
+    private bool _refreshPending;
     private int _version;
     public bool ReduceMotion => _settings.ReduceMotion == "On" || (_settings.ReduceMotion == "Default" && !SystemAnimationsEnabled());
     public AppearanceController(FrameworkElement root)
     {
         _root = root;
-        root.LayoutUpdated += LayoutUpdated;
+        root.Loaded += (_, _) => Refresh();
+        root.SizeChanged += (_, _) => Refresh();
         _systemPreferences.Tick += (_, _) =>
         {
             var motion = ReduceMotion;
@@ -76,12 +78,18 @@ internal sealed class AppearanceController
         }
         ApplyTree(_root, highContrast);
     }
-    private void LayoutUpdated(object? sender, object e) { if (!_applying) ApplyTree(_root,_highContrast); }
-    private void ApplyTree(DependencyObject node, bool highContrast)
+    // Never change typography from LayoutUpdated: template recreation can keep
+    // scheduling new layouts and starve input on large settings pages.
+    public void Refresh()
     {
-        _applying = true;
-        try { Visit(node,highContrast); } finally { _applying = false; }
+        if (_refreshPending) return;
+        _refreshPending = _root.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        {
+            _refreshPending = false;
+            ApplyTree(_root, _highContrast);
+        });
     }
+    private void ApplyTree(DependencyObject node, bool highContrast) => Visit(node, highContrast);
     private void Visit(DependencyObject node, bool highContrast)
     {
         if (node is IconElement) return;
@@ -106,6 +114,9 @@ internal sealed class AppearanceController
             if (!highContrast && control is TextBox or ComboBox or NumberBox or PasswordBox) control.Foreground = new SolidColorBrush(Color(_palette.Foreground));
             else if (highContrast) control.ClearValue(Control.ForegroundProperty);
         }
+        // Let editable controls and buttons style their own template children.
+        // Rewriting those children breaks inherited fonts and template states.
+        if (node is TextBox or PasswordBox or NumberBox or ComboBox or AutoSuggestBox or ButtonBase) return;
         for (var i = 0; i < VisualTreeHelper.GetChildrenCount(node); i++) Visit(VisualTreeHelper.GetChild(node,i),highContrast);
     }
     private static bool IsRail(DependencyObject node)

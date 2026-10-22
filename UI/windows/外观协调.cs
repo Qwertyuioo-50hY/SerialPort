@@ -14,6 +14,7 @@ public sealed partial class AppWindow
             Shared = new AppearancePalette { Background = _globalSettings.Theme == "Light" ? "#F4F5F7" : "#181818", Foreground = _globalSettings.Theme == "Light" ? "#202020" : "#FFFFFF" } };
         try { AppearanceStore.Validate(_globalSettings.Appearance); } catch { _globalSettings.Appearance = new(); }
         _appearanceController = new AppearanceController(Root);
+        AiSettingsPanel.CategoryChanged += (_, _) => _appearanceController.Refresh();
         _appearanceController.MotionChanged += (_, _) => AiChatView.SetReducedMotion(_appearanceController.ReduceMotion);
         AiSettingsPanel.Appearance.LoadSettings(_globalSettings.Appearance, AppWindow.Id);
         AiSettingsPanel.Appearance.Changed += (_, settings) =>

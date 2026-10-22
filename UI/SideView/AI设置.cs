@@ -11,6 +11,7 @@ public sealed partial class AiSettingsView : UserControl
     private readonly DispatcherTimer _autoSave = new() { Interval = TimeSpan.FromMilliseconds(800) };
     private AiApiSettings _loadedSettings = new();
     public event EventHandler? SaveRequested;
+    public event EventHandler? CategoryChanged;
     public AiSettingsView()
     {
         InitializeComponent();
@@ -46,7 +47,7 @@ public sealed partial class AiSettingsView : UserControl
         AiSettingsContent.Visibility = ai ? Visibility.Visible : Visibility.Collapsed;
         CategoryPlaceholder.Visibility = item is not null && !ai && !shortcuts && !profile && !appearance ? Visibility.Visible : Visibility.Collapsed;
         CategoryTitle.Text = item?.Content?.ToString() ?? "";
-        DispatcherQueue.TryEnqueue(() => SetLanguage(_english));
+        DispatcherQueue.TryEnqueue(() => { SetLanguage(_english); CategoryChanged?.Invoke(this, EventArgs.Empty); });
     }
     private void SettingsSearchChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
