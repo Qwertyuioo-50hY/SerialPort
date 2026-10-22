@@ -45,12 +45,24 @@ public sealed partial class AppWindow
     private void SideRailThemeRequested(object? sender, ElementTheme theme)
     {
         var previous = _globalSettings.Theme;
+        var previousAppearance = _globalSettings.Appearance is null ? null : Tomography.Business.Services.AppearanceStore.Copy(_globalSettings.Appearance);
         try
         {
             _globalSettings.Theme = theme.ToString();
+            if (_globalSettings.Appearance is not null)
+            {
+                _globalSettings.Appearance.Mode = theme.ToString();
+                if (!_globalSettings.Appearance.SeparateModes && _globalSettings.Appearance.Shared.Name != "自定义")
+                {
+                    _globalSettings.Appearance.Shared.Background = theme == ElementTheme.Dark ? "#181818" : "#F4F5F7";
+                    _globalSettings.Appearance.Shared.Foreground = theme == ElementTheme.Dark ? "#FFFFFF" : "#202020";
+                }
+            }
             SaveGlobalSettings();
             Root.RequestedTheme = theme;
+            ApplyAppearance();
+            if (_globalSettings.Appearance is not null) AiSettingsPanel.Appearance.LoadSettings(_globalSettings.Appearance, AppWindow.Id);
         }
-        catch (Exception) { _globalSettings.Theme = previous; AiSettingsPanel.SetStatus("主题保存失败。"); }
+        catch (Exception) { _globalSettings.Theme = previous; _globalSettings.Appearance = previousAppearance; ApplyAppearance(); AiSettingsPanel.SetStatus("主题保存失败。"); }
     }
 }

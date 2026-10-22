@@ -18,6 +18,7 @@
     <TextBlock x:Name="CategoryTitle" FontSize="20" FontWeight="SemiBold"/>
     <TextBlock Text="暂无可配置项" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
    </StackPanel>
+  <local:AppearanceSettingsView x:Name="AppearanceSettings" Grid.Column="1" Visibility="Collapsed"/>
   <local:ProfileSettingsView x:Name="ProfileSettings" Grid.Column="1" Visibility="Collapsed"/>
   <local:ShortcutSettingsView x:Name="ShortcutSettings" Grid.Column="1" Visibility="Collapsed"/>
   <ScrollViewer x:Name="AiSettingsContent" Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">

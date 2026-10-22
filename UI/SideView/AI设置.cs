@@ -6,6 +6,7 @@ namespace Tomography.UI.SideView;
 
 public sealed partial class AiSettingsView : UserControl
 {
+    public AppearanceSettingsView Appearance => AppearanceSettings;
     private bool _loading;
     private readonly DispatcherTimer _autoSave = new() { Interval = TimeSpan.FromMilliseconds(800) };
     private AiApiSettings _loadedSettings = new();
@@ -36,12 +37,14 @@ public sealed partial class AiSettingsView : UserControl
         if (AiSettingsContent is null || CategoryPlaceholder is null) return;
         var item = SettingsCategories.SelectedItem as ListViewItem;
         var ai = item?.Tag as string == "AI";
+        var appearance = item?.Tag as string == "Appearance";
+        AppearanceSettings.Visibility = appearance ? Visibility.Visible : Visibility.Collapsed;
         var profile = item?.Tag as string == "Profile";
         ProfileSettings.Visibility = profile ? Visibility.Visible : Visibility.Collapsed;
         var shortcuts = item?.Tag as string == "Shortcuts";
         ShortcutSettings.Visibility = shortcuts ? Visibility.Visible : Visibility.Collapsed;
         AiSettingsContent.Visibility = ai ? Visibility.Visible : Visibility.Collapsed;
-        CategoryPlaceholder.Visibility = item is not null && !ai && !shortcuts && !profile ? Visibility.Visible : Visibility.Collapsed;
+        CategoryPlaceholder.Visibility = item is not null && !ai && !shortcuts && !profile && !appearance ? Visibility.Visible : Visibility.Collapsed;
         CategoryTitle.Text = item?.Content?.ToString() ?? "";
         DispatcherQueue.TryEnqueue(() => SetLanguage(_english));
     }

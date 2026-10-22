@@ -73,6 +73,7 @@ public sealed partial class AppWindow : Window
         InitializeAi();
         InitializeHome();
         InitializeInterfacePreferences();
+        InitializeAppearance();
         InitializeProfile(user);
         SideRail.SetSection(ViewModel.Section);
         AddReconstructionSettings(Workspace.AlgorithmPanel);

@@ -20,6 +20,8 @@ public sealed partial class AiChatPanelView : UserControl
     private static readonly string[] EffortNames = { "轻度", "中等", "高", "极高", "最高" };
     private bool _updatingMode;
     private bool _busy;
+    private bool _reduceMotion;
+    public void SetReducedMotion(bool value) { _reduceMotion = value; if (value) { _pulse.Stop(); if (_pendingDot is not null) _pendingDot.Opacity = 1; } else if (_busy && _pendingDot is not null) _pulse.Start(); }
     private bool _composing;
     private bool _commitPending;
     private TextBlock? _pendingSummary;
@@ -41,7 +43,7 @@ public sealed partial class AiChatPanelView : UserControl
         };
         _pulse.Tick += (_, _) => { if (_pendingDot is not null) _pendingDot.Opacity = _pendingDot.Opacity < 1 ? 1 : 0.25; };
         Unloaded += (_, _) => _pulse.Stop();
-        Loaded += (_, _) => { if (_busy && _pendingDot is not null) _pulse.Start(); };
+        Loaded += (_, _) => { if (!_reduceMotion && _busy && _pendingDot is not null) _pulse.Start(); };
         UpdateSendState();
     }
     public void SetConfiguration(AiApiSettings settings)
@@ -136,7 +138,7 @@ public sealed partial class AiChatPanelView : UserControl
         _pendingExpander!.Visibility = string.IsNullOrEmpty(summary) ? Visibility.Collapsed : Visibility.Visible;
         _pendingAnswer.Visibility = string.IsNullOrEmpty(answer) ? Visibility.Collapsed : Visibility.Visible;
         EmptyMessage.Visibility = Visibility.Collapsed;
-        if (_busy) _pulse.Start(); ScrollToEnd();
+        if (_busy && !_reduceMotion) _pulse.Start(); ScrollToEnd();
     }
     private void ScrollToEnd() { if (Messages.Items.Count > 0) Messages.ScrollIntoView(Messages.Items[Messages.Items.Count - 1]); }
     private void SendMessage() { if (!_busy && !_composing && !string.IsNullOrWhiteSpace(MessageInput.Text)) SendRequested?.Invoke(this, MessageInput.Text.Trim()); }
