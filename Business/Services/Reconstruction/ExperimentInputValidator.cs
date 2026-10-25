@@ -17,7 +17,8 @@ public static class ExperimentInputValidator
         PythonRuntimeHost.Initialize(pythonDll);
         using var gil = Py.GIL(); using var scope = Py.CreateScope();
         scope.Set("path", path);
-        scope.Exec("import numpy as np\nfrom scipy.io import loadmat\ndata = loadmat(path)\nif 'sen' not in data or 'xy' not in data: raise ValueError('MAT requires sen and xy')\nsen, xy = np.asarray(data['sen']), np.asarray(data['xy'])\nif np.iscomplexobj(sen) or np.iscomplexobj(xy): raise ValueError('Complex matrices are not supported')\nif xy.ndim != 2 or xy.shape[1] != 2 or len(xy) == 0 or not np.isfinite(xy).all(): raise ValueError('xy must be finite N x 2')\nif sen.shape not in [(64, len(xy)), (len(xy), 64)] or not np.isfinite(sen).all(): raise ValueError('sen must be finite 64 x N or N x 64')\nrows, columns = int(sen.shape[0]), int(sen.shape[1])");
+        // MAT 灵敏度可为复数；保留原始文件，重建时沿用 sensitivity_io 的实部处理。
+        scope.Exec("import numpy as np\nfrom scipy.io import loadmat\ndata = loadmat(path)\nif 'sen' not in data or 'xy' not in data: raise ValueError('MAT requires sen and xy')\nsen, xy = np.asarray(data['sen']), np.asarray(data['xy'])\nif np.iscomplexobj(xy): raise ValueError('xy must contain real coordinates')\nif xy.ndim != 2 or xy.shape[1] != 2 or len(xy) == 0 or not np.isfinite(xy).all(): raise ValueError('xy must be finite N x 2')\nif sen.shape not in [(64, len(xy)), (len(xy), 64)] or not np.isfinite(sen).all(): raise ValueError('sen must be finite 64 x N or N x 64')\nrows, columns = int(sen.shape[0]), int(sen.shape[1])");
         using var rows = scope.Get("rows"); using var columns = scope.Get("columns");
         return (rows.As<int>(), columns.As<int>());
     }
