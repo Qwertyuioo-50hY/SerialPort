@@ -9,9 +9,9 @@ namespace Tomography.Business.Services;
 public static class EmtSampling
 {
     public static async Task<OperationResult> ExecuteAsync(IDeviceChannel channel, int frequencyKhz, int coilCount,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, string arrayType = "R", string excitationMode = "V")
     {
-        var command = EmtSampleCommand.Build(frequencyKhz, coilCount);
+        var command = EmtSampleCommand.Build(frequencyKhz, coilCount, arrayType, excitationMode);
         var completion = new TaskCompletionSource<OperationResult>(TaskCreationOptions.RunContinuationsAsynchronously);
         var pending = new StringBuilder();
         var values = new List<uint>();

@@ -55,7 +55,7 @@ public sealed partial class AppWindow
                         QueueRealtimeReconstruction();
                     }
                     ConnectionStatus.Text = $"{mode}：已采集 {count} 帧";
-                }, stop.Token, _deviceStop?.Token ?? _connectionLifetime.Token);
+                }, stop.Token, _deviceStop?.Token ?? _connectionLifetime.Token, _deviceSettings.ArrayType, _deviceSettings.ExcitationMode);
             if (_connectionLifetime.IsCancellationRequested) return;
             if (mode == AcquisitionMode.Reference && result.Data is double[] mean)
             {

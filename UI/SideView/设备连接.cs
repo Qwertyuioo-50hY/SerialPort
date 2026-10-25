@@ -43,7 +43,7 @@ public sealed partial class AppWindow
         DeviceView.SetState("连接中", true, false);
         try
         {
-            var settings = _protocolSettings.ReadSettings((int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount);
+            var settings = _protocolSettings.ReadSettings((int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount, _deviceSettings.ArrayType, _deviceSettings.ExcitationMode);
             _customFrame = _protocolSettings.Protocol == 2 ? new CustomFrameDecoder(_projectSettings.CustomFrame ?? throw new ArgumentException("请先保存自定义帧配置。")) : null;
             _selectedChannel = _protocolSettings.Transport switch { 0 => _serialConnection, 2 => _tcpConnection, _ => _networkConnection };
             _selectedChannel.DataReceived += DeviceBytesReceived;
@@ -79,7 +79,7 @@ public sealed partial class AppWindow
         try
         {
             if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 15)) throw new ArgumentException("激励频率需为 1–999 kHz，线圈数需为 1–15 的整数。");
-            var result = await EmtSampling.ExecuteAsync(channel, (int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount, token);
+            var result = await EmtSampling.ExecuteAsync(channel, (int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount, token, _deviceSettings.ArrayType, _deviceSettings.ExcitationMode);
             if (!result.IsSuccess) throw new InvalidOperationException(result.Message, result.Exception);
             token.ThrowIfCancellationRequested(); _deviceReady = true;
             DeviceView.SetState("握手成功", false, true);

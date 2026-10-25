@@ -77,7 +77,7 @@ public sealed partial class AppWindow
             _projectSettings = result.IsSuccess && result.Data is AppSettings settings ? settings : new AppSettings();
             _protocolSettings!.Restore(_projectSettings);
             DeviceView.FrameEditor.LoadDefinition(_projectSettings.CustomFrame);
-            _deviceSettings.Restore(_projectSettings.Device.FrequencyKhz, _projectSettings.Device.CoilCount);
+            _deviceSettings.Restore(_projectSettings.Device.FrequencyKhz, _projectSettings.Device.CoilCount, _projectSettings.Device.ArrayType, _projectSettings.Device.ExcitationMode);
             _referenceConfiguration = ReferenceConfiguration();
             foreach (var input in _projectSettings.ExperimentInputs.ToArray())
                 if (input.Key is "灵敏度矩阵" or "空场参考") await ImportExperimentalInputAsync(input.Key, input.Value);
@@ -86,7 +86,7 @@ public sealed partial class AppWindow
         }
         finally { _restoringDevice = false; }
     }
-    private string ReferenceConfiguration() => $"{_protocolSettings!.Transport}:{_protocolSettings.Protocol}:{_deviceSettings.FrequencyKhz}:{_deviceSettings.CoilCount}";
+    private string ReferenceConfiguration() => $"{_protocolSettings!.Transport}:{_protocolSettings.Protocol}:{_deviceSettings.FrequencyKhz}:{_deviceSettings.CoilCount}:{_deviceSettings.ArrayType}:{_deviceSettings.ExcitationMode}";
     private void DeviceConfigurationChanged(object? sender, EventArgs e)
     {
         if (_restoringDevice) return;
@@ -108,7 +108,7 @@ public sealed partial class AppWindow
         {
             if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 15))
                 throw new ArgumentException("频率需为 1–999 kHz、线圈需为 1–15 的整数。");
-            _projectSettings.Device = _protocolSettings!.ReadSettings((int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount);
+            _projectSettings.Device = _protocolSettings!.ReadSettings((int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount, _deviceSettings.ArrayType, _deviceSettings.ExcitationMode);
             _projectSettings.DefaultSerialPortConfig = _protocolSettings.GetSerialConfig();
             var path = ProjectSettingsPath; var result = await Task.Run(() => _projectConfig.Save(_projectSettings, path));
             if (!result.IsSuccess) ShowDeviceError(result.Message);

@@ -64,7 +64,7 @@ public sealed partial class ConnectionProtocolView : UserControl
         RtsEnable = RTSField.IsChecked == true
     };
 
-    public Tomography.Business.Models.DeviceConfiguration ReadSettings(int frequency, int coils)
+    public Tomography.Business.Models.DeviceConfiguration ReadSettings(int frequency, int coils, string arrayType = "R", string excitationMode = "V")
     {
         if (!double.IsFinite(Port) || Port != Math.Truncate(Port) || Port is < 1 or > 65535 ||
             !double.IsFinite(TimeoutSeconds) || TimeoutSeconds != Math.Truncate(TimeoutSeconds) || TimeoutSeconds is < 1 or > 60)
@@ -72,7 +72,7 @@ public sealed partial class ConnectionProtocolView : UserControl
         if (Transport == 1 && (!double.IsFinite(LocalPortField.Value) || LocalPortField.Value != Math.Truncate(LocalPortField.Value) || LocalPortField.Value is < 1 or > 65535))
             throw new ArgumentException("本地端口需为 1–65535 的整数。");
         return new() { Source = 0, Connection = Transport, Protocol = Protocol, ProtocolVersion = 1, LocalHost = LocalHost, LocalPort = LocalPort,
-            Host = Host, Port = (int)Port, TimeoutSeconds = (int)TimeoutSeconds, FrequencyKhz = frequency, CoilCount = coils };
+            Host = Host, Port = (int)Port, TimeoutSeconds = (int)TimeoutSeconds, FrequencyKhz = frequency, CoilCount = coils, ArrayType = arrayType, ExcitationMode = excitationMode };
     }
     public void Restore(Tomography.Business.Models.AppSettings settings)
     {

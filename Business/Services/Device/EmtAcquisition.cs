@@ -7,7 +7,7 @@ namespace Tomography.Business.Services;
 public sealed class EmtAcquisition
 {
     public async Task<OperationResult> RunAsync(IDeviceChannel serial, int frequency, int coils, AcquisitionMode mode,
-        int frameCount, Action<uint[]> onFrame, CancellationToken stopToken, CancellationToken lifetime = default)
+        int frameCount, Action<uint[]> onFrame, CancellationToken stopToken, CancellationToken lifetime = default, string arrayType = "R", string excitationMode = "V")
     {
         var target = mode switch { AcquisitionMode.Reference => 10, AcquisitionMode.Single => 1,
             AcquisitionMode.Batch => frameCount, AcquisitionMode.Live => int.MaxValue, _ => throw new ArgumentOutOfRangeException(nameof(mode)) };
@@ -16,7 +16,7 @@ public sealed class EmtAcquisition
         var count = 0;
         while (count < target && !stopToken.IsCancellationRequested)
         {
-            var result = await EmtSampling.ExecuteAsync(serial, frequency, coils, lifetime);
+            var result = await EmtSampling.ExecuteAsync(serial, frequency, coils, lifetime, arrayType, excitationMode);
             if (!result.IsSuccess) return result;
             var frame = (uint[])result.Data!;
             count++;
