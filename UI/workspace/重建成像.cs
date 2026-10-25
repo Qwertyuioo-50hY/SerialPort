@@ -38,7 +38,7 @@ public sealed partial class AppWindow
                 var image = await _pythonReconstruction.ReconstructAsync(request, settings.PythonDll);
                 if (_connectionLifetime.IsCancellationRequested || (automatic && !_realtimeEnabled)) return;
                 _reconstruction.Image = image;
-                Workspace.SetReconstruction(image);
+                Workspace.SetReconstruction(image, _deviceSettings.ArrayType == "R");
                 ConnectionStatus.Text = $"{request.Algorithm} 重建完成：{image.Width} × {image.Height}";
                 automatic = _realtimeEnabled;
             } while (automatic && _pendingRealtimeReconstruction);

@@ -59,8 +59,7 @@ public sealed partial class AppWindow
             else
                 await _networkConnection.OpenAsync(_protocolSettings.Transport == 1, settings.Host, settings.Port, settings.LocalHost, settings.LocalPort, token);
             token.ThrowIfCancellationRequested();
-            if (_protocolSettings.Protocol == 1 && _protocolSettings.Transport != 3) await PerformEmtHandshakeAsync(_selectedChannel, token);
-            else DeviceView.SetState(_protocolSettings.Transport == 3 ? "监听中，等待客户端" : "已连接", false, true);
+            DeviceView.SetState(_protocolSettings.Transport == 3 ? "监听中，等待客户端" : "已连接", false, true);
         }
         catch (Exception ex)
         {
@@ -84,8 +83,11 @@ public sealed partial class AppWindow
         }
         catch (Exception ex)
         {
-            CloseDevice();
-            if (!_connectionLifetime.IsCancellationRequested) DeviceView.SetState("未连接", false, false, ex is OperationCanceledException ? null : ex.Message);
+            if (!_connectionLifetime.IsCancellationRequested)
+            {
+                if (token.IsCancellationRequested || !channel.IsOpen) CloseDevice();
+                else DeviceView.SetState("握手失败，可重试", false, true, ex.Message);
+            }
         }
         finally { _connecting = false; }
     }

@@ -29,7 +29,7 @@ public sealed partial class AppWindow
             if (_projectSettings.CustomFrame?.ChannelMap.Length != 64) { ShowDeviceError("当前自定义帧仅用于原始数据显示，未定义成像通道。"); return; }
             BeginStreamAcquisition(mode); return;
         }
-        if (!_deviceReady) { ConnectionStatus.Text = "请先连接设备并完成握手"; return; }
+        if (!_deviceReady) { DeviceView.SetState("请先手动握手", false, ActiveChannel.IsOpen, "请先连接设备，再点击握手，成功后进行采集。"); return; }
         if (_deviceSettings.CoilCount != 8) { ShowDeviceError("当前成像算法需要 8 线圈、64 通道；其他线圈数量可握手并查看原始数据。"); return; }
         if (mode == AcquisitionMode.Reference) SetRealtimeReconstruction(false);
         _acquiringReference = mode == AcquisitionMode.Reference;
@@ -66,9 +66,10 @@ public sealed partial class AppWindow
             }
             if (!result.IsSuccess) { CloseDevice(); ConnectionIcon.Glyph = "\uECCA"; }
             else if (count > 0) DeviceView.SetParameterStatus("本次 EMT 采样已收到应答；所用参数已由采样链路确认（无独立参数回读）。");
-            ConnectionStatus.Text = result.Message;
+            if (result.IsSuccess) DeviceView.SetState(result.Message, false, ActiveChannel.IsOpen);
+            else ShowDeviceError(string.IsNullOrWhiteSpace(result.Message) ? "采集失败，未收到有效的 256 字节数据帧。" : result.Message);
         }
-        catch (Exception ex) { if (!_connectionLifetime.IsCancellationRequested) ConnectionStatus.Text = ex.Message; }
+        catch (Exception ex) { if (!_connectionLifetime.IsCancellationRequested) ShowDeviceError(ex.Message); }
         finally { _receivingEmtMeasurements = false; _acquiringReference = false; _sampling = false; _acquisitionStop = null; }
     }
     private static bool IsInteger(double value, int minimum, int maximum) => double.IsFinite(value)

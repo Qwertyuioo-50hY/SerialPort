@@ -8,7 +8,14 @@ public sealed partial class DevicePage : UserControl
 {
     public event EventHandler<string>? ActionRequested;
     private bool _emt;
-    public void SetProtocol(int protocol) => _emt = protocol == 1;
+    private bool _busy, _connected;
+    public void SetProtocol(int protocol) { _emt = protocol == 1; UpdateButtons(); }
+    private void UpdateButtons()
+    {
+        ConnectButton.IsEnabled = !_busy && !_connected;
+        HandshakeButton.IsEnabled = _emt && _connected && !_busy;
+        DisconnectButton.IsEnabled = _connected || _busy;
+    }
     private readonly DispatcherTimer _importTimer = new() { Interval = TimeSpan.FromSeconds(4) };
     public TextBlock StatusText => Status;
     public FrameSettingsView FrameEditor => FrameSettings;
@@ -23,9 +30,10 @@ public sealed partial class DevicePage : UserControl
     public void SetState(string text, bool busy, bool connected, string? error = null)
     {
         Status.Text = text; Status.Visibility = text == "未连接" ? Visibility.Collapsed : Visibility.Visible; Progress.IsActive = busy;
-        ConnectButton.IsEnabled = !busy && !connected; HandshakeButton.IsEnabled = _emt && connected && !busy;
-        DisconnectButton.IsEnabled = connected || busy;
-        Error.Message = error ?? ""; Error.IsOpen = error is not null;
+        _busy = busy; _connected = connected; UpdateButtons();
+        Error.Title = error is null ? "" : "设备操作失败";
+        ErrorDetails.Text = error is null ? "" : string.IsNullOrWhiteSpace(error) ? "设备操作失败，请检查连接和握手状态。" : error;
+        Error.IsOpen = error is not null;
     }
     public void SetInputState(bool busy) => ParametersHost.IsEnabled = !busy;
     public void SetParameterStatus(string text) => Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(ParametersHost, text);

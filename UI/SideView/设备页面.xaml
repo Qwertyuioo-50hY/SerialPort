@@ -17,7 +17,7 @@
      <ProgressRing x:Name="Progress" Width="18" Height="18" IsActive="False"/>
     </StackPanel>
     <TextBlock x:Name="Status" Visibility="Collapsed" TextWrapping="Wrap" AutomationProperties.AutomationId="DeviceStatus"/>
-    <InfoBar x:Name="Error" IsOpen="False" Severity="Error" AutomationProperties.AutomationId="DeviceError"/>
+    <InfoBar x:Name="Error" IsOpen="False" Severity="Error" AutomationProperties.AutomationId="DeviceError"><TextBlock x:Name="ErrorDetails" TextWrapping="Wrap"/></InfoBar>
     <Grid ColumnSpacing="20">
      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
      <Border Style="{StaticResource Module}"><ContentControl x:Name="ConnectionHost" HorizontalContentAlignment="Stretch"/></Border>
