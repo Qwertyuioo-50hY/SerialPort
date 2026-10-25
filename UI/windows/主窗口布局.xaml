@@ -79,6 +79,8 @@
                                             <NumberBox x:Name="BatchFrameCount" Grid.Column="1" Value="10" Minimum="1" Maximum="2147483647" SmallChange="1" SpinButtonPlacementMode="Hidden" CornerRadius="10" VerticalAlignment="Stretch" AutomationProperties.Name="多次采集数量（帧）" AutomationProperties.AutomationId="BatchFrameCount" ToolTipService.ToolTip="采集数量（帧）"/>
                                         </Grid>
                                         <Button Content="实时采集" Tag="Live" ToolTipService.ToolTip="再次点击可停止实时采集" Click="AcquisitionButtonClicked" AutomationProperties.AutomationId="AcquireLive"/>
+                                        <Button Content="数据保存" Click="SaveDataClicked" ToolTipService.ToolTip="手动补存当前空场和物场数据" AutomationProperties.AutomationId="SaveAcquisitionData"/>
+                                        <TextBlock x:Name="DataSaveStatus" Text="采集数据自动保存至 data" FontSize="12" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                     </StackPanel>
                                 </workspace:ImagingWorkspaceView.Commands>
                             </workspace:ImagingWorkspaceView>

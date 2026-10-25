@@ -24,7 +24,7 @@ internal static class ReconstructionRasterizer
             var top = image.Values[y0 * image.Width + x0] * (1 - tx) + image.Values[y0 * image.Width + x1] * tx;
             var bottom = image.Values[y1 * image.Width + x0] * (1 - tx) + image.Values[y1 * image.Width + x1] * tx;
             var value = top * (1 - ty) + bottom * ty;
-            var t = range > 0 ? Math.Clamp((value - minimum) / range, 0, 1) : 0;
+            var t = 1 - (range > 0 ? Math.Clamp((value - minimum) / range, 0, 1) : 0);
             var index = (y * size + x) * 4;
             pixels[index] = Color(1.5 - Math.Abs(4 * t - 1));
             pixels[index + 1] = Color(1.5 - Math.Abs(4 * t - 2));

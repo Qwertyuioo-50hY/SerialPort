@@ -17,7 +17,13 @@
      <ProgressRing x:Name="Progress" Width="18" Height="18" IsActive="False"/>
     </StackPanel>
     <TextBlock x:Name="Status" Visibility="Collapsed" TextWrapping="Wrap" AutomationProperties.AutomationId="DeviceStatus"/>
-    <InfoBar x:Name="Error" IsOpen="False" Severity="Error" AutomationProperties.AutomationId="DeviceError"><TextBlock x:Name="ErrorDetails" TextWrapping="Wrap"/></InfoBar>
+    <Border x:Name="Error" Visibility="Collapsed" CornerRadius="16" Padding="14,10" Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" AutomationProperties.AutomationId="DeviceError">
+     <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <FontIcon Glyph="&#xEA39;" FontSize="18" VerticalAlignment="Center" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+      <TextBlock x:Name="ErrorDetails" Grid.Column="1" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center"/>
+      <Button Grid.Column="2" Click="DismissErrorClicked" Background="Transparent" BorderThickness="0" MinHeight="28" Padding="6" AutomationProperties.Name="关闭错误提示"><FontIcon Glyph="&#xE711;" FontSize="14"/></Button>
+     </Grid>
+    </Border>
     <Grid ColumnSpacing="20">
      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
      <Border Style="{StaticResource Module}"><ContentControl x:Name="ConnectionHost" HorizontalContentAlignment="Stretch"/></Border>
@@ -35,7 +41,7 @@
        <TextBlock x:Name="ImportStatus" Visibility="Collapsed" FontSize="12" AutomationProperties.AutomationId="SensitivityImportResult"/>
       </StackPanel>
      </Border>
-     <Border Grid.Column="1" Style="{StaticResource Module}"><local:ReceivedDataView x:Name="ReceivedData"/></Border>
+     <Border Grid.Column="1" Style="{StaticResource Module}"><StackPanel Spacing="16"><StackPanel Orientation="Horizontal" Spacing="10"><FontIcon Glyph="&#xE713;" FontSize="18"/><TextBlock Text="算法配置" FontSize="18" FontWeight="SemiBold"/></StackPanel><StackPanel x:Name="AlgorithmBody" Spacing="12"/></StackPanel></Border>
     </Grid>
     <Border Style="{StaticResource Module}"><local:FrameSettingsView x:Name="FrameSettings"/></Border>
    </StackPanel>

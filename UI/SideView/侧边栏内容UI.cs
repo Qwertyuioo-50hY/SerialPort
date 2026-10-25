@@ -53,7 +53,7 @@ public sealed partial class AppWindow
                 ParameterBody.Children.Add(new TextBlock { Text = "暂无已安装插件", TextWrapping = TextWrapping.Wrap });
                 break;
             case "算法":
-                if (_reconstructionSettings is null) AddReconstructionSettings(Workspace.AlgorithmPanel);
+                if (_reconstructionSettings is null) AddReconstructionSettings(DeviceView.AlgorithmPanel);
                 break;
             case "登录":
                 Caption("账户登录");

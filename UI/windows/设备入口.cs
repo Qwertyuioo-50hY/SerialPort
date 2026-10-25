@@ -22,7 +22,7 @@ public sealed partial class AppWindow
     private void InitializeDevicePage()
     {
         _protocolSettings = new ConnectionProtocolView();
-        DeviceView.Attach(_protocolSettings, _deviceSettings); ConnectionStatus = DeviceView.StatusText;
+        DeviceView.Attach(_protocolSettings, _deviceSettings); DeviceView.AttachReceivedData(Workspace.ReceivePanel); ConnectionStatus = DeviceView.StatusText;
         _protocolSettings.RefreshRequested += (_, _) => RefreshDevicePorts();
         _protocolSettings.Changed += DeviceConfigurationChanged; _deviceSettings.Changed += DeviceConfigurationChanged;
         DeviceView.ActionRequested += DeviceActionRequested;

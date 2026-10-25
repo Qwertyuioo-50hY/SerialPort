@@ -6,7 +6,7 @@
   <TextBlock x:Name="Placeholder" Text="尚无重建图像" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
   <StackPanel x:Name="ColorScale" Grid.Row="1" Spacing="4" Visibility="Collapsed">
    <TextBlock Text="归一化重建强度" FontSize="12" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-   <Border Height="12" CornerRadius="4"><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#000080" Offset="0"/><GradientStop Color="Blue" Offset="0.125"/><GradientStop Color="Cyan" Offset="0.375"/><GradientStop Color="Yellow" Offset="0.625"/><GradientStop Color="Red" Offset="0.875"/><GradientStop Color="#800000" Offset="1"/></LinearGradientBrush></Border.Background></Border>
+   <Border Height="12" CornerRadius="4"><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#800000" Offset="0"/><GradientStop Color="Red" Offset="0.125"/><GradientStop Color="Yellow" Offset="0.375"/><GradientStop Color="Cyan" Offset="0.625"/><GradientStop Color="Blue" Offset="0.875"/><GradientStop Color="#000080" Offset="1"/></LinearGradientBrush></Border.Background></Border>
    <Grid><TextBlock Text="0" HorizontalAlignment="Left" FontSize="12"/><TextBlock Text="0.5" HorizontalAlignment="Center" FontSize="12"/><TextBlock Text="1" HorizontalAlignment="Right" FontSize="12"/></Grid>
   </StackPanel>
  </Grid>

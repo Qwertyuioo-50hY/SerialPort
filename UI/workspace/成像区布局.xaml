@@ -1,5 +1,5 @@
 <UserControl x:Class="Tomography.UI.workspace.ImagingWorkspaceView"
- xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Tomography.UI.workspace">
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Tomography.UI.workspace" xmlns:side="using:Tomography.UI.SideView">
  <UserControl.Resources>
   <CornerRadius x:Key="ControlCornerRadius">10</CornerRadius>
   <CornerRadius x:Key="OverlayCornerRadius">14</CornerRadius>
@@ -37,7 +37,7 @@
      </Grid>
     </Border>
     <Border Grid.Row="1" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16" CornerRadius="16">
-     <StackPanel Spacing="12"><TextBlock Text="算法配置" FontSize="16" FontWeight="SemiBold"/><StackPanel x:Name="AlgorithmBody" Spacing="12"/></StackPanel>
+     <side:ReceivedDataView x:Name="ReceivedData"/>
     </Border>
     <Border x:Name="CameraModule" Grid.Row="1" Grid.Column="1" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16" CornerRadius="16">
      <StackPanel Spacing="12"><TextBlock Text="相机模块" FontSize="16" FontWeight="SemiBold"/><local:CameraPreviewView MinHeight="320"/></StackPanel>

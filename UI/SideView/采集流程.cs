@@ -52,6 +52,7 @@ public sealed partial class AppWindow
                     else
                     {
                         _acquisitionRecords.AddObject(frame);
+                        _ = QueueRawDataSave(false, frame.Select(value => (double)value).ToArray());
                         _reconstruction.SetMeasurements(frame.Select(value => (double)value).ToArray());
                         QueueRealtimeReconstruction();
                     }
@@ -63,7 +64,10 @@ public sealed partial class AppWindow
                 _reconstruction.SetReference(mean);
                 _acquisitionRecords.SetReference(referenceFrames, mean);
                 Workspace.ShowReference(mean);
+                await QueueRawDataSave(true, mean);
             }
+            await _rawDataSaveTail;
+            if (_connectionLifetime.IsCancellationRequested) return;
             if (!result.IsSuccess) { CloseDevice(); ConnectionIcon.Glyph = "\uECCA"; }
             else if (count > 0) DeviceView.SetParameterStatus("本次 EMT 采样已收到应答；所用参数已由采样链路确认（无独立参数回读）。");
             if (result.IsSuccess) DeviceView.SetState(result.Message, false, ActiveChannel.IsOpen);

@@ -25,8 +25,8 @@ public sealed partial class AppWindow
             case TitleBarAction.AddCommand: await AddCustomCommandAsync(); break;
             case TitleBarAction.ConfigureApi: await ConfigureAsync("自定义API"); break;
             case TitleBarAction.ConfigureAlgorithm:
-                ViewModel.Section = "算法";
-                ViewModel.ParametersVisible = true;
+                ViewModel.Section = "设备"; SideRail.SetSection("设备");
+                ViewModel.ParametersVisible = false;
                 break;
             case TitleBarAction.ConfigureWaveform: await ConfigureAsync("波形图像"); break;
             default: HandleViewAction(action); break;

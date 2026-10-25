@@ -77,7 +77,7 @@ public sealed partial class AppWindow : Window
         InitializeAppearance();
         InitializeProfile(user);
         SideRail.SetSection(ViewModel.Section);
-        AddReconstructionSettings(Workspace.AlgorithmPanel);
+        AddReconstructionSettings(DeviceView.AlgorithmPanel);
         _reconstructionSettings!.CustomAlgorithmRequested += async (_, _) => await ImportFileAsync("自定义算法");
         BuildParameterContents();
     }
@@ -157,6 +157,7 @@ public sealed partial class AppWindow : Window
     private void WindowClosed(object sender, WindowEventArgs args)
     {
         _loaded = false;
+        _rawDataSaveTail.GetAwaiter().GetResult();
         _tray?.Dispose();
         _frame.Dispose();
         _acquisitionStop?.Cancel();
