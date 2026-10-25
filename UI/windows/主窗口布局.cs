@@ -69,6 +69,7 @@ public sealed partial class AppWindow : Window
         ViewModel.PropertyChanged += ViewModelPropertyChanged;
         Closed += WindowClosed;
         Workspace.ReconstructionRequested += WorkspaceReconstructionRequested;
+        Workspace.ReconstructionFrameRateChanged += (_, _) => UpdateReconstructionInterval();
         SideRail.ThemeRequested += SideRailThemeRequested;
         InitializeDevicePage();
         InitializeAi();

@@ -22,6 +22,7 @@ public sealed partial class AppWindow
     private volatile bool _receivingEmtMeasurements;
     private void CloseDevice()
     {
+        SetRealtimeReconstruction(false);
         _deviceStop?.Cancel(); _acquisitionStop?.Cancel(); _deviceReady = false; _receivingEmtMeasurements = false;
         if (_customFrame is not null) EndStreamAcquisition();
         if (_selectedChannel is not null) _selectedChannel.DataReceived -= DeviceBytesReceived;

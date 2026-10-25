@@ -32,7 +32,11 @@
     </Border>
     <Border x:Name="ReconstructionModule" Grid.Column="1" Style="{StaticResource WorkspaceCardStyle}" BorderThickness="1" Padding="16" CornerRadius="16">
      <Grid RowSpacing="12"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-      <Grid><Button Content="重建" Click="ReconstructionClicked" HorizontalAlignment="Right" AutomationProperties.AutomationId="ReconstructImage"/></Grid>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+       <TextBlock Text="帧率 (FPS)" VerticalAlignment="Center"/>
+       <NumberBox x:Name="ReconstructionFps" Value="5" Minimum="1" Maximum="60" Width="100" SpinButtonPlacementMode="Compact" ValueChanged="ReconstructionFpsChanged" AutomationProperties.Name="实时重建帧率"/>
+       <Button Content="重建" Click="ReconstructionClicked" AutomationProperties.AutomationId="ReconstructImage"/>
+      </StackPanel>
       <local:ReconstructionImageView x:Name="ReconstructionImage" Grid.Row="1" MinHeight="360"/>
      </Grid>
     </Border>

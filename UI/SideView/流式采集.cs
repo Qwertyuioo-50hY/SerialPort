@@ -11,6 +11,8 @@ public sealed partial class AppWindow
     private readonly DispatcherTimer _streamTimeout = new() { Interval = TimeSpan.FromSeconds(3) };
     private void BeginStreamAcquisition(AcquisitionMode mode)
     {
+        if (mode == AcquisitionMode.Reference) SetRealtimeReconstruction(false);
+        if (mode == AcquisitionMode.Live) SetRealtimeReconstruction(true);
         _streamMode = mode; _streamCount = 0; _streamReference.Clear(); _sampling = true;
         _acquiringReference = mode == AcquisitionMode.Reference;
         _deviceSettings.IsEnabled = false;
@@ -19,7 +21,7 @@ public sealed partial class AppWindow
     }
     private void StreamTimedOut(object? sender, object e) { EndStreamAcquisition(); CloseDevice(); ShowDeviceError("数值流 数据接收超时（3 秒）。"); }
     private void EndStreamAcquisition()
-    { _sampling = false; _acquiringReference = false; _streamTimeout.Stop(); _streamReference.Clear(); }
+    { if (_streamMode == AcquisitionMode.Live) SetRealtimeReconstruction(false); _sampling = false; _acquiringReference = false; _streamTimeout.Stop(); _streamReference.Clear(); }
     private void AcceptStreamFrame(double[] frame)
     {
         if (!_sampling) return;

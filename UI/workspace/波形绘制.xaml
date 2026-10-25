@@ -9,7 +9,11 @@
    <Button Content="自适应" Click="ResetZoomClicked" Padding="10,6"/>
   </StackPanel>
   <Grid Grid.Row="1" Background="Black">
-   <lvc:CartesianChart x:Name="Chart" LegendPosition="Top"/>
+   <lvc:CartesianChart x:Name="Chart" LegendPosition="Hidden"/>
+   <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,18,0" Spacing="18" IsHitTestVisible="False">
+    <StackPanel x:Name="ReferenceLegend" Orientation="Horizontal" Spacing="6"><Rectangle Width="16" Height="2" Fill="DodgerBlue"/><TextBlock Text="空场" Foreground="White" FontSize="12"/></StackPanel>
+    <StackPanel x:Name="MeasurementLegend" Orientation="Horizontal" Spacing="6"><Rectangle Width="16" Height="2" Fill="OrangeRed"/><TextBlock Text="物场" Foreground="White" FontSize="12"/></StackPanel>
+   </StackPanel>
    <TextBlock Text="幅值 (V)" FontSize="11" Margin="8,6,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" IsHitTestVisible="False"/>
    <TextBlock Text="通道" FontSize="11" Margin="0,0,4,12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="White" IsHitTestVisible="False"/>
   </Grid>

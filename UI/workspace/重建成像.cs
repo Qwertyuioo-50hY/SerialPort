@@ -26,28 +26,24 @@ public sealed partial class AppWindow
         _reconstructing = true; settings.SetBusy(true);
         try
         {
-            do
-            {
-                _pendingRealtimeReconstruction = false;
-                if ((settings.Algorithm is "Landweber" or "TV") && !IsInteger(settings.Iterations, 1, 10000)) throw new ArgumentException("迭代次数必须为 1–10000 的整数。");
-                var request = _reconstruction.CreateRequest(settings.Algorithm, settings.DifferenceMode,
-                    settings.Algorithm == "Tikhonov" ? settings.Lambda : 0.1,
-                    settings.Algorithm == "Landweber" ? settings.Alpha : 0.1,
-                    settings.Algorithm is "Landweber" or "TV" ? (int)settings.Iterations : 50,
-                    settings.Algorithm == "TV" ? settings.TvMu : 0.05);
-                var image = await _pythonReconstruction.ReconstructAsync(request, settings.PythonDll);
-                if (_connectionLifetime.IsCancellationRequested || (automatic && !_realtimeEnabled)) return;
-                _reconstruction.Image = image;
-                Workspace.SetReconstruction(image, _deviceSettings.ArrayType == "R");
-                ConnectionStatus.Text = $"{request.Algorithm} 重建完成：{image.Width} × {image.Height}";
-                automatic = _realtimeEnabled;
-            } while (automatic && _pendingRealtimeReconstruction);
+            _pendingRealtimeReconstruction = false;
+            if ((settings.Algorithm is "Landweber" or "TV") && !IsInteger(settings.Iterations, 1, 10000)) throw new ArgumentException("迭代次数必须为 1–10000 的整数。");
+            var request = _reconstruction.CreateRequest(settings.Algorithm, settings.DifferenceMode,
+                settings.Algorithm == "Tikhonov" ? settings.Lambda : 0.1,
+                settings.Algorithm == "Landweber" ? settings.Alpha : 0.1,
+                settings.Algorithm is "Landweber" or "TV" ? (int)settings.Iterations : 50,
+                settings.Algorithm == "TV" ? settings.TvMu : 0.05);
+            var image = await _pythonReconstruction.ReconstructAsync(request, settings.PythonDll);
+            if (_connectionLifetime.IsCancellationRequested || (automatic && !_realtimeEnabled)) return;
+            _reconstruction.Image = image;
+            Workspace.SetReconstruction(image, _deviceSettings.ArrayType == "R");
+            ConnectionStatus.Text = $"{request.Algorithm} 重建完成：{image.Width} × {image.Height}";
         }
         catch (Exception ex)
         {
             _pendingRealtimeReconstruction = false;
             if (!_connectionLifetime.IsCancellationRequested) { SetRealtimeReconstruction(false); ConnectionStatus.Text = ex.Message; }
         }
-        finally { _reconstructing = false; if (!_connectionLifetime.IsCancellationRequested) settings.SetBusy(false); }
+        finally { _reconstructing = false; if (!_connectionLifetime.IsCancellationRequested) settings.SetBusy(_realtimeEnabled); }
     }
 }

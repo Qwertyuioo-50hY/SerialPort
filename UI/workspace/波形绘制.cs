@@ -10,8 +10,8 @@ namespace Tomography.UI.workspace;
 
 public sealed partial class ChannelWaveformView : UserControl
 {
-    private readonly LineSeries<ObservablePoint> _reference = new() { Name = "空场", GeometrySize = 0, Fill = null, LineSmoothness = 0, Stroke = new SolidColorPaint(SKColors.DodgerBlue, 2) };
-    private readonly LineSeries<ObservablePoint> _measurements = new() { Name = "物场", GeometrySize = 0, Fill = null, LineSmoothness = 0, Stroke = new SolidColorPaint(SKColors.OrangeRed, 2) };
+    private readonly LineSeries<ObservablePoint> _reference = new() { Name = "空场", GeometrySize = 0, Fill = null, LineSmoothness = 0.45, Stroke = new SolidColorPaint(SKColors.DodgerBlue, 2) };
+    private readonly LineSeries<ObservablePoint> _measurements = new() { Name = "物场", GeometrySize = 0, Fill = null, LineSmoothness = 0.45, Stroke = new SolidColorPaint(SKColors.OrangeRed, 2) };
     private readonly Axis _vertical = new() { TextSize = 11, SeparatorsPaint = null, Labeler = value => value.ToString("0.#########", System.Globalization.CultureInfo.InvariantCulture) };
     public ChannelWaveformView()
     {
@@ -39,6 +39,8 @@ public sealed partial class ChannelWaveformView : UserControl
         {
             1 => new ISeries[] { _reference }, 2 => new ISeries[] { _measurements }, _ => new ISeries[] { _reference, _measurements }
         };
+        ReferenceLegend.Visibility = WaveformSelection.SelectedIndex == 2 ? Visibility.Collapsed : Visibility.Visible;
+        MeasurementLegend.Visibility = WaveformSelection.SelectedIndex == 1 ? Visibility.Collapsed : Visibility.Visible;
         ResetZoomClicked(this, new RoutedEventArgs());
     }
     private void ZoomInClicked(object sender, RoutedEventArgs e) => Zoom(0.5);
