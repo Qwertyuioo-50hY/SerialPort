@@ -32,6 +32,17 @@ public sealed partial class ConnectionProtocolView : UserControl
     private void RefreshClicked(object sender, RoutedEventArgs e) => RefreshRequested?.Invoke(this, EventArgs.Empty);
     private void UpdateConfiguration()
     {
+        if (Protocol == 1)
+        {
+            var ready = _ready; _ready = false;
+            try
+            {
+                BaudRateField.SelectedItem = "115200"; DataBitsField.SelectedItem = "8"; ParityField.SelectedItem = "None";
+                StopBitsField.SelectedIndex = 0; FlowControlField.SelectedItem = "None"; DTRField.IsChecked = false; RTSField.IsChecked = false;
+            }
+            finally { _ready = ready; }
+        }
+        foreach (var control in new Control[] { BaudRateField, DataBitsField, ParityField, StopBitsField, FlowControlField, DTRField, RTSField }) control.IsEnabled = Protocol != 1;
         UdpLocalParameters.Visibility = Show(Transport == 1);
         TcpHost.Header = Transport == 3 ? "监听地址" : "远端地址";
         SerialParameters.Visibility = Show(UsesSerialDevice);

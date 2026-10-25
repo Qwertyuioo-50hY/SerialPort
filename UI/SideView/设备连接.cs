@@ -19,9 +19,10 @@ public sealed partial class AppWindow
     private CustomFrameDecoder? _customFrame;
     private bool _connecting;
     private bool _deviceReady;
+    private volatile bool _receivingEmtMeasurements;
     private void CloseDevice()
     {
-        _deviceStop?.Cancel(); _acquisitionStop?.Cancel(); _deviceReady = false;
+        _deviceStop?.Cancel(); _acquisitionStop?.Cancel(); _deviceReady = false; _receivingEmtMeasurements = false;
         if (_customFrame is not null) EndStreamAcquisition();
         if (_selectedChannel is not null) _selectedChannel.DataReceived -= DeviceBytesReceived;
         _selectedChannel = null;
@@ -58,7 +59,8 @@ public sealed partial class AppWindow
             else
                 await _networkConnection.OpenAsync(_protocolSettings.Transport == 1, settings.Host, settings.Port, settings.LocalHost, settings.LocalPort, token);
             token.ThrowIfCancellationRequested();
-            DeviceView.SetState(_protocolSettings.Transport == 3 ? "监听中，等待客户端" : "已连接", false, true);
+            if (_protocolSettings.Protocol == 1 && _protocolSettings.Transport != 3) await PerformEmtHandshakeAsync(_selectedChannel, token);
+            else DeviceView.SetState(_protocolSettings.Transport == 3 ? "监听中，等待客户端" : "已连接", false, true);
         }
         catch (Exception ex)
         {
@@ -78,11 +80,7 @@ public sealed partial class AppWindow
         DeviceView.SetState("握手中", true, true);
         try
         {
-            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 15)) throw new ArgumentException("激励频率需为 1–999 kHz，线圈数需为 1–15 的整数。");
-            var result = await EmtSampling.ExecuteAsync(channel, (int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount, token, _deviceSettings.ArrayType, _deviceSettings.ExcitationMode);
-            if (!result.IsSuccess) throw new InvalidOperationException(result.Message, result.Exception);
-            token.ThrowIfCancellationRequested(); _deviceReady = true;
-            DeviceView.SetState("握手成功", false, true);
+            await PerformEmtHandshakeAsync(channel, token);
         }
         catch (Exception ex)
         {
@@ -91,14 +89,23 @@ public sealed partial class AppWindow
         }
         finally { _connecting = false; }
     }
+    private async Task PerformEmtHandshakeAsync(IDeviceChannel channel, CancellationToken token)
+    {
+        DeviceView.SetState("握手中", true, true);
+        var result = await EmtHandshake.ExecuteAsync(channel, token);
+        if (!result.IsSuccess) throw new InvalidOperationException(result.Message, result.Exception);
+        token.ThrowIfCancellationRequested(); _deviceReady = true;
+        DeviceView.SetState("握手成功", false, true);
+    }
     private void DeviceBytesReceived(object? sender, LogEntry entry)
     {
         if (!ReferenceEquals(sender, _selectedChannel)) return;
         var bytes = entry.RawData.ToArray();
+        var binary = _receivingEmtMeasurements;
         DispatcherQueue.TryEnqueue(() =>
         {
             if (ReferenceEquals(sender, _selectedChannel) && !_connectionLifetime.IsCancellationRequested)
-                DeviceView.AppendReceived(bytes, _protocolSettings!.ReceiveEncoding);
+                DeviceView.AppendReceived(bytes, _protocolSettings!.ReceiveEncoding, binary);
         });
         lock (_decoderLock)
         {

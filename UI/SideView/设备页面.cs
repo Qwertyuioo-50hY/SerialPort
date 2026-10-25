@@ -36,7 +36,8 @@ public sealed partial class DevicePage : UserControl
         ImportStatus.Foreground = new SolidColorBrush(success ? Microsoft.UI.ColorHelper.FromArgb(255, 40, 170, 105) : Microsoft.UI.ColorHelper.FromArgb(255, 230, 85, 85));
         ImportStatus.Visibility = Visibility.Visible; _importTimer.Start();
     }
-    public void AppendReceived(byte[] bytes, string encoding) => ReceivedData.Append(bytes, encoding);
+    public void AppendReceived(byte[] bytes, string encoding, bool binary = false) => ReceivedData.Append(bytes, encoding, binary);
+    public void AppendEmtFrame(uint[] values) => ReceivedData.AppendEmtFrame(values);
     private void HandshakeClicked(object sender, RoutedEventArgs e) => ActionRequested?.Invoke(this, "握手");
     private void DisconnectClicked(object sender, RoutedEventArgs e) => ActionRequested?.Invoke(this, "断开");
     private void ConnectClicked(object sender, RoutedEventArgs e) => ActionRequested?.Invoke(this, "连接");

@@ -7,8 +7,8 @@ namespace Tomography.UI.SideView;
 
 public sealed class DeviceParametersView : UserControl
 {
-    private readonly NumberBox _frequency = new() { Value = 100, Minimum = 1, Maximum = 159 };
-    private readonly NumberBox _coils = new() { Value = 8, Minimum = 1, Maximum = 15 };
+    private readonly NumberBox _frequency = new() { Value = 100, Minimum = 1, Maximum = 500 };
+    private readonly NumberBox _coils = new() { Value = 8, Minimum = 1, Maximum = 32 };
     private readonly ClickComboBox _arrayType = new() { ItemsSource = new[] { "环形阵列（R）", "方形阵列（S）" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch, CornerRadius = new(12) };
     private readonly ClickComboBox _excitationMode = new() { ItemsSource = new[] { "恒压激励（V）", "恒流激励（I）" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch, CornerRadius = new(12) };
     public string ArrayType => _arrayType.SelectedIndex == 1 ? "S" : "R";

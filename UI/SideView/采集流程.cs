@@ -33,19 +33,20 @@ public sealed partial class AppWindow
         if (_deviceSettings.CoilCount != 8) { ShowDeviceError("当前成像算法需要 8 线圈、64 通道；其他线圈数量可握手并查看原始数据。"); return; }
         if (mode == AcquisitionMode.Reference) SetRealtimeReconstruction(false);
         _acquiringReference = mode == AcquisitionMode.Reference;
-        _sampling = true; _deviceSettings.IsEnabled = false;
+        _sampling = true; _receivingEmtMeasurements = true; _deviceSettings.IsEnabled = false;
         using var stop = CancellationTokenSource.CreateLinkedTokenSource(_deviceStop?.Token ?? _connectionLifetime.Token);
         _acquisitionStop = stop;
         var referenceFrames = new List<uint[]>();
         var count = 0;
         try
         {
-            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 15))
-                throw new ArgumentException("激励频率必须为 1–999 kHz 的整数，线圈数必须为 1–15 的整数。");
+            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 500) || !IsInteger(_deviceSettings.CoilCount, 1, 32))
+                throw new ArgumentException("激励频率必须为 1–500 kHz 的整数，线圈数必须为 1–32 的整数。");
             var result = await _acquisition.RunAsync(ActiveChannel, (int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount,
                 mode, _batchFrameTarget, frame =>
                 {
                     if (_connectionLifetime.IsCancellationRequested) return;
+                    DeviceView.AppendEmtFrame(frame);
                     count++; if (mode != AcquisitionMode.Reference) Workspace.ShowChannels(frame);
                     if (mode == AcquisitionMode.Reference) referenceFrames.Add(frame.ToArray());
                     else
@@ -68,7 +69,7 @@ public sealed partial class AppWindow
             ConnectionStatus.Text = result.Message;
         }
         catch (Exception ex) { if (!_connectionLifetime.IsCancellationRequested) ConnectionStatus.Text = ex.Message; }
-        finally { _acquiringReference = false; _sampling = false; _acquisitionStop = null; }
+        finally { _receivingEmtMeasurements = false; _acquiringReference = false; _sampling = false; _acquisitionStop = null; }
     }
     private static bool IsInteger(double value, int minimum, int maximum) => double.IsFinite(value)
         && value == Math.Truncate(value) && value >= minimum && value <= maximum;

@@ -106,8 +106,8 @@ public sealed partial class AppWindow
         if (_restoringDevice) return;
         try
         {
-            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 999) || !IsInteger(_deviceSettings.CoilCount, 1, 15))
-                throw new ArgumentException("频率需为 1–999 kHz、线圈需为 1–15 的整数。");
+            if (!IsInteger(_deviceSettings.FrequencyKhz, 1, 500) || !IsInteger(_deviceSettings.CoilCount, 1, 32))
+                throw new ArgumentException("频率需为 1–500 kHz、线圈需为 1–32 的整数。");
             _projectSettings.Device = _protocolSettings!.ReadSettings((int)_deviceSettings.FrequencyKhz, (int)_deviceSettings.CoilCount, _deviceSettings.ArrayType, _deviceSettings.ExcitationMode);
             _projectSettings.DefaultSerialPortConfig = _protocolSettings.GetSerialConfig();
             var path = ProjectSettingsPath; var result = await Task.Run(() => _projectConfig.Save(_projectSettings, path));

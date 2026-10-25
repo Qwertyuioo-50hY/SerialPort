@@ -1,6 +1,9 @@
 {
   "CustomFrame": null,
   "Device": {
+    "ProtocolVersion": 1,
+    "LocalHost": "0.0.0.0",
+    "LocalPort": 1347,
     "Source": 0,
     "Connection": 0,
     "Protocol": 1,
@@ -8,11 +11,13 @@
     "Port": 1346,
     "TimeoutSeconds": 3,
     "FrequencyKhz": 100,
+    "ArrayType": "R",
+    "ExcitationMode": "V",
     "CoilCount": 8
   },
   "ExperimentInputs": {},
   "DefaultSerialPortConfig": {
-    "PortName": "",
+    "PortName": "COM4",
     "BaudRate": 115200,
     "Parity": 0,
     "DataBits": 8,
@@ -22,7 +27,7 @@
     "WriteTimeout": 1000,
     "DtrEnable": false,
     "RtsEnable": false,
-    "EncodingName": "UTF-8"
+    "EncodingName": "ASCII"
   },
   "LogDirectoryPath": "C:\\Users\\qwq_5\\OneDrive\\Desktop\\EMT\\Seial_Port_C#\\SerialPort\\UI\\bin\\Debug\\net10.0-windows10.0.26100.0\\win-x64\\AppX\\Logs",
   "LogFilePath": "C:\\Users\\qwq_5\\OneDrive\\Desktop\\EMT\\Seial_Port_C#\\SerialPort\\UI\\bin\\Debug\\net10.0-windows10.0.26100.0\\win-x64\\AppX\\Logs\\serial.log",
